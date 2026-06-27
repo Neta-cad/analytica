@@ -1,0 +1,766 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Formula Library — Analytica</title>
+<link rel="stylesheet" href="../css/main.css">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+* { box-sizing: border-box; }
+body { background: #0A1628; min-height: 100vh; margin: 0; }
+
+.topnav {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  height: 60px;
+  background: rgba(10,22,40,0.95);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 20px;
+  z-index: 40;
+}
+.topnav-logo {
+  font-family: 'Playfair Display', serif;
+  font-size: 20px;
+  font-weight: 900;
+  color: #fff;
+  text-decoration: none;
+}
+.topnav-logo span { color: #F5A623; }
+.topnav-right { display: flex; gap: 10px; }
+.btn-sm {
+  padding: 7px 16px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  font-family: 'DM Sans', sans-serif;
+  cursor: pointer;
+  text-decoration: none;
+  transition: all 0.2s;
+  border: none;
+}
+.btn-gold { background: #F5A623; color: #0A1628; }
+.btn-gold:hover { background: #FFD07A; }
+.btn-outline {
+  background: transparent;
+  border: 1px solid rgba(255,255,255,0.2) !important;
+  color: #fff;
+}
+
+.page {
+  margin-top: 60px;
+  padding: 20px;
+  max-width: 1000px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.page-title {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(22px, 4vw, 30px);
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+.page-title span { color: #F5A623; }
+.page-sub { font-size: 13px; color: rgba(255,255,255,0.4); margin-bottom: 20px; }
+
+/* ── SEARCH ── */
+.search-box {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 10px;
+  padding: 12px 16px;
+  margin-bottom: 14px;
+}
+.search-box input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  color: #fff;
+  font-size: 15px;
+  font-family: 'DM Sans', sans-serif;
+  outline: none;
+}
+.search-box input::placeholder { color: rgba(255,255,255,0.3); }
+
+/* ── FILTER TABS ── */
+.filter-tabs {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding-bottom: 4px;
+  margin-bottom: 24px;
+}
+.filter-tabs::-webkit-scrollbar { display: none; }
+.tab {
+  padding: 7px 16px;
+  border-radius: 100px;
+  font-size: 13px;
+  font-weight: 500;
+  white-space: nowrap;
+  cursor: pointer;
+  border: 1px solid rgba(255,255,255,0.1);
+  color: rgba(255,255,255,0.5);
+  background: transparent;
+  font-family: 'DM Sans', sans-serif;
+  transition: all 0.2s;
+}
+.tab.active, .tab:hover {
+  background: rgba(245,166,35,0.12);
+  border-color: rgba(245,166,35,0.3);
+  color: #F5A623;
+}
+
+/* ── STATS ── */
+.lib-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin-bottom: 24px;
+}
+.lstat {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.07);
+  border-radius: 12px;
+  padding: 14px;
+  text-align: center;
+}
+.lstat-num {
+  font-family: 'Playfair Display', serif;
+  font-size: 22px;
+  font-weight: 700;
+  color: #F5A623;
+}
+.lstat-label {
+  font-size: 11px;
+  color: rgba(255,255,255,0.4);
+  margin-top: 2px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* ── FORMULA CARDS ── */
+.formulas-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 14px;
+}
+
+.formula-card {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.07);
+  border-radius: 14px;
+  padding: 20px;
+  transition: all 0.3s;
+  position: relative;
+}
+.formula-card:hover {
+  border-color: rgba(245,166,35,0.2);
+  transform: translateY(-2px);
+}
+
+.formula-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+.formula-left { flex: 1; }
+.formula-name {
+  font-size: 16px;
+  font-weight: 600;
+  color: #fff;
+  margin-bottom: 4px;
+}
+.formula-desc {
+  font-size: 13px;
+  color: rgba(255,255,255,0.45);
+  line-height: 1.5;
+}
+
+.formula-badges { display: flex; gap: 6px; flex-wrap: wrap; }
+.badge {
+  padding: 3px 10px;
+  border-radius: 100px;
+  font-size: 11px;
+  font-weight: 600;
+  border: 1px solid;
+  white-space: nowrap;
+}
+.badge-excel { background: rgba(39,174,96,0.1); color: #27AE60; border-color: rgba(39,174,96,0.3); }
+.badge-sql { background: rgba(52,152,219,0.1); color: #3498db; border-color: rgba(52,152,219,0.3); }
+.badge-dax { background: rgba(245,166,35,0.1); color: #F5A623; border-color: rgba(245,166,35,0.3); }
+.badge-python { background: rgba(155,89,182,0.1); color: #9b59b6; border-color: rgba(155,89,182,0.3); }
+.badge-easy { background: rgba(39,174,96,0.08); color: #2ecc71; border-color: rgba(39,174,96,0.15); }
+.badge-medium { background: rgba(245,166,35,0.08); color: #F5A623; border-color: rgba(245,166,35,0.15); }
+.badge-hard { background: rgba(231,76,60,0.08); color: #e74c3c; border-color: rgba(231,76,60,0.15); }
+
+/* Formula code block */
+.formula-code {
+  background: #0d1f3c;
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 8px;
+  padding: 12px 14px;
+  font-family: 'Courier New', monospace;
+  font-size: 13px;
+  color: #F5A623;
+  margin: 12px 0;
+  overflow-x: auto;
+  white-space: pre;
+  line-height: 1.6;
+}
+
+/* Example */
+.formula-example {
+  font-size: 12px;
+  color: rgba(255,255,255,0.35);
+  margin-bottom: 12px;
+  line-height: 1.5;
+}
+.formula-example strong { color: rgba(255,255,255,0.55); }
+
+/* Actions */
+.formula-actions { display: flex; gap: 8px; }
+.btn-copy {
+  padding: 7px 16px;
+  background: rgba(245,166,35,0.1);
+  border: 1px solid rgba(245,166,35,0.2);
+  border-radius: 7px;
+  color: #F5A623;
+  font-size: 12px;
+  font-weight: 600;
+  font-family: 'DM Sans', sans-serif;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.btn-copy:hover { background: rgba(245,166,35,0.2); }
+.btn-copy.copied {
+  background: rgba(39,174,96,0.15);
+  border-color: rgba(39,174,96,0.3);
+  color: #27AE60;
+}
+.btn-save-fav {
+  padding: 7px 12px;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 7px;
+  color: rgba(255,255,255,0.4);
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.btn-save-fav:hover { color: #F5A623; border-color: rgba(245,166,35,0.2); }
+
+/* Empty state */
+.empty-state {
+  text-align: center;
+  padding: 60px 24px;
+  color: rgba(255,255,255,0.3);
+}
+.empty-icon { font-size: 48px; margin-bottom: 14px; }
+.empty-title { font-size: 16px; font-weight: 600; color: rgba(255,255,255,0.4); }
+
+/* Toast */
+.toast {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  padding: 12px 20px;
+  background: #27AE60;
+  color: #fff;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  z-index: 9999;
+  opacity: 0;
+  transform: translateY(10px);
+  transition: all 0.3s;
+  pointer-events: none;
+}
+.toast.show { opacity: 1; transform: translateY(0); }
+
+@media (min-width: 700px) {
+  .formulas-grid { grid-template-columns: repeat(2, 1fr); }
+}
+</style>
+</head>
+<body>
+
+<div class="topnav">
+  <a href="../index.html" class="topnav-logo">Analytica<span>.</span></a>
+  <div class="topnav-right">
+    <a href="../dashboard/index.html" class="btn-sm btn-outline">Dashboard</a>
+    <a href="../auth/signup.html" class="btn-sm btn-gold">Join Free</a>
+  </div>
+</div>
+
+<div class="page">
+  <div class="page-title">Formula <span>Library</span></div>
+  <div class="page-sub">Search and copy Excel, SQL, DAX and Python formulas instantly</div>
+
+  <!-- Stats -->
+  <div class="lib-stats">
+    <div class="lstat"><div class="lstat-num">60+</div><div class="lstat-label">Formulas</div></div>
+    <div class="lstat"><div class="lstat-num">4</div><div class="lstat-label">Tools</div></div>
+    <div class="lstat"><div class="lstat-num">Free</div><div class="lstat-label">Always</div></div>
+  </div>
+
+  <!-- Search -->
+  <div class="search-box">
+    <span>🔍</span>
+    <input type="text" id="search-input" placeholder="Search formulas... e.g. 'count duplicates', 'average', 'join'" oninput="filterFormulas()">
+  </div>
+
+  <!-- Filter Tabs -->
+  <div class="filter-tabs">
+    <button class="tab active" onclick="setFilter('all', this)">All</button>
+    <button class="tab" onclick="setFilter('excel', this)">📗 Excel</button>
+    <button class="tab" onclick="setFilter('sql', this)">🗄️ SQL</button>
+    <button class="tab" onclick="setFilter('dax', this)">📊 DAX</button>
+    <button class="tab" onclick="setFilter('python', this)">🐍 Python</button>
+  </div>
+
+  <!-- Formulas Grid -->
+  <div class="formulas-grid" id="formulas-grid"></div>
+
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast">✅ Copied to clipboard!</div>
+
+<script>
+const formulas = [
+  // ── EXCEL ──
+  {
+    name: 'VLOOKUP',
+    tool: 'excel',
+    desc: 'Search for a value in the first column of a table and return a value in the same row.',
+    code: '=VLOOKUP(lookup_value, table_array, col_index, [range_lookup])',
+    example: 'Find employee salary by ID: =VLOOKUP(A2, EmployeeTable, 3, FALSE)',
+    level: 'easy'
+  },
+  {
+    name: 'XLOOKUP',
+    tool: 'excel',
+    desc: 'Modern replacement for VLOOKUP. Search any column, return any column.',
+    code: '=XLOOKUP(lookup_value, lookup_array, return_array, [if_not_found])',
+    example: 'Find name by ID: =XLOOKUP(A2, B:B, C:C, "Not Found")',
+    level: 'easy'
+  },
+  {
+    name: 'COUNTIF',
+    tool: 'excel',
+    desc: 'Count cells that meet a single condition.',
+    code: '=COUNTIF(range, criteria)',
+    example: 'Count Lagos entries: =COUNTIF(A:A, "Lagos")',
+    level: 'easy'
+  },
+  {
+    name: 'COUNTIFS',
+    tool: 'excel',
+    desc: 'Count cells that meet multiple conditions.',
+    code: '=COUNTIFS(range1, criteria1, range2, criteria2, ...)',
+    example: 'Count Lagos + Urban: =COUNTIFS(A:A,"Lagos",B:B,"Urban")',
+    level: 'easy'
+  },
+  {
+    name: 'SUMIF',
+    tool: 'excel',
+    desc: 'Sum values in a range that meet a condition.',
+    code: '=SUMIF(range, criteria, [sum_range])',
+    example: 'Sum sales for Lagos: =SUMIF(A:A, "Lagos", C:C)',
+    level: 'easy'
+  },
+  {
+    name: 'SUMIFS',
+    tool: 'excel',
+    desc: 'Sum values that meet multiple conditions.',
+    code: '=SUMIFS(sum_range, range1, criteria1, range2, criteria2)',
+    example: 'Sum Q1 Lagos sales: =SUMIFS(C:C,A:A,"Lagos",B:B,"Q1")',
+    level: 'medium'
+  },
+  {
+    name: 'INDEX MATCH',
+    tool: 'excel',
+    desc: 'Powerful alternative to VLOOKUP. Look up in any direction.',
+    code: '=INDEX(return_range, MATCH(lookup_value, lookup_range, 0))',
+    example: 'Find salary: =INDEX(C:C, MATCH(A2, B:B, 0))',
+    level: 'medium'
+  },
+  {
+    name: 'IF Statement',
+    tool: 'excel',
+    desc: 'Return one value if condition is true, another if false.',
+    code: '=IF(logical_test, value_if_true, value_if_false)',
+    example: 'Pass/Fail: =IF(A2>=50, "Pass", "Fail")',
+    level: 'easy'
+  },
+  {
+    name: 'Nested IF',
+    tool: 'excel',
+    desc: 'Multiple conditions using nested IF statements.',
+    code: '=IF(A2>=70,"A", IF(A2>=60,"B", IF(A2>=50,"C","F")))',
+    example: 'Grade system: A=70+, B=60+, C=50+, F=below 50',
+    level: 'medium'
+  },
+  {
+    name: 'IFS',
+    tool: 'excel',
+    desc: 'Test multiple conditions without nesting. Cleaner than nested IF.',
+    code: '=IFS(condition1, value1, condition2, value2, ...)',
+    example: '=IFS(A2>=70,"A", A2>=60,"B", A2>=50,"C", TRUE,"F")',
+    level: 'medium'
+  },
+  {
+    name: 'REMOVE DUPLICATES (UNIQUE)',
+    tool: 'excel',
+    desc: 'Return unique values from a list. Excel 365 only.',
+    code: '=UNIQUE(array, [by_col], [exactly_once])',
+    example: 'Unique states: =UNIQUE(A2:A100)',
+    level: 'easy'
+  },
+  {
+    name: 'TEXT',
+    tool: 'excel',
+    desc: 'Format a number or date as text with a specific format.',
+    code: '=TEXT(value, format_text)',
+    example: 'Format date: =TEXT(A2, "DD/MM/YYYY")',
+    level: 'easy'
+  },
+  {
+    name: 'CONCATENATE / TEXTJOIN',
+    tool: 'excel',
+    desc: 'Join multiple text strings into one.',
+    code: '=TEXTJOIN(" ", TRUE, A2, B2, C2)',
+    example: 'Full name: =TEXTJOIN(" ", TRUE, A2, B2)',
+    level: 'easy'
+  },
+  {
+    name: 'LEFT / RIGHT / MID',
+    tool: 'excel',
+    desc: 'Extract part of a text string.',
+    code: '=LEFT(text, num_chars)\n=RIGHT(text, num_chars)\n=MID(text, start_num, num_chars)',
+    example: 'Get first 3 chars: =LEFT(A2, 3)',
+    level: 'easy'
+  },
+  {
+    name: 'AVERAGEIF',
+    tool: 'excel',
+    desc: 'Calculate the average of cells that meet a condition.',
+    code: '=AVERAGEIF(range, criteria, [average_range])',
+    example: 'Avg salary in Lagos: =AVERAGEIF(A:A, "Lagos", C:C)',
+    level: 'easy'
+  },
+  {
+    name: 'PIVOT — Dynamic Array',
+    tool: 'excel',
+    desc: 'Summarize data without a Pivot Table using GROUPBY (Excel 365).',
+    code: '=GROUPBY(row_fields, values, function)',
+    example: 'Sum by state: =GROUPBY(A2:A100, C2:C100, SUM)',
+    level: 'hard'
+  },
+
+  // ── SQL ──
+  {
+    name: 'SELECT with WHERE',
+    tool: 'sql',
+    desc: 'Filter rows from a table based on a condition.',
+    code: 'SELECT column1, column2\nFROM table_name\nWHERE condition;',
+    example: 'SELECT name, salary FROM employees WHERE state = \'Lagos\';',
+    level: 'easy'
+  },
+  {
+    name: 'GROUP BY with COUNT',
+    tool: 'sql',
+    desc: 'Count rows grouped by a column.',
+    code: 'SELECT column, COUNT(*) AS total\nFROM table_name\nGROUP BY column\nORDER BY total DESC;',
+    example: 'SELECT state, COUNT(*) FROM employees GROUP BY state;',
+    level: 'easy'
+  },
+  {
+    name: 'INNER JOIN',
+    tool: 'sql',
+    desc: 'Combine rows from two tables where condition matches.',
+    code: 'SELECT a.col1, b.col2\nFROM table_a a\nINNER JOIN table_b b ON a.id = b.id;',
+    example: 'SELECT e.name, d.dept FROM employees e INNER JOIN departments d ON e.dept_id = d.id;',
+    level: 'medium'
+  },
+  {
+    name: 'LEFT JOIN',
+    tool: 'sql',
+    desc: 'Return all rows from left table, matching rows from right.',
+    code: 'SELECT a.col1, b.col2\nFROM table_a a\nLEFT JOIN table_b b ON a.id = b.id;',
+    example: 'Get all employees even without a department assigned.',
+    level: 'medium'
+  },
+  {
+    name: 'CASE WHEN',
+    tool: 'sql',
+    desc: 'Add conditional logic inside a SQL query.',
+    code: 'SELECT name,\n  CASE\n    WHEN salary > 500000 THEN \'Senior\'\n    WHEN salary > 200000 THEN \'Mid\'\n    ELSE \'Junior\'\n  END AS level\nFROM employees;',
+    example: 'Classify employees by salary range.',
+    level: 'medium'
+  },
+  {
+    name: 'REMOVE DUPLICATES',
+    tool: 'sql',
+    desc: 'Select only unique rows.',
+    code: 'SELECT DISTINCT column1, column2\nFROM table_name;',
+    example: 'SELECT DISTINCT state FROM employees;',
+    level: 'easy'
+  },
+  {
+    name: 'WINDOW FUNCTION — ROW_NUMBER',
+    tool: 'sql',
+    desc: 'Assign a row number within a partition.',
+    code: 'SELECT name,\n  ROW_NUMBER() OVER (PARTITION BY dept ORDER BY salary DESC) AS rank\nFROM employees;',
+    example: 'Rank employees by salary within each department.',
+    level: 'hard'
+  },
+  {
+    name: 'SUBQUERY',
+    tool: 'sql',
+    desc: 'Use a query inside another query.',
+    code: 'SELECT name, salary\nFROM employees\nWHERE salary > (SELECT AVG(salary) FROM employees);',
+    example: 'Find employees earning above average salary.',
+    level: 'medium'
+  },
+  {
+    name: 'CTE (Common Table Expression)',
+    tool: 'sql',
+    desc: 'Create a temporary named result set.',
+    code: 'WITH summary AS (\n  SELECT state, COUNT(*) AS total\n  FROM employees\n  GROUP BY state\n)\nSELECT * FROM summary WHERE total > 10;',
+    example: 'States with more than 10 employees.',
+    level: 'hard'
+  },
+  {
+    name: 'HAVING Clause',
+    tool: 'sql',
+    desc: 'Filter groups after GROUP BY (like WHERE but for groups).',
+    code: 'SELECT state, COUNT(*) AS total\nFROM employees\nGROUP BY state\nHAVING COUNT(*) > 5;',
+    example: 'States with more than 5 employees.',
+    level: 'medium'
+  },
+
+  // ── DAX ──
+  {
+    name: 'CALCULATE',
+    tool: 'dax',
+    desc: 'Evaluate an expression in a modified filter context.',
+    code: 'CALCULATE(expression, filter1, filter2, ...)',
+    example: 'Lagos Sales = CALCULATE(SUM(Sales[Amount]), Sales[State]="Lagos")',
+    level: 'medium'
+  },
+  {
+    name: 'SUMX',
+    tool: 'dax',
+    desc: 'Iterate over a table and sum an expression.',
+    code: 'SUMX(table, expression)',
+    example: 'Total Revenue = SUMX(Orders, Orders[Qty] * Orders[Price])',
+    level: 'medium'
+  },
+  {
+    name: 'DIVIDE',
+    tool: 'dax',
+    desc: 'Safe division that handles divide-by-zero.',
+    code: 'DIVIDE(numerator, denominator, [alternate_result])',
+    example: 'Profit Margin = DIVIDE([Profit], [Revenue], 0)',
+    level: 'easy'
+  },
+  {
+    name: 'ALL',
+    tool: 'dax',
+    desc: 'Remove all filters from a table or column.',
+    code: 'ALL(table_or_column)',
+    example: '% of Total = DIVIDE([Sales], CALCULATE([Sales], ALL(Sales)))',
+    level: 'hard'
+  },
+  {
+    name: 'RELATED',
+    tool: 'dax',
+    desc: 'Retrieve a value from a related table.',
+    code: 'RELATED(column)',
+    example: 'Category = RELATED(Products[Category])',
+    level: 'medium'
+  },
+  {
+    name: 'TIME INTELLIGENCE — YTD',
+    tool: 'dax',
+    desc: 'Calculate year-to-date total.',
+    code: 'TOTALYTD(expression, dates_column)',
+    example: 'YTD Sales = TOTALYTD(SUM(Sales[Amount]), Calendar[Date])',
+    level: 'medium'
+  },
+
+  // ── PYTHON ──
+  {
+    name: 'Read CSV with Pandas',
+    tool: 'python',
+    desc: 'Load a CSV file into a Pandas DataFrame.',
+    code: 'import pandas as pd\ndf = pd.read_csv("filename.csv")\nprint(df.head())',
+    example: 'Load Nigerian labour force data into Python.',
+    level: 'easy'
+  },
+  {
+    name: 'Filter Rows',
+    tool: 'python',
+    desc: 'Filter DataFrame rows based on a condition.',
+    code: 'df_filtered = df[df["state"] == "Lagos"]\n# Multiple conditions:\ndf_filtered = df[(df["state"] == "Lagos") & (df["sector"] == "Urban")]',
+    example: 'Get only Lagos urban households.',
+    level: 'easy'
+  },
+  {
+    name: 'Group By and Aggregate',
+    tool: 'python',
+    desc: 'Group data and calculate statistics.',
+    code: 'result = df.groupby("state")["household_size"].agg(["mean", "count", "sum"])\nprint(result)',
+    example: 'Average household size per state.',
+    level: 'easy'
+  },
+  {
+    name: 'Remove Duplicates',
+    tool: 'python',
+    desc: 'Drop duplicate rows from a DataFrame.',
+    code: 'df_clean = df.drop_duplicates()\n# Drop duplicates based on specific columns:\ndf_clean = df.drop_duplicates(subset=["name", "email"])',
+    example: 'Remove duplicate household records.',
+    level: 'easy'
+  },
+  {
+    name: 'Handle Missing Values',
+    tool: 'python',
+    desc: 'Find and fill or drop missing values.',
+    code: 'df.isnull().sum()         # Count missing values\ndf.fillna(0)               # Fill with 0\ndf.dropna()                # Drop rows with nulls\ndf["col"].fillna(df["col"].mean())  # Fill with mean',
+    example: 'Clean missing salary data.',
+    level: 'medium'
+  },
+  {
+    name: 'Plot a Bar Chart',
+    tool: 'python',
+    desc: 'Create a bar chart using matplotlib.',
+    code: 'import matplotlib.pyplot as plt\ndf.groupby("state")["sales"].sum().plot(kind="bar")\nplt.title("Sales by State")\nplt.tight_layout()\nplt.show()',
+    example: 'Visualize sales by state.',
+    level: 'medium'
+  },
+  {
+    name: 'Correlation Matrix',
+    tool: 'python',
+    desc: 'Find correlations between numeric columns.',
+    code: 'import seaborn as sns\ncorr = df.corr()\nsns.heatmap(corr, annot=True, cmap="coolwarm")',
+    example: 'Find which variables are correlated in your dataset.',
+    level: 'hard'
+  }
+]
+
+let currentFilter = 'all'
+
+// ── RENDER ──
+function renderFormulas(data) {
+  const grid = document.getElementById('formulas-grid')
+
+  if (data.length === 0) {
+    grid.innerHTML = `
+      <div class="empty-state" style="grid-column:1/-1">
+        <div class="empty-icon">🔍</div>
+        <div class="empty-title">No formulas found</div>
+        <div style="font-size:13px;color:rgba(255,255,255,0.3);margin-top:6px;">Try a different search term</div>
+      </div>`
+    return
+  }
+
+  grid.innerHTML = data.map((f, i) => `
+    <div class="formula-card">
+      <div class="formula-top">
+        <div class="formula-left">
+          <div class="formula-name">${f.name}</div>
+          <div class="formula-desc">${f.desc}</div>
+        </div>
+        <div class="formula-badges">
+          <span class="badge badge-${f.tool}">${f.tool.toUpperCase()}</span>
+          <span class="badge badge-${f.level}">${f.level}</span>
+        </div>
+      </div>
+      <div class="formula-code">${escapeHtml(f.code)}</div>
+      <div class="formula-example"><strong>Example:</strong> ${escapeHtml(f.example)}</div>
+      <div class="formula-actions">
+        <button class="btn-copy" id="copy-${i}" onclick="copyFormula('${escapeJs(f.code)}', ${i})">
+          📋 Copy Formula
+        </button>
+        <button class="btn-save-fav">🔖</button>
+      </div>
+    </div>
+  `).join('')
+}
+
+// ── COPY ──
+function copyFormula(code, index) {
+  navigator.clipboard.writeText(code).then(() => {
+    const btn = document.getElementById(`copy-${index}`)
+    btn.textContent = '✅ Copied!'
+    btn.classList.add('copied')
+    showToast()
+    setTimeout(() => {
+      btn.textContent = '📋 Copy Formula'
+      btn.classList.remove('copied')
+    }, 2000)
+  })
+}
+
+function showToast() {
+  const toast = document.getElementById('toast')
+  toast.classList.add('show')
+  setTimeout(() => toast.classList.remove('show'), 2000)
+}
+
+// ── FILTER ──
+function setFilter(filter, btn) {
+  currentFilter = filter
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'))
+  btn.classList.add('active')
+  filterFormulas()
+}
+
+function filterFormulas() {
+  const search = document.getElementById('search-input').value.toLowerCase()
+  let filtered = formulas
+
+  if (currentFilter !== 'all') {
+    filtered = filtered.filter(f => f.tool === currentFilter)
+  }
+
+  if (search) {
+    filtered = filtered.filter(f =>
+      f.name.toLowerCase().includes(search) ||
+      f.desc.toLowerCase().includes(search) ||
+      f.code.toLowerCase().includes(search) ||
+      f.example.toLowerCase().includes(search)
+    )
+  }
+
+  renderFormulas(filtered)
+}
+
+// ── HELPERS ──
+function escapeHtml(str) {
+  return String(str)
+    .replace(/&/g,'&amp;')
+    .replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;')
+}
+
+function escapeJs(str) {
+  return str.replace(/'/g, "\\'").replace(/\n/g, '\\n')
+}
+
+// ── INIT ──
+renderFormulas(formulas)
+</script>
+</body>
+</html>

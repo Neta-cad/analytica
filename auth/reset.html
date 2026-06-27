@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Reset Password — Analytica</title>
+<link rel="stylesheet" href="../css/main.css">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+body {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: #0A1628;
+  position: relative;
+  overflow: hidden;
+}
+body::before {
+  content: '';
+  position: fixed; inset: 0;
+  background-image:
+    linear-gradient(rgba(245,166,35,0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(245,166,35,0.04) 1px, transparent 1px);
+  background-size: 50px 50px;
+  pointer-events: none;
+}
+.orb {
+  position: fixed;
+  border-radius: 50%;
+  filter: blur(70px);
+  pointer-events: none;
+}
+.orb-1 { width:300px; height:300px; background:rgba(245,166,35,0.08); top:-80px; right:-80px; }
+.orb-2 { width:250px; height:250px; background:rgba(26,58,107,0.5); bottom:-60px; left:-60px; }
+
+.auth-card {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 20px;
+  padding: 40px 32px;
+  width: 100%;
+  max-width: 420px;
+  position: relative;
+  z-index: 2;
+}
+.auth-logo {
+  font-family: 'Playfair Display', serif;
+  font-size: 24px;
+  font-weight: 900;
+  color: #fff;
+  text-align: center;
+  margin-bottom: 8px;
+  display: block;
+  text-decoration: none;
+}
+.auth-logo span { color: #F5A623; }
+.auth-tagline {
+  text-align: center;
+  font-size: 13px;
+  color: rgba(255,255,255,0.4);
+  margin-bottom: 32px;
+}
+.auth-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 26px;
+  font-weight: 700;
+  text-align: center;
+  margin-bottom: 6px;
+}
+.auth-sub {
+  text-align: center;
+  font-size: 13px;
+  color: rgba(255,255,255,0.45);
+  margin-bottom: 28px;
+  line-height: 1.6;
+}
+.form-group { margin-bottom: 18px; }
+label {
+  display: block;
+  font-size: 13px;
+  font-weight: 500;
+  color: rgba(255,255,255,0.7);
+  margin-bottom: 7px;
+}
+input {
+  width: 100%;
+  padding: 12px 16px;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 8px;
+  color: #fff;
+  font-size: 14px;
+  font-family: 'DM Sans', sans-serif;
+  outline: none;
+  transition: border-color 0.2s;
+}
+input:focus { border-color: #F5A623; }
+input::placeholder { color: rgba(255,255,255,0.25); }
+
+.btn-submit {
+  width: 100%;
+  padding: 14px;
+  background: #F5A623;
+  border: none;
+  border-radius: 8px;
+  color: #0A1628;
+  font-size: 15px;
+  font-weight: 700;
+  font-family: 'DM Sans', sans-serif;
+  cursor: pointer;
+  transition: all 0.2s;
+  margin-top: 8px;
+}
+.btn-submit:hover { background: #FFD07A; transform: translateY(-1px); }
+.btn-submit:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+
+.back-link {
+  text-align: center;
+  font-size: 13px;
+  color: rgba(255,255,255,0.45);
+  margin-top: 20px;
+}
+.back-link a { color: #F5A623; font-weight: 600; text-decoration: none; }
+
+.alert {
+  padding: 12px 16px;
+  border-radius: 8px;
+  font-size: 13px;
+  margin-bottom: 18px;
+  display: none;
+}
+.alert.error { background: rgba(231,76,60,0.15); border: 1px solid rgba(231,76,60,0.3); color: #ff6b6b; display: block; }
+.alert.success { background: rgba(39,174,96,0.15); border: 1px solid rgba(39,174,96,0.3); color: #2ecc71; display: block; }
+
+/* Steps */
+.step { display: none; }
+.step.active { display: block; }
+
+.success-box {
+  text-align: center;
+  padding: 20px 0;
+}
+.success-icon { font-size: 56px; margin-bottom: 16px; }
+.success-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 22px;
+  font-weight: 700;
+  margin-bottom: 10px;
+}
+.success-desc {
+  font-size: 13px;
+  color: rgba(255,255,255,0.45);
+  line-height: 1.7;
+  margin-bottom: 24px;
+}
+</style>
+</head>
+<body>
+
+<div class="orb orb-1"></div>
+<div class="orb orb-2"></div>
+
+<div class="auth-card">
+  <a href="../index.html" class="auth-logo">Analytica<span>.</span></a>
+  <p class="auth-tagline">Africa's Data Intelligence Platform</p>
+
+  <!-- Step 1: Enter Email -->
+  <div class="step active" id="step-1">
+    <h1 class="auth-title">Reset Password</h1>
+    <p class="auth-sub">Enter your email address and we'll send you a link to reset your password.</p>
+
+    <div class="alert" id="step1-alert"></div>
+
+    <div class="form-group">
+      <label for="email">Email Address</label>
+      <input type="email" id="email" placeholder="you@example.com" required>
+    </div>
+
+    <button class="btn-submit" id="send-btn" onclick="sendResetEmail()">
+      Send Reset Link →
+    </button>
+
+    <p class="back-link">
+      Remember your password? <a href="login.html">Log In</a>
+    </p>
+  </div>
+
+  <!-- Step 2: Success -->
+  <div class="step" id="step-2">
+    <div class="success-box">
+      <div class="success-icon">📧</div>
+      <div class="success-title">Check Your Email!</div>
+      <p class="success-desc">
+        We sent a password reset link to <strong id="sent-email" style="color:#F5A623;"></strong>.
+        Click the link in the email to set a new password.
+      </p>
+      <p style="font-size:12px;color:rgba(255,255,255,0.3);margin-bottom:24px;">
+        Didn't receive it? Check your spam folder or try again.
+      </p>
+      <button class="btn-submit" onclick="showStep(1)" style="margin-bottom:12px;">
+        ← Try Again
+      </button>
+      <a href="login.html" style="display:block;text-align:center;font-size:13px;color:#F5A623;font-weight:600;text-decoration:none;">
+        Back to Login
+      </a>
+    </div>
+  </div>
+
+  <!-- Step 3: New Password (after clicking email link) -->
+  <div class="step" id="step-3">
+    <h1 class="auth-title">Set New Password</h1>
+    <p class="auth-sub">Enter your new password below.</p>
+
+    <div class="alert" id="step3-alert"></div>
+
+    <div class="form-group">
+      <label>New Password</label>
+      <input type="password" id="new-password" placeholder="Min. 8 characters">
+    </div>
+    <div class="form-group">
+      <label>Confirm Password</label>
+      <input type="password" id="confirm-password" placeholder="Repeat new password">
+    </div>
+
+    <button class="btn-submit" id="update-btn" onclick="updatePassword()">
+      Update Password →
+    </button>
+  </div>
+
+  <!-- Step 4: Password Updated -->
+  <div class="step" id="step-4">
+    <div class="success-box">
+      <div class="success-icon">✅</div>
+      <div class="success-title">Password Updated!</div>
+      <p class="success-desc">Your password has been successfully updated. You can now log in with your new password.</p>
+      <a href="login.html" class="btn-submit" style="display:block;text-align:center;text-decoration:none;">
+        Go to Login →
+      </a>
+    </div>
+  </div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="../js/supabase.js"></script>
+<script>
+
+// ── CHECK IF COMING FROM RESET LINK ──
+window.addEventListener('load', async () => {
+  const hash = window.location.hash
+  if (hash && hash.includes('type=recovery')) {
+    showStep(3)
+  }
+})
+
+// ── SHOW STEP ──
+function showStep(n) {
+  document.querySelectorAll('.step').forEach(s => s.classList.remove('active'))
+  document.getElementById(`step-${n}`).classList.add('active')
+}
+
+// ── SEND RESET EMAIL ──
+async function sendResetEmail() {
+  const email = document.getElementById('email').value.trim()
+  const alertBox = document.getElementById('step1-alert')
+  const btn = document.getElementById('send-btn')
+
+  if (!email) {
+    alertBox.textContent = 'Please enter your email address.'
+    alertBox.className = 'alert error'
+    return
+  }
+
+  btn.disabled = true
+  btn.textContent = 'Sending...'
+
+  const { error } = await db.auth.resetPasswordForEmail(email, {
+    redirectTo: `${window.location.origin}/auth/reset.html`
+  })
+
+  if (error) {
+    alertBox.textContent = error.message
+    alertBox.className = 'alert error'
+    btn.disabled = false
+    btn.textContent = 'Send Reset Link →'
+    return
+  }
+
+  document.getElementById('sent-email').textContent = email
+  showStep(2)
+}
+
+// ── UPDATE PASSWORD ──
+async function updatePassword() {
+  const newPass = document.getElementById('new-password').value
+  const confirmPass = document.getElementById('confirm-password').value
+  const alertBox = document.getElementById('step3-alert')
+  const btn = document.getElementById('update-btn')
+
+  if (newPass.length < 8) {
+    alertBox.textContent = 'Password must be at least 8 characters.'
+    alertBox.className = 'alert error'
+    return
+  }
+
+  if (newPass !== confirmPass) {
+    alertBox.textContent = 'Passwords do not match.'
+    alertBox.className = 'alert error'
+    return
+  }
+
+  btn.disabled = true
+  btn.textContent = 'Updating...'
+
+  const { error } = await db.auth.updateUser({ password: newPass })
+
+  if (error) {
+    alertBox.textContent = error.message
+    alertBox.className = 'alert error'
+    btn.disabled = false
+    btn.textContent = 'Update Password →'
+    return
+  }
+
+  showStep(4)
+}
+</script>
+</body>
+</html>

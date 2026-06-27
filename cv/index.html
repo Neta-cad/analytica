@@ -1,0 +1,858 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CV & Portfolio Builder — Analytica</title>
+<link rel="stylesheet" href="../css/main.css">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+* { box-sizing: border-box; }
+body { background: #0A1628; min-height: 100vh; margin: 0; }
+
+.topnav {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  height: 60px;
+  background: rgba(10,22,40,0.95);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 20px;
+  z-index: 40;
+}
+.topnav-logo {
+  font-family: 'Playfair Display', serif;
+  font-size: 20px;
+  font-weight: 900;
+  color: #fff;
+  text-decoration: none;
+}
+.topnav-logo span { color: #F5A623; }
+.topnav-right { display: flex; gap: 10px; }
+.btn-sm {
+  padding: 7px 16px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  font-family: 'DM Sans', sans-serif;
+  cursor: pointer;
+  text-decoration: none;
+  transition: all 0.2s;
+  border: none;
+}
+.btn-gold { background: #F5A623; color: #0A1628; }
+.btn-gold:hover { background: #FFD07A; }
+.btn-outline {
+  background: transparent;
+  border: 1px solid rgba(255,255,255,0.2) !important;
+  color: #fff;
+}
+
+.page {
+  margin-top: 60px;
+  padding: 28px 20px;
+  max-width: 1100px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.page-title {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(24px, 5vw, 36px);
+  font-weight: 700;
+  margin-bottom: 6px;
+}
+.page-title span { color: #F5A623; }
+.page-sub { font-size: 14px; color: rgba(255,255,255,0.45); margin-bottom: 28px; }
+
+/* ── STEPS ── */
+.steps-row {
+  display: flex;
+  gap: 0;
+  margin-bottom: 28px;
+  overflow-x: auto;
+  padding-bottom: 4px;
+}
+.steps-row::-webkit-scrollbar { display: none; }
+.step-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+.step-num {
+  width: 30px; height: 30px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  font-weight: 700;
+  border: 2px solid rgba(255,255,255,0.15);
+  color: rgba(255,255,255,0.4);
+  transition: all 0.3s;
+}
+.step-num.active {
+  background: #F5A623;
+  border-color: #F5A623;
+  color: #0A1628;
+}
+.step-num.done {
+  background: #27AE60;
+  border-color: #27AE60;
+  color: #fff;
+}
+.step-label {
+  font-size: 12px;
+  font-weight: 500;
+  color: rgba(255,255,255,0.35);
+  white-space: nowrap;
+}
+.step-label.active { color: #F5A623; }
+.step-line {
+  width: 32px; height: 2px;
+  background: rgba(255,255,255,0.08);
+  flex-shrink: 0;
+}
+
+/* ── LAYOUT ── */
+.builder-layout {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* ── FORM PANEL ── */
+.form-panel {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.07);
+  border-radius: 16px;
+  padding: 24px;
+}
+.panel-title {
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Form elements */
+.form-group { margin-bottom: 16px; }
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+label {
+  display: block;
+  font-size: 12px;
+  font-weight: 500;
+  color: rgba(255,255,255,0.55);
+  margin-bottom: 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+input, select, textarea {
+  width: 100%;
+  padding: 11px 14px;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 8px;
+  color: #fff;
+  font-size: 14px;
+  font-family: 'DM Sans', sans-serif;
+  outline: none;
+  transition: border-color 0.2s;
+}
+input:focus, select:focus, textarea:focus { border-color: #F5A623; }
+input::placeholder, textarea::placeholder { color: rgba(255,255,255,0.25); }
+select option { background: #112240; }
+textarea { resize: vertical; min-height: 80px; }
+
+/* Skills input */
+.skills-input-wrap {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+.skills-input-wrap input { flex: 1; }
+.btn-add {
+  padding: 11px 16px;
+  background: rgba(245,166,35,0.12);
+  border: 1px solid rgba(245,166,35,0.25);
+  border-radius: 8px;
+  color: #F5A623;
+  font-size: 13px;
+  font-weight: 600;
+  font-family: 'DM Sans', sans-serif;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.2s;
+}
+.btn-add:hover { background: rgba(245,166,35,0.2); }
+
+.skills-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.skill-chip {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  background: rgba(245,166,35,0.1);
+  border: 1px solid rgba(245,166,35,0.2);
+  border-radius: 100px;
+  font-size: 12px;
+  color: #F5A623;
+}
+.skill-chip button {
+  background: none;
+  border: none;
+  color: rgba(245,166,35,0.6);
+  cursor: pointer;
+  padding: 0;
+  font-size: 14px;
+  width: auto;
+  display: inline;
+}
+
+/* Project item */
+.project-item {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.07);
+  border-radius: 10px;
+  padding: 14px;
+  margin-bottom: 10px;
+  position: relative;
+}
+.project-item .remove-btn {
+  position: absolute;
+  top: 10px; right: 10px;
+  background: rgba(231,76,60,0.1);
+  border: 1px solid rgba(231,76,60,0.2);
+  border-radius: 6px;
+  color: #e74c3c;
+  width: 26px; height: 26px;
+  font-size: 14px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Navigation buttons */
+.nav-buttons {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 20px;
+}
+.btn-prev {
+  padding: 12px 24px;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 8px;
+  color: rgba(255,255,255,0.6);
+  font-size: 14px;
+  font-weight: 500;
+  font-family: 'DM Sans', sans-serif;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.btn-prev:hover { border-color: #F5A623; color: #F5A623; }
+.btn-next {
+  padding: 12px 28px;
+  background: #F5A623;
+  border: none;
+  border-radius: 8px;
+  color: #0A1628;
+  font-size: 14px;
+  font-weight: 700;
+  font-family: 'DM Sans', sans-serif;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.btn-next:hover { background: #FFD07A; }
+
+/* ── CV PREVIEW ── */
+.preview-panel {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.07);
+  border-radius: 16px;
+  padding: 20px;
+}
+.preview-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.preview-title { font-size: 14px; font-weight: 600; color: rgba(255,255,255,0.6); }
+.btn-download-cv {
+  padding: 9px 18px;
+  background: rgba(39,174,96,0.12);
+  border: 1px solid rgba(39,174,96,0.25);
+  border-radius: 7px;
+  color: #27AE60;
+  font-size: 13px;
+  font-weight: 600;
+  font-family: 'DM Sans', sans-serif;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.btn-download-cv:hover { background: rgba(39,174,96,0.2); }
+
+/* CV Paper */
+.cv-paper {
+  background: #fff;
+  color: #1a1a2e;
+  border-radius: 8px;
+  padding: 32px 28px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 12px;
+  line-height: 1.5;
+  min-height: 400px;
+}
+.cv-header-section {
+  border-bottom: 3px solid #0A1628;
+  padding-bottom: 14px;
+  margin-bottom: 16px;
+}
+.cv-name {
+  font-family: 'Playfair Display', serif;
+  font-size: 24px;
+  font-weight: 900;
+  color: #0A1628;
+  margin-bottom: 4px;
+}
+.cv-role {
+  font-size: 14px;
+  color: #F5A623;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+.cv-contact {
+  font-size: 11px;
+  color: #666;
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+.cv-section { margin-bottom: 16px; }
+.cv-section-title {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: #0A1628;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 4px;
+  margin-bottom: 8px;
+}
+.cv-summary { font-size: 12px; color: #444; line-height: 1.6; }
+.cv-skills-wrap { display: flex; flex-wrap: wrap; gap: 6px; }
+.cv-skill {
+  padding: 2px 10px;
+  background: #f0f4ff;
+  border-radius: 100px;
+  font-size: 11px;
+  color: #0A1628;
+  font-weight: 500;
+}
+.cv-project { margin-bottom: 10px; }
+.cv-project-title { font-size: 12px; font-weight: 700; color: #0A1628; }
+.cv-project-desc { font-size: 11px; color: #555; margin-top: 2px; }
+.cv-project-tools { font-size: 10px; color: #F5A623; margin-top: 2px; }
+
+.cv-placeholder {
+  text-align: center;
+  padding: 60px 20px;
+  color: #999;
+}
+.cv-placeholder-icon { font-size: 40px; margin-bottom: 12px; }
+.cv-placeholder-text { font-size: 13px; }
+
+/* Template selector */
+.template-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin-bottom: 20px;
+}
+.template-btn {
+  padding: 14px 8px;
+  border-radius: 10px;
+  border: 2px solid rgba(255,255,255,0.1);
+  background: rgba(255,255,255,0.03);
+  color: rgba(255,255,255,0.5);
+  font-size: 12px;
+  font-family: 'DM Sans', sans-serif;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-align: center;
+}
+.template-btn.active, .template-btn:hover {
+  border-color: #F5A623;
+  color: #F5A623;
+  background: rgba(245,166,35,0.08);
+}
+.template-icon { font-size: 22px; margin-bottom: 4px; }
+
+@media (min-width: 900px) {
+  .builder-layout { flex-direction: row; align-items: flex-start; }
+  .form-panel { width: 480px; flex-shrink: 0; }
+  .preview-panel { flex: 1; position: sticky; top: 80px; }
+}
+</style>
+</head>
+<body>
+
+<div class="topnav">
+  <a href="../index.html" class="topnav-logo">Analytica<span>.</span></a>
+  <div class="topnav-right">
+    <a href="../dashboard/index.html" class="btn-sm btn-outline">Dashboard</a>
+    <a href="../auth/signup.html" class="btn-sm btn-gold">Join Free</a>
+  </div>
+</div>
+
+<div class="page">
+  <div class="page-title">CV & Portfolio <span>Builder</span></div>
+  <div class="page-sub">Build a professional data analyst CV in minutes — free, no design skills needed</div>
+
+  <!-- Steps -->
+  <div class="steps-row">
+    <div class="step-item">
+      <div class="step-num active" id="step-1">1</div>
+      <div class="step-label active" id="step-label-1">Personal Info</div>
+    </div>
+    <div class="step-line"></div>
+    <div class="step-item">
+      <div class="step-num" id="step-2">2</div>
+      <div class="step-label" id="step-label-2">Skills</div>
+    </div>
+    <div class="step-line"></div>
+    <div class="step-item">
+      <div class="step-num" id="step-3">3</div>
+      <div class="step-label" id="step-label-3">Projects</div>
+    </div>
+    <div class="step-line"></div>
+    <div class="step-item">
+      <div class="step-num" id="step-4">4</div>
+      <div class="step-label" id="step-label-4">Template</div>
+    </div>
+    <div class="step-line"></div>
+    <div class="step-item">
+      <div class="step-num" id="step-5">5</div>
+      <div class="step-label" id="step-label-5">Download</div>
+    </div>
+  </div>
+
+  <div class="builder-layout">
+
+    <!-- Form Panel -->
+    <div class="form-panel" id="form-panel">
+
+      <!-- STEP 1: Personal Info -->
+      <div id="section-1">
+        <div class="panel-title">👤 Personal Information</div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>First Name</label>
+            <input type="text" id="cv-firstname" placeholder="Ayomide" oninput="updatePreview()">
+          </div>
+          <div class="form-group">
+            <label>Last Name</label>
+            <input type="text" id="cv-lastname" placeholder="Akingboye" oninput="updatePreview()">
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Professional Title</label>
+          <input type="text" id="cv-title" placeholder="Data Analyst" oninput="updatePreview()">
+        </div>
+        <div class="form-group">
+          <label>Email</label>
+          <input type="email" id="cv-email" placeholder="you@example.com" oninput="updatePreview()">
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Phone</label>
+            <input type="text" id="cv-phone" placeholder="+234 800 000 0000" oninput="updatePreview()">
+          </div>
+          <div class="form-group">
+            <label>Location</label>
+            <input type="text" id="cv-location" placeholder="Lagos, Nigeria" oninput="updatePreview()">
+          </div>
+        </div>
+        <div class="form-group">
+          <label>LinkedIn / GitHub URL</label>
+          <input type="text" id="cv-linkedin" placeholder="linkedin.com/in/yourname" oninput="updatePreview()">
+        </div>
+        <div class="form-group">
+          <label>Professional Summary</label>
+          <textarea id="cv-summary" placeholder="Brief summary of your experience and what you bring to a data role..." oninput="updatePreview()"></textarea>
+        </div>
+        <div class="nav-buttons">
+          <div></div>
+          <button class="btn-next" onclick="goToStep(2)">Next: Skills →</button>
+        </div>
+      </div>
+
+      <!-- STEP 2: Skills -->
+      <div id="section-2" style="display:none;">
+        <div class="panel-title">🛠️ Skills & Tools</div>
+        <div class="form-group">
+          <label>Add Your Skills</label>
+          <div class="skills-input-wrap">
+            <input type="text" id="skill-input" placeholder="e.g. SQL, Power BI, Python..." onkeypress="if(event.key==='Enter'){addSkill()}">
+            <button class="btn-add" onclick="addSkill()">+ Add</button>
+          </div>
+          <div class="skills-tags" id="skills-tags"></div>
+        </div>
+        <div class="form-group" style="margin-top:20px;">
+          <label>Quick Add Popular Skills</label>
+          <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;">
+            ${['SQL','Excel','Power BI','Python','Tableau','R','DAX','Machine Learning','Data Cleaning','Statistics','Google Sheets','Looker'].map(s =>
+              `<button onclick="quickAddSkill('${s}')" style="padding:5px 12px;border-radius:100px;border:1px solid rgba(255,255,255,0.1);background:rgba(255,255,255,0.04);color:rgba(255,255,255,0.5);font-size:12px;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all 0.2s;" onmouseover="this.style.borderColor='#F5A623';this.style.color='#F5A623'" onmouseout="this.style.borderColor='rgba(255,255,255,0.1)';this.style.color='rgba(255,255,255,0.5)'">${s}</button>`
+            ).join('')}
+          </div>
+        </div>
+        <div class="form-group" style="margin-top:20px;">
+          <label>Years of Experience</label>
+          <select id="cv-experience" onchange="updatePreview()">
+            <option value="0-1">0–1 years (Entry Level)</option>
+            <option value="1-3">1–3 years (Junior)</option>
+            <option value="3-5">3–5 years (Mid Level)</option>
+            <option value="5+">5+ years (Senior)</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Highest Education</label>
+          <input type="text" id="cv-education" placeholder="B.Sc Computer Science — UNILAG, 2022" oninput="updatePreview()">
+        </div>
+        <div class="nav-buttons">
+          <button class="btn-prev" onclick="goToStep(1)">← Back</button>
+          <button class="btn-next" onclick="goToStep(3)">Next: Projects →</button>
+        </div>
+      </div>
+
+      <!-- STEP 3: Projects -->
+      <div id="section-3" style="display:none;">
+        <div class="panel-title">📊 Projects</div>
+        <div id="projects-list"></div>
+        <button onclick="addProject()" style="width:100%;padding:12px;background:rgba(245,166,35,0.08);border:1px dashed rgba(245,166,35,0.3);border-radius:10px;color:#F5A623;font-size:14px;font-weight:600;font-family:'DM Sans',sans-serif;cursor:pointer;transition:all 0.2s;margin-bottom:16px;">
+          + Add Project
+        </button>
+        <div class="nav-buttons">
+          <button class="btn-prev" onclick="goToStep(2)">← Back</button>
+          <button class="btn-next" onclick="goToStep(4)">Next: Template →</button>
+        </div>
+      </div>
+
+      <!-- STEP 4: Template -->
+      <div id="section-4" style="display:none;">
+        <div class="panel-title">🎨 Choose Template</div>
+        <div class="template-grid">
+          <button class="template-btn active" onclick="setTemplate('classic', this)">
+            <div class="template-icon">📄</div>
+            Classic
+          </button>
+          <button class="template-btn" onclick="setTemplate('modern', this)">
+            <div class="template-icon">⚡</div>
+            Modern
+          </button>
+          <button class="template-btn" onclick="setTemplate('minimal', this)">
+            <div class="template-icon">✨</div>
+            Minimal
+          </button>
+        </div>
+        <div style="background:rgba(245,166,35,0.06);border:1px solid rgba(245,166,35,0.15);border-radius:10px;padding:14px;margin-bottom:16px;">
+          <div style="font-size:13px;font-weight:600;color:#F5A623;margin-bottom:4px;">⭐ Pro Templates</div>
+          <div style="font-size:12px;color:rgba(255,255,255,0.4);">Upgrade to Pro to unlock 10+ premium templates with color themes and custom fonts.</div>
+        </div>
+        <div class="nav-buttons">
+          <button class="btn-prev" onclick="goToStep(3)">← Back</button>
+          <button class="btn-next" onclick="goToStep(5)">Next: Download →</button>
+        </div>
+      </div>
+
+      <!-- STEP 5: Download -->
+      <div id="section-5" style="display:none;">
+        <div class="panel-title">⬇️ Your CV is Ready!</div>
+        <div style="text-align:center;padding:20px 0;">
+          <div style="font-size:56px;margin-bottom:16px;">🎉</div>
+          <div style="font-size:16px;font-weight:600;margin-bottom:8px;">Looking great!</div>
+          <div style="font-size:13px;color:rgba(255,255,255,0.4);margin-bottom:28px;line-height:1.6;">Your CV is ready to download. Share it with employers or use your Analytica portfolio link.</div>
+        </div>
+        <button onclick="downloadCV()" style="width:100%;padding:14px;background:#27AE60;border:none;border-radius:10px;color:#fff;font-size:15px;font-weight:700;font-family:'DM Sans',sans-serif;cursor:pointer;margin-bottom:12px;transition:all 0.2s;">
+          ⬇️ Download CV as PDF
+        </button>
+        <button onclick="copyPortfolioLink()" style="width:100%;padding:14px;background:rgba(245,166,35,0.1);border:1px solid rgba(245,166,35,0.25);border-radius:10px;color:#F5A623;font-size:15px;font-weight:700;font-family:'DM Sans',sans-serif;cursor:pointer;margin-bottom:12px;transition:all 0.2s;">
+          🔗 Copy Portfolio Link
+        </button>
+        <button onclick="goToStep(1)" style="width:100%;padding:14px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:10px;color:rgba(255,255,255,0.6);font-size:14px;font-family:'DM Sans',sans-serif;cursor:pointer;transition:all 0.2s;">
+          ↺ Start Over
+        </button>
+        <div class="nav-buttons" style="margin-top:8px;">
+          <button class="btn-prev" onclick="goToStep(4)">← Back</button>
+          <div></div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Preview Panel -->
+    <div class="preview-panel">
+      <div class="preview-header">
+        <div class="preview-title">📄 Live Preview</div>
+        <button class="btn-download-cv" onclick="downloadCV()">⬇️ Download PDF</button>
+      </div>
+      <div class="cv-paper" id="cv-preview">
+        <div class="cv-placeholder">
+          <div class="cv-placeholder-icon">📄</div>
+          <div class="cv-placeholder-text">Start filling in your info to see your CV preview here</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+let currentStep = 1
+let skills = []
+let projects = []
+let selectedTemplate = 'classic'
+let projectCount = 0
+
+// ── STEP NAVIGATION ──
+function goToStep(step) {
+  document.getElementById(`section-${currentStep}`).style.display = 'none'
+  document.getElementById(`step-${currentStep}`).className = 'step-num done'
+
+  currentStep = step
+  document.getElementById(`section-${currentStep}`).style.display = 'block'
+  document.getElementById(`step-${currentStep}`).className = 'step-num active'
+  document.getElementById(`step-label-${currentStep}`).className = 'step-label active'
+
+  updatePreview()
+  window.scrollTo(0, 0)
+}
+
+// ── ADD SKILL ──
+function addSkill() {
+  const input = document.getElementById('skill-input')
+  const skill = input.value.trim()
+  if (!skill || skills.includes(skill)) return
+  skills.push(skill)
+  input.value = ''
+  renderSkills()
+  updatePreview()
+}
+
+function quickAddSkill(skill) {
+  if (skills.includes(skill)) return
+  skills.push(skill)
+  renderSkills()
+  updatePreview()
+}
+
+function removeSkill(skill) {
+  skills = skills.filter(s => s !== skill)
+  renderSkills()
+  updatePreview()
+}
+
+function renderSkills() {
+  document.getElementById('skills-tags').innerHTML = skills.map(s => `
+    <div class="skill-chip">
+      ${s}
+      <button onclick="removeSkill('${s}')">×</button>
+    </div>
+  `).join('')
+}
+
+// ── ADD PROJECT ──
+function addProject() {
+  projectCount++
+  const id = `project-${projectCount}`
+  const div = document.createElement('div')
+  div.className = 'project-item'
+  div.id = id
+  div.innerHTML = `
+    <button class="remove-btn" onclick="removeProject('${id}')">×</button>
+    <div class="form-group" style="margin-bottom:10px;">
+      <label>Project Title</label>
+      <input type="text" placeholder="Nigeria Inflation Analysis" oninput="updatePreview()">
+    </div>
+    <div class="form-group" style="margin-bottom:10px;">
+      <label>Description</label>
+      <textarea placeholder="What did you analyze and what did you find?" style="min-height:60px;" oninput="updatePreview()"></textarea>
+    </div>
+    <div class="form-group" style="margin-bottom:0;">
+      <label>Tools Used</label>
+      <input type="text" placeholder="SQL, Power BI, Excel" oninput="updatePreview()">
+    </div>
+  `
+  document.getElementById('projects-list').appendChild(div)
+  updatePreview()
+}
+
+function removeProject(id) {
+  document.getElementById(id).remove()
+  updatePreview()
+}
+
+// ── TEMPLATE ──
+function setTemplate(template, btn) {
+  selectedTemplate = template
+  document.querySelectorAll('.template-btn').forEach(b => b.classList.remove('active'))
+  btn.classList.add('active')
+  updatePreview()
+}
+
+// ── UPDATE PREVIEW ──
+function updatePreview() {
+  const firstname = document.getElementById('cv-firstname')?.value || ''
+  const lastname = document.getElementById('cv-lastname')?.value || ''
+  const title = document.getElementById('cv-title')?.value || ''
+  const email = document.getElementById('cv-email')?.value || ''
+  const phone = document.getElementById('cv-phone')?.value || ''
+  const location = document.getElementById('cv-location')?.value || ''
+  const linkedin = document.getElementById('cv-linkedin')?.value || ''
+  const summary = document.getElementById('cv-summary')?.value || ''
+  const education = document.getElementById('cv-education')?.value || ''
+
+  const fullName = `${firstname} ${lastname}`.trim()
+
+  if (!fullName && !title) {
+    document.getElementById('cv-preview').innerHTML = `
+      <div class="cv-placeholder">
+        <div class="cv-placeholder-icon">📄</div>
+        <div class="cv-placeholder-text">Start filling in your info to see your CV preview here</div>
+      </div>`
+    return
+  }
+
+  // Get projects
+  const projectItems = document.querySelectorAll('.project-item')
+  const projectsHTML = Array.from(projectItems).map(item => {
+    const inputs = item.querySelectorAll('input, textarea')
+    const pTitle = inputs[0]?.value || ''
+    const pDesc = inputs[1]?.value || ''
+    const pTools = inputs[2]?.value || ''
+    if (!pTitle) return ''
+    return `
+      <div class="cv-project">
+        <div class="cv-project-title">${pTitle}</div>
+        ${pDesc ? `<div class="cv-project-desc">${pDesc}</div>` : ''}
+        ${pTools ? `<div class="cv-project-tools">Tools: ${pTools}</div>` : ''}
+      </div>
+    `
+  }).join('')
+
+  const accentColor = selectedTemplate === 'modern' ? '#9b59b6' :
+                      selectedTemplate === 'minimal' ? '#3498db' : '#0A1628'
+
+  document.getElementById('cv-preview').innerHTML = `
+    <div class="cv-header-section" style="border-color:${accentColor};">
+      ${fullName ? `<div class="cv-name">${fullName}</div>` : ''}
+      ${title ? `<div class="cv-role" style="color:${accentColor === '#0A1628' ? '#F5A623' : accentColor};">${title}</div>` : ''}
+      <div class="cv-contact">
+        ${email ? `<span>📧 ${email}</span>` : ''}
+        ${phone ? `<span>📱 ${phone}</span>` : ''}
+        ${location ? `<span>📍 ${location}</span>` : ''}
+        ${linkedin ? `<span>🔗 ${linkedin}</span>` : ''}
+      </div>
+    </div>
+
+    ${summary ? `
+      <div class="cv-section">
+        <div class="cv-section-title" style="color:${accentColor};">Professional Summary</div>
+        <div class="cv-summary">${summary}</div>
+      </div>
+    ` : ''}
+
+    ${skills.length > 0 ? `
+      <div class="cv-section">
+        <div class="cv-section-title" style="color:${accentColor};">Technical Skills</div>
+        <div class="cv-skills-wrap">
+          ${skills.map(s => `<span class="cv-skill">${s}</span>`).join('')}
+        </div>
+      </div>
+    ` : ''}
+
+    ${projectsHTML ? `
+      <div class="cv-section">
+        <div class="cv-section-title" style="color:${accentColor};">Projects</div>
+        ${projectsHTML}
+      </div>
+    ` : ''}
+
+    ${education ? `
+      <div class="cv-section">
+        <div class="cv-section-title" style="color:${accentColor};">Education</div>
+        <div class="cv-summary">${education}</div>
+      </div>
+    ` : ''}
+  `
+}
+
+// ── DOWNLOAD CV ──
+function downloadCV() {
+  const preview = document.getElementById('cv-preview').innerHTML
+  const win = window.open('', '_blank')
+  win.document.write(`
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <title>My Analytica CV</title>
+      <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+      <style>
+        body { font-family: 'DM Sans', sans-serif; padding: 40px; color: #1a1a2e; max-width: 700px; margin: 0 auto; }
+        .cv-name { font-family: 'Playfair Display', serif; font-size: 28px; font-weight: 900; }
+        .cv-role { font-size: 16px; color: #F5A623; font-weight: 600; margin: 4px 0; }
+        .cv-contact { font-size: 12px; color: #666; display: flex; gap: 16px; flex-wrap: wrap; }
+        .cv-header-section { border-bottom: 3px solid #0A1628; padding-bottom: 14px; margin-bottom: 16px; }
+        .cv-section-title { font-size: 11px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; border-bottom: 1px solid #eee; padding-bottom: 4px; margin-bottom: 8px; }
+        .cv-summary { font-size: 13px; color: #444; line-height: 1.6; }
+        .cv-skills-wrap { display: flex; flex-wrap: wrap; gap: 6px; }
+        .cv-skill { padding: 2px 10px; background: #f0f4ff; border-radius: 100px; font-size: 11px; }
+        .cv-project-title { font-size: 13px; font-weight: 700; }
+        .cv-project-desc { font-size: 12px; color: #555; }
+        .cv-project-tools { font-size: 11px; color: #F5A623; }
+        .cv-project { margin-bottom: 10px; }
+        @media print { body { padding: 20px; } }
+      </style>
+    </head>
+    <body>${preview}</body>
+    </html>
+  `)
+  win.document.close()
+  setTimeout(() => win.print(), 500)
+}
+
+// ── COPY PORTFOLIO LINK ──
+function copyPortfolioLink() {
+  const firstname = document.getElementById('cv-firstname')?.value || 'analyst'
+  const lastname = document.getElementById('cv-lastname')?.value || ''
+  const slug = `${firstname}${lastname}`.toLowerCase().replace(/\s/g, '')
+  const link = `https://analytica-eta.vercel.app/portfolio/${slug}`
+  navigator.clipboard.writeText(link).then(() => {
+    alert(`✅ Portfolio link copied!\n${link}`)
+  })
+}
+
+// Init first project
+addProject()
+</script>
+</body>
+</html>

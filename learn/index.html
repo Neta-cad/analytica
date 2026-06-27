@@ -1,0 +1,728 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Learn — Analytica</title>
+<link rel="stylesheet" href="../css/main.css">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+* { box-sizing: border-box; }
+body { background: #0A1628; min-height: 100vh; margin: 0; }
+
+.topnav {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  height: 60px;
+  background: rgba(10,22,40,0.95);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 20px;
+  z-index: 40;
+}
+.topnav-logo {
+  font-family: 'Playfair Display', serif;
+  font-size: 20px;
+  font-weight: 900;
+  color: #fff;
+  text-decoration: none;
+}
+.topnav-logo span { color: #F5A623; }
+.topnav-right { display: flex; gap: 10px; }
+.btn-sm {
+  padding: 7px 16px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  font-family: 'DM Sans', sans-serif;
+  cursor: pointer;
+  text-decoration: none;
+  transition: all 0.2s;
+  border: none;
+}
+.btn-gold { background: #F5A623; color: #0A1628; }
+.btn-gold:hover { background: #FFD07A; }
+.btn-outline {
+  background: transparent;
+  border: 1px solid rgba(255,255,255,0.2) !important;
+  color: #fff;
+}
+
+.page {
+  margin-top: 60px;
+  padding: 24px 20px;
+  max-width: 1000px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.page-title {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(24px, 5vw, 36px);
+  font-weight: 700;
+  margin-bottom: 6px;
+}
+.page-title span { color: #F5A623; }
+.page-sub {
+  font-size: 14px;
+  color: rgba(255,255,255,0.45);
+  margin-bottom: 28px;
+}
+
+/* ── ROADMAP ── */
+.roadmap-section { margin-bottom: 48px; }
+
+.section-label {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: #F5A623;
+  margin-bottom: 12px;
+}
+
+.section-title {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(20px, 4vw, 28px);
+  font-weight: 700;
+  margin-bottom: 20px;
+}
+
+.roadmap {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  position: relative;
+}
+
+.roadmap::before {
+  content: '';
+  position: absolute;
+  left: 20px;
+  top: 40px;
+  bottom: 40px;
+  width: 2px;
+  background: linear-gradient(180deg, #F5A623, rgba(245,166,35,0.1));
+}
+
+.roadmap-step {
+  display: flex;
+  gap: 16px;
+  padding: 0 0 24px 0;
+  position: relative;
+}
+
+.step-number {
+  width: 42px; height: 42px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  font-weight: 700;
+  flex-shrink: 0;
+  position: relative;
+  z-index: 2;
+  border: 2px solid;
+}
+
+.step-1 { background: rgba(245,166,35,0.15); border-color: #F5A623; color: #F5A623; }
+.step-2 { background: rgba(52,152,219,0.15); border-color: #3498db; color: #3498db; }
+.step-3 { background: rgba(155,89,182,0.15); border-color: #9b59b6; color: #9b59b6; }
+.step-4 { background: rgba(39,174,96,0.15); border-color: #27AE60; color: #27AE60; }
+.step-5 { background: rgba(231,76,60,0.15); border-color: #e74c3c; color: #e74c3c; }
+
+.step-content {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.07);
+  border-radius: 14px;
+  padding: 18px;
+  flex: 1;
+  transition: all 0.3s;
+}
+.step-content:hover { border-color: rgba(245,166,35,0.2); }
+
+.step-title {
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+.step-desc {
+  font-size: 13px;
+  color: rgba(255,255,255,0.45);
+  line-height: 1.6;
+  margin-bottom: 12px;
+}
+.step-skills {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+.skill-tag {
+  padding: 3px 10px;
+  border-radius: 100px;
+  font-size: 11px;
+  font-weight: 500;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.1);
+  color: rgba(255,255,255,0.5);
+}
+.step-duration {
+  font-size: 11px;
+  color: rgba(255,255,255,0.3);
+  margin-top: 10px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* ── COURSES ── */
+.courses-section { margin-bottom: 48px; }
+
+.filter-tabs {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding-bottom: 4px;
+  margin-bottom: 20px;
+}
+.filter-tabs::-webkit-scrollbar { display: none; }
+.tab {
+  padding: 7px 16px;
+  border-radius: 100px;
+  font-size: 13px;
+  font-weight: 500;
+  white-space: nowrap;
+  cursor: pointer;
+  border: 1px solid rgba(255,255,255,0.1);
+  color: rgba(255,255,255,0.5);
+  background: transparent;
+  font-family: 'DM Sans', sans-serif;
+  transition: all 0.2s;
+}
+.tab.active, .tab:hover {
+  background: rgba(245,166,35,0.12);
+  border-color: rgba(245,166,35,0.3);
+  color: #F5A623;
+}
+
+.courses-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 14px;
+}
+
+.course-card {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.07);
+  border-radius: 14px;
+  padding: 18px;
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+  transition: all 0.3s;
+  text-decoration: none;
+}
+.course-card:hover {
+  border-color: rgba(245,166,35,0.2);
+  transform: translateY(-2px);
+}
+
+.course-icon {
+  width: 50px; height: 50px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  flex-shrink: 0;
+}
+.icon-yt { background: rgba(231,76,60,0.15); }
+.icon-course { background: rgba(52,152,219,0.15); }
+.icon-free { background: rgba(39,174,96,0.15); }
+.icon-doc { background: rgba(245,166,35,0.15); }
+
+.course-info { flex: 1; }
+.course-title {
+  font-size: 15px;
+  font-weight: 600;
+  color: #fff;
+  margin-bottom: 4px;
+}
+.course-provider {
+  font-size: 12px;
+  color: rgba(255,255,255,0.4);
+  margin-bottom: 8px;
+}
+.course-tags { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 8px; }
+.ctag {
+  padding: 2px 8px;
+  border-radius: 100px;
+  font-size: 11px;
+  font-weight: 500;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.08);
+  color: rgba(255,255,255,0.4);
+}
+.ctag.free { background: rgba(39,174,96,0.1); color: #27AE60; border-color: rgba(39,174,96,0.2); }
+.ctag.beginner { background: rgba(52,152,219,0.1); color: #3498db; border-color: rgba(52,152,219,0.2); }
+.ctag.intermediate { background: rgba(245,166,35,0.1); color: #F5A623; border-color: rgba(245,166,35,0.2); }
+.course-desc {
+  font-size: 13px;
+  color: rgba(255,255,255,0.4);
+  line-height: 1.5;
+}
+
+.course-arrow {
+  font-size: 18px;
+  color: rgba(255,255,255,0.2);
+  flex-shrink: 0;
+  align-self: center;
+  transition: all 0.2s;
+}
+.course-card:hover .course-arrow { color: #F5A623; transform: translateX(4px); }
+
+/* ── CHEAT SHEETS ── */
+.sheets-section { margin-bottom: 48px; }
+.sheets-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+}
+.sheet-card {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.07);
+  border-radius: 12px;
+  padding: 18px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s;
+  text-decoration: none;
+  display: block;
+}
+.sheet-card:hover {
+  border-color: rgba(245,166,35,0.25);
+  transform: translateY(-2px);
+}
+.sheet-icon { font-size: 28px; margin-bottom: 8px; }
+.sheet-name { font-size: 13px; font-weight: 600; color: rgba(255,255,255,0.8); margin-bottom: 4px; }
+.sheet-pages { font-size: 11px; color: rgba(255,255,255,0.3); }
+.sheet-btn {
+  margin-top: 10px;
+  padding: 6px 14px;
+  background: rgba(245,166,35,0.1);
+  border: 1px solid rgba(245,166,35,0.2);
+  border-radius: 6px;
+  color: #F5A623;
+  font-size: 11px;
+  font-weight: 600;
+  font-family: 'DM Sans', sans-serif;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: inline-block;
+}
+.sheet-btn:hover { background: rgba(245,166,35,0.2); }
+
+/* ── PROJECT IDEAS ── */
+.projects-section { margin-bottom: 48px; }
+.projects-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+}
+.project-card {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.07);
+  border-radius: 12px;
+  padding: 18px;
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+  transition: all 0.3s;
+}
+.project-card:hover { border-color: rgba(245,166,35,0.2); }
+.project-emoji { font-size: 28px; flex-shrink: 0; }
+.project-title { font-size: 14px; font-weight: 600; margin-bottom: 4px; }
+.project-desc { font-size: 13px; color: rgba(255,255,255,0.4); line-height: 1.5; margin-bottom: 8px; }
+.project-tools { display: flex; gap: 6px; flex-wrap: wrap; }
+.ptool {
+  padding: 2px 8px;
+  border-radius: 100px;
+  font-size: 10px;
+  font-weight: 600;
+  background: rgba(52,152,219,0.1);
+  color: #3498db;
+  border: 1px solid rgba(52,152,219,0.2);
+}
+.difficulty {
+  padding: 2px 8px;
+  border-radius: 100px;
+  font-size: 10px;
+  font-weight: 600;
+}
+.diff-easy { background: rgba(39,174,96,0.1); color: #27AE60; border: 1px solid rgba(39,174,96,0.2); }
+.diff-medium { background: rgba(245,166,35,0.1); color: #F5A623; border: 1px solid rgba(245,166,35,0.2); }
+.diff-hard { background: rgba(231,76,60,0.1); color: #e74c3c; border: 1px solid rgba(231,76,60,0.2); }
+
+@media (min-width: 600px) {
+  .courses-grid { grid-template-columns: repeat(2, 1fr); }
+  .projects-grid { grid-template-columns: repeat(2, 1fr); }
+  .sheets-grid { grid-template-columns: repeat(4, 1fr); }
+}
+</style>
+</head>
+<body>
+
+<div class="topnav">
+  <a href="../index.html" class="topnav-logo">Analytica<span>.</span></a>
+  <div class="topnav-right">
+    <a href="../dashboard/index.html" class="btn-sm btn-outline">Dashboard</a>
+    <a href="../auth/signup.html" class="btn-sm btn-gold">Join Free</a>
+  </div>
+</div>
+
+<div class="page">
+
+  <div class="page-title">Learning <span>Resources</span></div>
+  <div class="page-sub">Everything you need to go from zero to professional data analyst</div>
+
+  <!-- ── ROADMAP ── -->
+  <div class="roadmap-section">
+    <div class="section-label">Start Here</div>
+    <div class="section-title">The Data Analyst Roadmap</div>
+
+    <div class="roadmap">
+      <div class="roadmap-step">
+        <div class="step-number step-1">1</div>
+        <div class="step-content">
+          <div class="step-title">🏁 Foundation — Spreadsheets & Data Basics</div>
+          <div class="step-desc">Learn Excel or Google Sheets. Understand data types, formulas, pivot tables and basic charts. This is where every analyst starts.</div>
+          <div class="step-skills">
+            <span class="skill-tag">Excel</span>
+            <span class="skill-tag">Google Sheets</span>
+            <span class="skill-tag">Pivot Tables</span>
+            <span class="skill-tag">VLOOKUP</span>
+            <span class="skill-tag">Charts</span>
+          </div>
+          <div class="step-duration">⏱️ 4–6 weeks</div>
+        </div>
+      </div>
+
+      <div class="roadmap-step">
+        <div class="step-number step-2">2</div>
+        <div class="step-content">
+          <div class="step-title">🗄️ SQL — Query Your Data</div>
+          <div class="step-desc">Learn to query databases using SQL. SELECT, WHERE, JOIN, GROUP BY. SQL is the most important skill for every data analyst.</div>
+          <div class="step-skills">
+            <span class="skill-tag">SELECT</span>
+            <span class="skill-tag">WHERE</span>
+            <span class="skill-tag">JOIN</span>
+            <span class="skill-tag">GROUP BY</span>
+            <span class="skill-tag">Subqueries</span>
+            <span class="skill-tag">CTEs</span>
+          </div>
+          <div class="step-duration">⏱️ 6–8 weeks</div>
+        </div>
+      </div>
+
+      <div class="roadmap-step">
+        <div class="step-number step-3">3</div>
+        <div class="step-content">
+          <div class="step-title">📊 Data Visualization — Tell Stories With Data</div>
+          <div class="step-desc">Learn Power BI or Tableau. Build dashboards that help decision makers understand data at a glance.</div>
+          <div class="step-skills">
+            <span class="skill-tag">Power BI</span>
+            <span class="skill-tag">Tableau</span>
+            <span class="skill-tag">DAX</span>
+            <span class="skill-tag">Dashboards</span>
+            <span class="skill-tag">KPIs</span>
+          </div>
+          <div class="step-duration">⏱️ 6–8 weeks</div>
+        </div>
+      </div>
+
+      <div class="roadmap-step">
+        <div class="step-number step-4">4</div>
+        <div class="step-content">
+          <div class="step-title">🐍 Python for Data Analysis</div>
+          <div class="step-desc">Learn Python basics then move to pandas, numpy and matplotlib. Automate your analysis and handle large datasets.</div>
+          <div class="step-skills">
+            <span class="skill-tag">Python</span>
+            <span class="skill-tag">Pandas</span>
+            <span class="skill-tag">NumPy</span>
+            <span class="skill-tag">Matplotlib</span>
+            <span class="skill-tag">Seaborn</span>
+          </div>
+          <div class="step-duration">⏱️ 8–12 weeks</div>
+        </div>
+      </div>
+
+      <div class="roadmap-step">
+        <div class="step-number step-5">5</div>
+        <div class="step-content">
+          <div class="step-title">🚀 Build Projects & Get Hired</div>
+          <div class="step-desc">Build 3–5 real projects using Nigerian or African datasets. Create a portfolio, update your CV and start applying for roles.</div>
+          <div class="step-skills">
+            <span class="skill-tag">Portfolio</span>
+            <span class="skill-tag">GitHub</span>
+            <span class="skill-tag">CV Writing</span>
+            <span class="skill-tag">Interviews</span>
+            <span class="skill-tag">Networking</span>
+          </div>
+          <div class="step-duration">⏱️ Ongoing</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── COURSES ── -->
+  <div class="courses-section">
+    <div class="section-label">Free Courses</div>
+    <div class="section-title">Curated Learning Resources</div>
+
+    <div class="filter-tabs">
+      <button class="tab active" onclick="setFilter('all', this)">All</button>
+      <button class="tab" onclick="setFilter('excel', this)">Excel</button>
+      <button class="tab" onclick="setFilter('sql', this)">SQL</button>
+      <button class="tab" onclick="setFilter('powerbi', this)">Power BI</button>
+      <button class="tab" onclick="setFilter('python', this)">Python</button>
+    </div>
+
+    <div class="courses-grid" id="courses-grid"></div>
+  </div>
+
+  <!-- ── CHEAT SHEETS ── -->
+  <div class="sheets-section">
+    <div class="section-label">Quick Reference</div>
+    <div class="section-title">Cheat Sheets</div>
+    <div class="sheets-grid">
+      <a href="../tools/formulas.html" class="sheet-card">
+        <div class="sheet-icon">📗</div>
+        <div class="sheet-name">Excel Formulas</div>
+        <div class="sheet-pages">20+ formulas</div>
+        <div class="sheet-btn">View →</div>
+      </a>
+      <a href="../tools/formulas.html" class="sheet-card">
+        <div class="sheet-icon">🗄️</div>
+        <div class="sheet-name">SQL Queries</div>
+        <div class="sheet-pages">15+ queries</div>
+        <div class="sheet-btn">View →</div>
+      </a>
+      <a href="../tools/formulas.html" class="sheet-card">
+        <div class="sheet-icon">📊</div>
+        <div class="sheet-name">DAX Formulas</div>
+        <div class="sheet-pages">10+ formulas</div>
+        <div class="sheet-btn">View →</div>
+      </a>
+      <a href="../tools/formulas.html" class="sheet-card">
+        <div class="sheet-icon">🐍</div>
+        <div class="sheet-name">Python Pandas</div>
+        <div class="sheet-pages">15+ snippets</div>
+        <div class="sheet-btn">View →</div>
+      </a>
+    </div>
+  </div>
+
+  <!-- ── PROJECT IDEAS ── -->
+  <div class="projects-section">
+    <div class="section-label">Build Your Portfolio</div>
+    <div class="section-title">Project Ideas for Nigerian Data</div>
+    <div class="projects-grid">
+      <div class="project-card">
+        <div class="project-emoji">📈</div>
+        <div>
+          <div class="project-title">Nigeria Inflation Analysis</div>
+          <div class="project-desc">Analyze CBN inflation data from 2015–2024. Find trends, peaks and compare food vs non-food inflation.</div>
+          <div class="project-tools">
+            <span class="ptool">Excel</span>
+            <span class="ptool">Power BI</span>
+            <span class="difficulty diff-easy">Easy</span>
+          </div>
+        </div>
+      </div>
+      <div class="project-card">
+        <div class="project-emoji">👥</div>
+        <div>
+          <div class="project-title">Nigeria Population Dashboard</div>
+          <div class="project-desc">Build an interactive dashboard showing population by state, zone and urban/rural split.</div>
+          <div class="project-tools">
+            <span class="ptool">Power BI</span>
+            <span class="ptool">SQL</span>
+            <span class="difficulty diff-easy">Easy</span>
+          </div>
+        </div>
+      </div>
+      <div class="project-card">
+        <div class="project-emoji">💰</div>
+        <div>
+          <div class="project-title">Lagos Property Price Analysis</div>
+          <div class="project-desc">Scrape or collect property listings data and analyze price trends by area and property type.</div>
+          <div class="project-tools">
+            <span class="ptool">Python</span>
+            <span class="ptool">Pandas</span>
+            <span class="difficulty diff-medium">Medium</span>
+          </div>
+        </div>
+      </div>
+      <div class="project-card">
+        <div class="project-emoji">🌾</div>
+        <div>
+          <div class="project-title">Nigeria Agricultural Output</div>
+          <div class="project-desc">Analyze crop production data across states. Find top producing states and seasonal patterns.</div>
+          <div class="project-tools">
+            <span class="ptool">SQL</span>
+            <span class="ptool">Python</span>
+            <span class="difficulty diff-medium">Medium</span>
+          </div>
+        </div>
+      </div>
+      <div class="project-card">
+        <div class="project-emoji">🏦</div>
+        <div>
+          <div class="project-title">Bank Customer Churn Prediction</div>
+          <div class="project-desc">Use a Nigerian bank dataset to predict which customers are likely to leave using ML.</div>
+          <div class="project-tools">
+            <span class="ptool">Python</span>
+            <span class="ptool">Scikit-learn</span>
+            <span class="difficulty diff-hard">Hard</span>
+          </div>
+        </div>
+      </div>
+      <div class="project-card">
+        <div class="project-emoji">⚡</div>
+        <div>
+          <div class="project-title">Nigeria Power Supply Analysis</div>
+          <div class="project-desc">Analyze NERC data on electricity generation, distribution and outages across Nigeria.</div>
+          <div class="project-tools">
+            <span class="ptool">Excel</span>
+            <span class="ptool">SQL</span>
+            <span class="difficulty diff-medium">Medium</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+const courses = [
+  {
+    title: 'Excel for Data Analysis — Full Course',
+    provider: 'freeCodeCamp — YouTube',
+    icon: '📗',
+    iconClass: 'icon-yt',
+    tags: ['free', 'beginner'],
+    desc: 'Complete Excel course covering formulas, pivot tables, charts and data analysis from scratch.',
+    url: 'https://www.youtube.com/watch?v=Vl0H-qTclOg',
+    tool: 'excel'
+  },
+  {
+    title: 'SQL for Beginners — Full Course',
+    provider: 'freeCodeCamp — YouTube',
+    icon: '🗄️',
+    iconClass: 'icon-yt',
+    tags: ['free', 'beginner'],
+    desc: 'Learn SQL from scratch with hands-on examples. Covers SELECT, JOIN, GROUP BY and more.',
+    url: 'https://www.youtube.com/watch?v=HXV3zeQKqGY',
+    tool: 'sql'
+  },
+  {
+    title: 'Power BI Full Course',
+    provider: 'Guy in a Cube — YouTube',
+    icon: '📊',
+    iconClass: 'icon-yt',
+    tags: ['free', 'beginner'],
+    desc: 'Build professional Power BI dashboards. Covers data modeling, DAX and report design.',
+    url: 'https://www.youtube.com/c/GuyinaCube',
+    tool: 'powerbi'
+  },
+  {
+    title: 'Python for Data Analysis',
+    provider: 'freeCodeCamp — YouTube',
+    icon: '🐍',
+    iconClass: 'icon-yt',
+    tags: ['free', 'beginner'],
+    desc: 'Learn Python with pandas, numpy and matplotlib for real data analysis projects.',
+    url: 'https://www.youtube.com/watch?v=r-uOLxNrNk8',
+    tool: 'python'
+  },
+  {
+    title: 'Advanced SQL — Window Functions',
+    provider: 'Mode Analytics',
+    icon: '🗄️',
+    iconClass: 'icon-doc',
+    tags: ['free', 'intermediate'],
+    desc: 'Master advanced SQL including window functions, CTEs and performance optimization.',
+    url: 'https://mode.com/sql-tutorial/sql-window-functions/',
+    tool: 'sql'
+  },
+  {
+    title: 'Google Data Analytics Certificate',
+    provider: 'Coursera — Google',
+    icon: '🎓',
+    iconClass: 'icon-course',
+    tags: ['intermediate'],
+    desc: 'Industry-recognized certificate. Covers spreadsheets, SQL, Tableau and R programming.',
+    url: 'https://www.coursera.org/professional-certificates/google-data-analytics',
+    tool: 'all'
+  },
+  {
+    title: 'DAX Patterns — Power BI',
+    provider: 'SQLBI',
+    icon: '📊',
+    iconClass: 'icon-doc',
+    tags: ['free', 'intermediate'],
+    desc: 'Learn advanced DAX patterns for Power BI. The most comprehensive DAX reference online.',
+    url: 'https://www.daxpatterns.com',
+    tool: 'powerbi'
+  },
+  {
+    title: 'Pandas Documentation & Tutorials',
+    provider: 'Pandas Official',
+    icon: '🐍',
+    iconClass: 'icon-free',
+    tags: ['free', 'intermediate'],
+    desc: 'Official pandas documentation with tutorials, user guide and API reference.',
+    url: 'https://pandas.pydata.org/docs/',
+    tool: 'python'
+  }
+]
+
+let currentFilter = 'all'
+
+function renderCourses(data) {
+  const grid = document.getElementById('courses-grid')
+  grid.innerHTML = data.map(c => `
+    <a href="${c.url}" target="_blank" class="course-card">
+      <div class="course-icon ${c.iconClass}">${c.icon}</div>
+      <div class="course-info">
+        <div class="course-title">${c.title}</div>
+        <div class="course-provider">${c.provider}</div>
+        <div class="course-tags">
+          ${c.tags.map(t => `<span class="ctag ${t}">${t.charAt(0).toUpperCase() + t.slice(1)}</span>`).join('')}
+        </div>
+        <div class="course-desc">${c.desc}</div>
+      </div>
+      <div class="course-arrow">→</div>
+    </a>
+  `).join('')
+}
+
+function setFilter(filter, btn) {
+  currentFilter = filter
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'))
+  btn.classList.add('active')
+  const filtered = filter === 'all'
+    ? courses
+    : courses.filter(c => c.tool === filter || c.tool === 'all')
+  renderCourses(filtered)
+}
+
+renderCourses(courses)
+</script>
+</body>
+</html>

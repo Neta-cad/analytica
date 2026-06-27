@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>About Us — Analytica</title>
+<link rel="stylesheet" href="css/main.css">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+* { box-sizing: border-box; }
+body { background: #0A1628; min-height: 100vh; margin: 0; }
+
+.topnav {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  height: 60px;
+  background: rgba(10,22,40,0.95);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 20px;
+  z-index: 40;
+}
+.topnav-logo {
+  font-family: 'Playfair Display', serif;
+  font-size: 20px;
+  font-weight: 900;
+  color: #fff;
+  text-decoration: none;
+}
+.topnav-logo span { color: #F5A623; }
+.topnav-right { display: flex; gap: 10px; }
+.btn-sm {
+  padding: 7px 16px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  font-family: 'DM Sans', sans-serif;
+  cursor: pointer;
+  text-decoration: none;
+  transition: all 0.2s;
+  border: none;
+}
+.btn-gold { background: #F5A623; color: #0A1628; }
+.btn-gold:hover { background: #FFD07A; }
+.btn-outline {
+  background: transparent;
+  border: 1px solid rgba(255,255,255,0.2) !important;
+  color: #fff;
+}
+
+.page {
+  margin-top: 60px;
+  padding: 40px 20px;
+  max-width: 900px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* ── HERO ── */
+.about-hero {
+  text-align: center;
+  padding: 40px 0 60px;
+  position: relative;
+}
+.about-hero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(245,166,35,0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(245,166,35,0.04) 1px, transparent 1px);
+  background-size: 40px 40px;
+  border-radius: 20px;
+}
+.hero-label {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: #F5A623;
+  margin-bottom: 16px;
+}
+.hero-title {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(28px, 6vw, 48px);
+  font-weight: 900;
+  line-height: 1.15;
+  margin-bottom: 16px;
+  position: relative;
+}
+.hero-title span { color: #F5A623; }
+.hero-sub {
+  font-size: 15px;
+  color: rgba(255,255,255,0.5);
+  line-height: 1.8;
+  max-width: 560px;
+  margin: 0 auto 32px;
+  position: relative;
+}
+.hero-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  flex-wrap: wrap;
+  position: relative;
+}
+.btn-hero {
+  padding: 13px 28px;
+  background: #F5A623;
+  border: none;
+  border-radius: 8px;
+  color: #0A1628;
+  font-size: 15px;
+  font-weight: 700;
+  font-family: 'DM Sans', sans-serif;
+  cursor: pointer;
+  text-decoration: none;
+  transition: all 0.2s;
+}
+.btn-hero:hover { background: #FFD07A; }
+.btn-hero-outline {
+  padding: 13px 28px;
+  border: 1.5px solid rgba(255,255,255,0.2);
+  border-radius: 8px;
+  color: #fff;
+  font-size: 15px;
+  font-weight: 500;
+  background: transparent;
+  font-family: 'DM Sans', sans-serif;
+  cursor: pointer;
+  text-decoration: none;
+  transition: all 0.2s;
+}
+.btn-hero-outline:hover { border-color: #F5A623; color: #F5A623; }
+
+/* ── STATS ── */
+.about-stats {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 14px;
+  margin-bottom: 60px;
+}
+.astat {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.07);
+  border-radius: 14px;
+  padding: 24px;
+  text-align: center;
+}
+.astat-num {
+  font-family: 'Playfair Display', serif;
+  font-size: 36px;
+  font-weight: 900;
+  color: #F5A623;
+  line-height: 1;
+  margin-bottom: 6px;
+}
+.astat-label {
+  font-size: 13px;
+  color: rgba(255,255,255,0.4);
+}
+
+/* ── MISSION ── */
+.mission-section {
+  margin-bottom: 60px;
+}
+.section-label {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: #F5A623;
+  margin-bottom: 12px;
+}
+.section-title {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(22px, 4vw, 32px);
+  font-weight: 700;
+  margin-bottom: 16px;
+}
+.mission-cards {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 14px;
+}
+.mission-card {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.07);
+  border-radius: 14px;
+  padding: 24px;
+  transition: all 0.3s;
+}
+.mission-card:hover {
+  border-color: rgba(245,166,35,0.2);
+  transform: translateY(-2px);
+}
+.mission-icon { font-size: 28px; margin-bottom: 12px; }
+.mission-title { font-size: 16px; font-weight: 600; margin-bottom: 8px; }
+.mission-desc {
+  font-size: 13px;
+  color: rgba(255,255,255,0.45);
+  line-height: 1.7;
+}
+
+/* ── STORY ── */
+.story-section {
+  margin-bottom: 60px;
+  background: rgba(255,255,255,0.02);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 20px;
+  padding: 32px 24px;
+}
+.story-text {
+  font-size: 15px;
+  color: rgba(255,255,255,0.6);
+  line-height: 1.9;
+  margin-bottom: 16px;
+}
+.story-text strong { color: #F5A623; }
+
+/* ── TEAM ── */
+.team-section { margin-bottom: 60px; }
+.team-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 14px;
+}
+.team-card {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.07);
+  border-radius: 14px;
+  padding: 20px;
+  text-align: center;
+  transition: all 0.3s;
+}
+.team-card:hover {
+  border-color: rgba(245,166,35,0.2);
+  transform: translateY(-2px);
+}
+.team-avatar {
+  width: 60px; height: 60px;
+  border-radius: 50%;
+  margin: 0 auto 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  font-weight: 700;
+  color: #0A1628;
+}
+.avatar-gold { background: linear-gradient(135deg, #F5A623, #e8920f); }
+.avatar-blue { background: linear-gradient(135deg, #3498db, #2980b9); }
+.avatar-green { background: linear-gradient(135deg, #27AE60, #219a52); }
+.avatar-purple { background: linear-gradient(135deg, #9b59b6, #8e44ad); }
+.team-name { font-size: 15px; font-weight: 600; margin-bottom: 4px; }
+.team-role { font-size: 12px; color: #F5A623; margin-bottom: 8px; }
+.team-bio { font-size: 12px; color: rgba(255,255,255,0.4); line-height: 1.5; }
+
+/* ── VALUES ── */
+.values-section { margin-bottom: 60px; }
+.values-list { display: flex; flex-direction: column; gap: 12px; }
+.value-item {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+  padding: 16px;
+  background: rgba(255,255,255,0.02);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 12px;
+}
+.value-icon {
+  width: 40px; height: 40px;
+  border-radius: 10px;
+  background: rgba(245,166,35,0.1);
+  border: 1px solid rgba(245,166,35,0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  flex-shrink: 0;
+}
+.value-title { font-size: 14px; font-weight: 600; margin-bottom: 4px; }
+.value-desc { font-size: 13px; color: rgba(255,255,255,0.4); line-height: 1.5; }
+
+/* ── CTA ── */
+.about-cta {
+  background: linear-gradient(135deg, rgba(245,166,35,0.1), rgba(17,34,64,0.8));
+  border: 1px solid rgba(245,166,35,0.2);
+  border-radius: 20px;
+  padding: 48px 24px;
+  text-align: center;
+  margin-bottom: 40px;
+}
+.cta-title {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(22px, 4vw, 32px);
+  font-weight: 700;
+  margin-bottom: 12px;
+}
+.cta-sub {
+  font-size: 14px;
+  color: rgba(255,255,255,0.5);
+  margin-bottom: 24px;
+  line-height: 1.7;
+}
+
+@media (min-width: 600px) {
+  .about-stats { grid-template-columns: repeat(4, 1fr); }
+  .mission-cards { grid-template-columns: repeat(3, 1fr); }
+  .team-grid { grid-template-columns: repeat(4, 1fr); }
+}
+</style>
+</head>
+<body>
+
+<div class="topnav">
+  <a href="index.html" class="topnav-logo">Analytica<span>.</span></a>
+  <div class="topnav-right">
+    <a href="auth/login.html" class="btn-sm btn-outline">Log In</a>
+    <a href="auth/signup.html" class="btn-sm btn-gold">Join Free</a>
+  </div>
+</div>
+
+<div class="page">
+
+  <!-- Hero -->
+  <div class="about-hero">
+    <div class="hero-label">Our Story</div>
+    <h1 class="hero-title">Built in Africa.<br>Built for <span>Africa.</span></h1>
+    <p class="hero-sub">Analytica was born from a simple frustration — African data analysts had no platform built specifically for them, their data, their jobs and their challenges.</p>
+    <div class="hero-actions">
+      <a href="auth/signup.html" class="btn-hero">Join the Community →</a>
+      <a href="contact.html" class="btn-hero-outline">Contact Us</a>
+    </div>
+  </div>
+
+  <!-- Stats -->
+  <div class="about-stats">
+    <div class="astat">
+      <div class="astat-num">50K+</div>
+      <div class="astat-label">Analysts</div>
+    </div>
+    <div class="astat">
+      <div class="astat-num">15+</div>
+      <div class="astat-label">Countries</div>
+    </div>
+    <div class="astat">
+      <div class="astat-num">1,200+</div>
+      <div class="astat-label">Datasets</div>
+    </div>
+    <div class="astat">
+      <div class="astat-num">2026</div>
+      <div class="astat-label">Founded</div>
+    </div>
+  </div>
+
+  <!-- Mission -->
+  <div class="mission-section">
+    <div class="section-label">Why We Exist</div>
+    <div class="section-title">Our Mission</div>
+    <div class="mission-cards">
+      <div class="mission-card">
+        <div class="mission-icon">🌍</div>
+        <div class="mission-title">Africa-First</div>
+        <div class="mission-desc">We build for Nigerian and African analysts first. Local datasets, local jobs, local context — not an afterthought.</div>
+      </div>
+      <div class="mission-card">
+        <div class="mission-icon">🚪</div>
+        <div class="mission-title">No Gatekeeping</div>
+        <div class="mission-desc">Data skills should be accessible to everyone. We keep our tools free and our community open to beginners and experts alike.</div>
+      </div>
+      <div class="mission-card">
+        <div class="mission-icon">💡</div>
+        <div class="mission-title">Real Tools</div>
+        <div class="mission-desc">We build tools that work on any device — including low-end PCs and mobile phones — because that's the reality for most African analysts.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Story -->
+  <div class="story-section">
+    <div class="section-label">The Story</div>
+    <div class="section-title" style="margin-bottom:20px;">How Analytica Started</div>
+    <p class="story-text">In 2026, a group of young Nigerian data analysts noticed something frustrating — <strong>every resource they used was built for someone else.</strong> The datasets were about American cities. The job boards listed only London and New York roles. The communities didn't understand Nigerian business contexts.</p>
+    <p class="story-text">So they decided to build <strong>the platform they wished existed.</strong> One that had Nigerian Bureau of Statistics data. One that listed jobs at Flutterwave and MTN. One where you could ask questions about WAEC data or CBN reports and get real answers from people who understood.</p>
+    <p class="story-text">That platform is <strong>Analytica.</strong> Built in Nigeria. For Africa. And now growing across the continent — from Lagos to Nairobi, Accra to Johannesburg.</p>
+  </div>
+
+  <!-- Team -->
+  <div class="team-section">
+    <div class="section-label">The People</div>
+    <div class="section-title">Meet the Team</div>
+    <div class="team-grid">
+      <div class="team-card">
+        <div class="team-avatar avatar-gold">A</div>
+        <div class="team-name">Ayomide</div>
+        <div class="team-role">Founder & CEO</div>
+        <div class="team-bio">Mathematics teacher, data analyst and entrepreneur building Africa's data future.</div>
+      </div>
+      <div class="team-card">
+        <div class="team-avatar avatar-blue">W</div>
+        <div class="team-name">Wisdom</div>
+        <div class="team-role">AI & Backend Lead</div>
+        <div class="team-bio">Building the AI infrastructure and backend systems that power Analytica.</div>
+      </div>
+      <div class="team-card">
+        <div class="team-avatar avatar-green">T</div>
+        <div class="team-name">Temi</div>
+        <div class="team-role">Product Designer</div>
+        <div class="team-bio">Designing beautiful, accessible interfaces for African users on any device.</div>
+      </div>
+      <div class="team-card">
+        <div class="team-avatar avatar-purple">K</div>
+        <div class="team-name">Kemi</div>
+        <div class="team-role">Community Lead</div>
+        <div class="team-bio">Growing and nurturing the Analytica analyst community across Africa.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Values -->
+  <div class="values-section">
+    <div class="section-label">What We Stand For</div>
+    <div class="section-title">Our Values</div>
+    <div class="values-list">
+      <div class="value-item">
+        <div class="value-icon">🌍</div>
+        <div>
+          <div class="value-title">Africa First</div>
+          <div class="value-desc">Every decision we make puts African analysts and African data at the center.</div>
+        </div>
+      </div>
+      <div class="value-item">
+        <div class="value-icon">🤝</div>
+        <div>
+          <div class="value-title">Community Over Competition</div>
+          <div class="value-desc">We believe analysts grow faster together. We foster collaboration not gatekeeping.</div>
+        </div>
+      </div>
+      <div class="value-item">
+        <div class="value-icon">🔓</div>
+        <div>
+          <div class="value-title">Radical Openness</div>
+          <div class="value-desc">Our tools, datasets and knowledge are as free as possible. Data literacy should not be a privilege.</div>
+        </div>
+      </div>
+      <div class="value-item">
+        <div class="value-icon">⚡</div>
+        <div>
+          <div class="value-title">Ship Fast, Improve Always</div>
+          <div class="value-desc">We build quickly, listen to feedback and constantly improve based on what our community needs.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CTA -->
+  <div class="about-cta">
+    <div class="cta-title">Join the Movement 🌍</div>
+    <p class="cta-sub">50,000+ analysts across Africa are already using Analytica. Come be part of something bigger than yourself.</p>
+    <a href="auth/signup.html" class="btn-hero">Create Free Account →</a>
+  </div>
+
+</div>
+
+</body>
+</html>

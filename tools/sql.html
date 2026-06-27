@@ -1,0 +1,809 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SQL Playground — Analytica</title>
+<link rel="stylesheet" href="../css/main.css">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+* { box-sizing: border-box; }
+body { background: #0A1628; min-height: 100vh; margin: 0; }
+
+.topnav {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  height: 60px;
+  background: rgba(10,22,40,0.95);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 20px;
+  z-index: 40;
+}
+.topnav-logo {
+  font-family: 'Playfair Display', serif;
+  font-size: 20px;
+  font-weight: 900;
+  color: #fff;
+  text-decoration: none;
+}
+.topnav-logo span { color: #F5A623; }
+.topnav-right { display: flex; gap: 10px; align-items: center; }
+.btn-sm {
+  padding: 7px 16px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  font-family: 'DM Sans', sans-serif;
+  cursor: pointer;
+  text-decoration: none;
+  transition: all 0.2s;
+  border: none;
+}
+.btn-gold { background: #F5A623; color: #0A1628; }
+.btn-gold:hover { background: #FFD07A; }
+.btn-outline { background: transparent; border: 1px solid rgba(255,255,255,0.2) !important; color: #fff; }
+
+.page {
+  margin-top: 60px;
+  padding: 20px;
+  max-width: 1100px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* ── HEADER ── */
+.page-header {
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.page-title {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(22px, 4vw, 30px);
+  font-weight: 700;
+}
+.page-title span { color: #F5A623; }
+.page-sub { font-size: 13px; color: rgba(255,255,255,0.4); margin-top: 4px; }
+
+/* ── LAYOUT ── */
+.playground-layout {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* ── SIDEBAR ── */
+.sidebar {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.07);
+  border-radius: 14px;
+  padding: 16px;
+}
+.sidebar-title {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.4);
+  margin-bottom: 12px;
+}
+.table-item {
+  padding: 8px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+  margin-bottom: 4px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: rgba(255,255,255,0.6);
+}
+.table-item:hover, .table-item.active {
+  background: rgba(245,166,35,0.1);
+  color: #F5A623;
+}
+.table-icon { font-size: 14px; }
+
+.table-columns {
+  margin-left: 28px;
+  margin-bottom: 8px;
+  display: none;
+}
+.table-columns.show { display: block; }
+.col-item {
+  font-size: 11px;
+  color: rgba(255,255,255,0.3);
+  padding: 3px 0;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.col-type {
+  color: #3498db;
+  font-size: 10px;
+}
+
+/* ── EDITOR AREA ── */
+.editor-area { flex: 1; display: flex; flex-direction: column; gap: 12px; }
+
+/* Query Examples */
+.examples-row {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding-bottom: 4px;
+}
+.examples-row::-webkit-scrollbar { display: none; }
+.example-btn {
+  padding: 6px 14px;
+  border-radius: 100px;
+  font-size: 12px;
+  font-weight: 500;
+  white-space: nowrap;
+  cursor: pointer;
+  border: 1px solid rgba(255,255,255,0.1);
+  color: rgba(255,255,255,0.5);
+  background: transparent;
+  font-family: 'DM Sans', sans-serif;
+  transition: all 0.2s;
+}
+.example-btn:hover {
+  background: rgba(52,152,219,0.1);
+  border-color: rgba(52,152,219,0.3);
+  color: #3498db;
+}
+
+/* Editor box */
+.editor-box {
+  background: #0d1f3c;
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 14px;
+  overflow: hidden;
+}
+.editor-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 16px;
+  background: rgba(255,255,255,0.03);
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+.editor-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: rgba(255,255,255,0.4);
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.editor-actions { display: flex; gap: 8px; }
+.btn-run {
+  padding: 8px 20px;
+  background: #F5A623;
+  border: none;
+  border-radius: 7px;
+  color: #0A1628;
+  font-size: 13px;
+  font-weight: 700;
+  font-family: 'DM Sans', sans-serif;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.btn-run:hover { background: #FFD07A; }
+.btn-run:disabled { opacity: 0.6; cursor: not-allowed; }
+.btn-clear {
+  padding: 8px 14px;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 7px;
+  color: rgba(255,255,255,0.5);
+  font-size: 13px;
+  font-family: 'DM Sans', sans-serif;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.btn-clear:hover { border-color: rgba(231,76,60,0.4); color: #e74c3c; }
+
+#sql-editor {
+  width: 100%;
+  min-height: 160px;
+  padding: 16px;
+  background: transparent;
+  border: none;
+  color: #e2e8f0;
+  font-family: 'Courier New', monospace;
+  font-size: 14px;
+  line-height: 1.7;
+  resize: vertical;
+  outline: none;
+  tab-size: 2;
+}
+
+/* Results */
+.results-box {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.07);
+  border-radius: 14px;
+  overflow: hidden;
+}
+.results-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 16px;
+  background: rgba(255,255,255,0.02);
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+.results-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: rgba(255,255,255,0.4);
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.results-count {
+  font-size: 12px;
+  color: rgba(255,255,255,0.3);
+}
+.btn-export {
+  padding: 6px 14px;
+  background: rgba(39,174,96,0.1);
+  border: 1px solid rgba(39,174,96,0.2);
+  border-radius: 6px;
+  color: #27AE60;
+  font-size: 12px;
+  font-weight: 600;
+  font-family: 'DM Sans', sans-serif;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: none;
+}
+.btn-export.show { display: block; }
+.btn-export:hover { background: rgba(39,174,96,0.2); }
+
+.results-content {
+  overflow-x: auto;
+  min-height: 100px;
+  max-height: 360px;
+  overflow-y: auto;
+}
+
+/* Results table */
+.results-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+.results-table th {
+  padding: 10px 14px;
+  text-align: left;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.4);
+  background: rgba(255,255,255,0.03);
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+  white-space: nowrap;
+}
+.results-table td {
+  padding: 10px 14px;
+  color: rgba(255,255,255,0.7);
+  border-bottom: 1px solid rgba(255,255,255,0.04);
+  white-space: nowrap;
+  max-width: 200px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.results-table tr:hover td { background: rgba(255,255,255,0.03); }
+
+/* Result states */
+.result-placeholder {
+  text-align: center;
+  padding: 40px 20px;
+  color: rgba(255,255,255,0.2);
+}
+.result-placeholder-icon { font-size: 32px; margin-bottom: 10px; }
+.result-placeholder-text { font-size: 13px; }
+
+.result-error {
+  padding: 16px;
+  background: rgba(231,76,60,0.1);
+  border-left: 3px solid #e74c3c;
+  color: #ff6b6b;
+  font-size: 13px;
+  font-family: 'Courier New', monospace;
+  line-height: 1.6;
+}
+
+.result-success-bar {
+  padding: 8px 16px;
+  background: rgba(39,174,96,0.1);
+  border-bottom: 1px solid rgba(39,174,96,0.15);
+  color: #27AE60;
+  font-size: 12px;
+  font-weight: 500;
+  display: none;
+}
+.result-success-bar.show { display: block; }
+
+/* Running indicator */
+.running-indicator {
+  text-align: center;
+  padding: 30px;
+  color: rgba(255,255,255,0.4);
+  font-size: 13px;
+  display: none;
+}
+.running-indicator.show { display: block; }
+
+/* Keyboard shortcut hint */
+.shortcut-hint {
+  font-size: 11px;
+  color: rgba(255,255,255,0.2);
+  text-align: right;
+  margin-top: 6px;
+}
+
+@media (min-width: 900px) {
+  .playground-layout { flex-direction: row; align-items: flex-start; }
+  .sidebar { width: 220px; flex-shrink: 0; position: sticky; top: 80px; }
+  .editor-area { flex: 1; }
+}
+</style>
+</head>
+<body>
+
+<div class="topnav">
+  <a href="../index.html" class="topnav-logo">Analytica<span>.</span></a>
+  <div class="topnav-right">
+    <a href="../dashboard/index.html" class="btn-sm btn-outline">Dashboard</a>
+    <a href="../auth/signup.html" class="btn-sm btn-gold">Join Free</a>
+  </div>
+</div>
+
+<div class="page">
+
+  <div class="page-header">
+    <div>
+      <div class="page-title">SQL <span>Playground</span></div>
+      <div class="page-sub">Write and run SQL queries in your browser — no installation needed</div>
+    </div>
+  </div>
+
+  <div class="playground-layout">
+
+    <!-- Sidebar: Tables -->
+    <div class="sidebar">
+      <div class="sidebar-title">📋 Tables</div>
+
+      <div class="table-item active" onclick="toggleTable('households', this)">
+        <span class="table-icon">🏠</span> households
+      </div>
+      <div class="table-columns show" id="cols-households">
+        <div class="col-item">household_id <span class="col-type">TEXT</span></div>
+        <div class="col-item">state <span class="col-type">TEXT</span></div>
+        <div class="col-item">lga <span class="col-type">TEXT</span></div>
+        <div class="col-item">sector <span class="col-type">TEXT</span></div>
+        <div class="col-item">zone <span class="col-type">TEXT</span></div>
+        <div class="col-item">region <span class="col-type">TEXT</span></div>
+        <div class="col-item">household_size <span class="col-type">INT</span></div>
+        <div class="col-item">size_category <span class="col-type">TEXT</span></div>
+      </div>
+
+      <div class="table-item" onclick="toggleTable('jobs', this)">
+        <span class="table-icon">💼</span> jobs
+      </div>
+      <div class="table-columns" id="cols-jobs">
+        <div class="col-item">id <span class="col-type">INT</span></div>
+        <div class="col-item">title <span class="col-type">TEXT</span></div>
+        <div class="col-item">company <span class="col-type">TEXT</span></div>
+        <div class="col-item">location <span class="col-type">TEXT</span></div>
+        <div class="col-item">type <span class="col-type">TEXT</span></div>
+        <div class="col-item">level <span class="col-type">TEXT</span></div>
+        <div class="col-item">salary <span class="col-type">TEXT</span></div>
+      </div>
+
+      <div class="table-item" onclick="toggleTable('datasets', this)">
+        <span class="table-icon">📊</span> datasets
+      </div>
+      <div class="table-columns" id="cols-datasets">
+        <div class="col-item">id <span class="col-type">INT</span></div>
+        <div class="col-item">name <span class="col-type">TEXT</span></div>
+        <div class="col-item">category <span class="col-type">TEXT</span></div>
+        <div class="col-item">source <span class="col-type">TEXT</span></div>
+        <div class="col-item">format <span class="col-type">TEXT</span></div>
+        <div class="col-item">downloads <span class="col-type">INT</span></div>
+        <div class="col-item">free <span class="col-type">BOOL</span></div>
+      </div>
+
+      <div class="table-item" onclick="toggleTable('states', this)">
+        <span class="table-icon">🗺️</span> ng_states
+      </div>
+      <div class="table-columns" id="cols-states">
+        <div class="col-item">state <span class="col-type">TEXT</span></div>
+        <div class="col-item">zone <span class="col-type">TEXT</span></div>
+        <div class="col-item">region <span class="col-type">TEXT</span></div>
+        <div class="col-item">population <span class="col-type">INT</span></div>
+        <div class="col-item">urban_pct <span class="col-type">FLOAT</span></div>
+      </div>
+    </div>
+
+    <!-- Editor Area -->
+    <div class="editor-area">
+
+      <!-- Example queries -->
+      <div class="examples-row">
+        <button class="example-btn" onclick="loadExample('select_all')">SELECT all households</button>
+        <button class="example-btn" onclick="loadExample('count_by_state')">Count by state</button>
+        <button class="example-btn" onclick="loadExample('urban_rural')">Urban vs Rural</button>
+        <button class="example-btn" onclick="loadExample('avg_size')">Avg household size</button>
+        <button class="example-btn" onclick="loadExample('large_hh')">Large households</button>
+        <button class="example-btn" onclick="loadExample('zone_summary')">Zone summary</button>
+      </div>
+
+      <!-- SQL Editor -->
+      <div class="editor-box">
+        <div class="editor-topbar">
+          <div class="editor-label">
+            <span style="color:#F5A623;">●</span> SQL Editor
+          </div>
+          <div class="editor-actions">
+            <button class="btn-clear" onclick="clearEditor()">Clear</button>
+            <button class="btn-run" id="run-btn" onclick="runQuery()">
+              ▶ Run Query
+            </button>
+          </div>
+        </div>
+        <textarea id="sql-editor" spellcheck="false" placeholder="-- Write your SQL query here
+-- Example:
+SELECT state, COUNT(*) as total
+FROM households
+GROUP BY state
+ORDER BY total DESC;"></textarea>
+      </div>
+      <div class="shortcut-hint">Tip: Press Ctrl+Enter to run</div>
+
+      <!-- Results -->
+      <div class="results-box">
+        <div class="results-topbar">
+          <div class="results-label">
+            <span>📋</span> Results
+            <span class="results-count" id="results-count"></span>
+          </div>
+          <button class="btn-export" id="export-btn" onclick="exportCSV()">⬇️ Export CSV</button>
+        </div>
+        <div class="result-success-bar" id="success-bar"></div>
+        <div class="running-indicator" id="running-indicator">
+          ⏳ Running query...
+        </div>
+        <div class="results-content" id="results-content">
+          <div class="result-placeholder">
+            <div class="result-placeholder-icon">📝</div>
+            <div class="result-placeholder-text">Write a query above and click Run to see results</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="../js/supabase.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.10.2/sql-wasm.js"></script>
+<script>
+let SQL = null
+let db_sql = null
+let lastResults = []
+let lastColumns = []
+
+// ── SAMPLE DATA ──
+const householdsData = [
+  ['HH001','Lagos','Alimosho','Urban','South West','Southern Nigeria',4,'3-4 (Medium)'],
+  ['HH002','Lagos','Ikeja','Urban','South West','Southern Nigeria',3,'3-4 (Medium)'],
+  ['HH003','Kano','Kano Municipal','Urban','North West','Northern Nigeria',7,'7-9 (Large)'],
+  ['HH004','Kano','Nassarawa','Rural','North West','Northern Nigeria',9,'7-9 (Large)'],
+  ['HH005','Abuja','AMAC','Urban','North Central','Northern Nigeria',4,'3-4 (Medium)'],
+  ['HH006','Rivers','Port Harcourt','Urban','South South','Southern Nigeria',5,'5-6 (Average)'],
+  ['HH007','Oyo','Ibadan North','Urban','South West','Southern Nigeria',6,'5-6 (Average)'],
+  ['HH008','Kaduna','Kaduna North','Urban','North West','Northern Nigeria',5,'5-6 (Average)'],
+  ['HH009','Anambra','Onitsha','Urban','South East','Southern Nigeria',3,'3-4 (Medium)'],
+  ['HH010','Borno','Maiduguri','Urban','North East','Northern Nigeria',8,'7-9 (Large)'],
+  ['HH011','Enugu','Enugu North','Urban','South East','Southern Nigeria',4,'3-4 (Medium)'],
+  ['HH012','Delta','Warri South','Urban','South South','Southern Nigeria',5,'5-6 (Average)'],
+  ['HH013','Sokoto','Sokoto North','Rural','North West','Northern Nigeria',11,'10+ (Very Large)'],
+  ['HH014','Kebbi','Birnin Kebbi','Rural','North West','Northern Nigeria',10,'10+ (Very Large)'],
+  ['HH015','Imo','Owerri North','Urban','South East','Southern Nigeria',4,'3-4 (Medium)'],
+  ['HH016','Ekiti','Ado-Ekiti','Urban','South West','Southern Nigeria',3,'3-4 (Medium)'],
+  ['HH017','Zamfara','Gusau','Rural','North West','Northern Nigeria',8,'7-9 (Large)'],
+  ['HH018','Kwara','Ilorin East','Urban','North Central','Northern Nigeria',5,'5-6 (Average)'],
+  ['HH019','Cross River','Calabar','Urban','South South','Southern Nigeria',4,'3-4 (Medium)'],
+  ['HH020','Bauchi','Bauchi','Urban','North East','Northern Nigeria',6,'5-6 (Average)'],
+]
+
+const jobsData = [
+  [1,'Data Analyst','Flutterwave','Lagos','hybrid','mid','₦350K-500K/mo'],
+  [2,'BI Analyst','MTN Nigeria','Lagos','onsite','mid','₦400K-600K/mo'],
+  [3,'Junior Data Analyst','Paystack','Remote','remote','entry','₦150K-250K/mo'],
+  [4,'Data Scientist','Andela','Remote','remote','senior','$3K-5K/mo'],
+  [5,'Data Analyst','eHealth Africa','Abuja','hybrid','mid','₦280K-420K/mo'],
+  [6,'Analytics Engineer','Kuda Bank','Lagos','hybrid','senior','₦600K-900K/mo'],
+  [7,'Data Analyst Intern','Sterling Bank','Lagos','onsite','entry','₦80K-120K/mo'],
+  [8,'Market Research Analyst','Jumia','Remote','remote','mid','₦250K-380K/mo'],
+]
+
+const datasetsData = [
+  [1,'Nigeria Labour Force Survey Q1 2024','economy','NBS','CSV',234,1],
+  [2,'Nigeria GDP by Sector 2010-2023','economy','CBN','XLSX',412,1],
+  [3,'Nigeria Population by State 2023','population','NPC','CSV',678,1],
+  [4,'Nigeria Inflation Rate 2015-2024','economy','NBS','CSV',521,1],
+  [5,'Nigeria Primary School Enrollment 2022','education','UBEC','XLSX',189,1],
+  [6,'Nigeria Agricultural Production 2023','agriculture','FMARD','CSV',143,1],
+  [7,'Nigeria Health Facilities Database','health','FMOH','CSV',302,0],
+  [8,'Nigeria Crime Statistics 2018-2022','crime','NPF','XLSX',267,0],
+  [9,'Africa Internet Usage 2023','population','ITU','CSV',891,1],
+]
+
+const statesData = [
+  ['Lagos','South West','Southern Nigeria',15388000,88],
+  ['Kano','North West','Northern Nigeria',13893000,35],
+  ['Abuja FCT','North Central','Northern Nigeria',3564000,75],
+  ['Rivers','South South','Southern Nigeria',7303000,52],
+  ['Oyo','South West','Southern Nigeria',7840000,48],
+  ['Kaduna','North West','Northern Nigeria',8252000,38],
+  ['Anambra','South East','Southern Nigeria',5480000,60],
+  ['Borno','North East','Northern Nigeria',5860000,28],
+  ['Enugu','South East','Southern Nigeria',4411000,55],
+  ['Delta','South South','Southern Nigeria',5663000,49],
+  ['Sokoto','North West','Northern Nigeria',4910000,22],
+  ['Kebbi','North West','Northern Nigeria',4441000,18],
+  ['Imo','South East','Southern Nigeria',5408000,58],
+  ['Ekiti','South West','Southern Nigeria',3270000,45],
+  ['Kwara','North Central','Northern Nigeria',3192000,40],
+]
+
+// Check auth and plan
+async function checkAccess() {
+  const { data: { session } } = await db.auth.getSession()
+  if (!session) {
+    window.location.href = '../auth/login.html'
+    return false
+  }
+  const meta = session.user.user_metadata || {}
+  if (meta.plan !== 'pro') {
+    document.querySelector('.page').innerHTML = `
+      <div style="display:flex;flex-direction:column;align-items:center;
+      justify-content:center;min-height:60vh;padding:40px 24px;text-align:center;">
+        <div style="font-size:52px;margin-bottom:16px;">🔒</div>
+        <div style="font-family:'Playfair Display',serif;font-size:22px;
+        font-weight:700;margin-bottom:10px;">Pro Feature</div>
+        <p style="font-size:14px;color:rgba(255,255,255,0.5);margin-bottom:24px;
+        max-width:320px;line-height:1.7;">
+          SQL Playground is available on Pro plan only. Upgrade for ₦2,500/month.
+        </p>
+        <a href="../payment/index.html"
+          style="padding:14px 32px;background:#F5A623;border:none;border-radius:8px;
+          color:#0A1628;font-size:15px;font-weight:700;text-decoration:none;">
+          Upgrade to Pro →
+        </a>
+      </div>
+    `
+    return false
+  }
+  return true
+}
+
+// Run access check before init
+checkAccess().then(hasAccess => {
+  if (hasAccess) initSQL()
+})
+
+
+// ── INIT SQL.JS ──
+async function initSQL() {
+  try {
+    SQL = await initSqlJs({
+      locateFile: file => `https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.10.2/${file}`
+    })
+
+    db_sql = new SQL.Database()
+
+    // Create tables
+    db_sql.run(`
+      CREATE TABLE households (
+        household_id TEXT, state TEXT, lga TEXT, sector TEXT,
+        zone TEXT, region TEXT, household_size INTEGER, size_category TEXT
+      );
+      CREATE TABLE jobs (
+        id INTEGER, title TEXT, company TEXT, location TEXT,
+        type TEXT, level TEXT, salary TEXT
+      );
+      CREATE TABLE datasets (
+        id INTEGER, name TEXT, category TEXT, source TEXT,
+        format TEXT, downloads INTEGER, free INTEGER
+      );
+      CREATE TABLE ng_states (
+        state TEXT, zone TEXT, region TEXT,
+        population INTEGER, urban_pct INTEGER
+      );
+    `)
+
+    // Insert data
+    const hhStmt = db_sql.prepare('INSERT INTO households VALUES (?,?,?,?,?,?,?,?)')
+    householdsData.forEach(row => { hhStmt.run(row) })
+    hhStmt.free()
+
+    const jobStmt = db_sql.prepare('INSERT INTO jobs VALUES (?,?,?,?,?,?,?)')
+    jobsData.forEach(row => { jobStmt.run(row) })
+    jobStmt.free()
+
+    const dsStmt = db_sql.prepare('INSERT INTO datasets VALUES (?,?,?,?,?,?,?)')
+    datasetsData.forEach(row => { dsStmt.run(row) })
+    dsStmt.free()
+
+    const stStmt = db_sql.prepare('INSERT INTO ng_states VALUES (?,?,?,?,?)')
+    statesData.forEach(row => { stStmt.run(row) })
+    stStmt.free()
+
+    console.log('SQL.js ready ✓')
+  } catch(e) {
+    console.error('SQL init error:', e)
+  }
+}
+
+// ── RUN QUERY ──
+async function runQuery() {
+  const query = document.getElementById('sql-editor').value.trim()
+  if (!query) return
+
+  const runBtn = document.getElementById('run-btn')
+  const running = document.getElementById('running-indicator')
+  const content = document.getElementById('results-content')
+  const successBar = document.getElementById('success-bar')
+  const exportBtn = document.getElementById('export-btn')
+  const resultsCount = document.getElementById('results-count')
+
+  runBtn.disabled = true
+  running.classList.add('show')
+  content.innerHTML = ''
+  successBar.className = 'result-success-bar'
+  exportBtn.className = 'btn-export'
+  resultsCount.textContent = ''
+
+  await new Promise(r => setTimeout(r, 400))
+
+  try {
+    const results = db_sql.exec(query)
+    running.classList.remove('show')
+
+    if (results.length === 0) {
+      successBar.textContent = '✓ Query executed successfully. No rows returned.'
+      successBar.classList.add('show')
+      content.innerHTML = '<div class="result-placeholder"><div class="result-placeholder-icon">✅</div><div class="result-placeholder-text">Query ran successfully</div></div>'
+      runBtn.disabled = false
+      return
+    }
+
+    const { columns, values } = results[0]
+    lastColumns = columns
+    lastResults = values
+
+    const rowCount = values.length
+    successBar.textContent = `✓ ${rowCount} row${rowCount !== 1 ? 's' : ''} returned`
+    successBar.classList.add('show')
+    resultsCount.textContent = `(${rowCount} rows)`
+    exportBtn.classList.add('show')
+
+    // Build table
+    const table = document.createElement('table')
+    table.className = 'results-table'
+
+    const thead = document.createElement('thead')
+    const headerRow = document.createElement('tr')
+    columns.forEach(col => {
+      const th = document.createElement('th')
+      th.textContent = col
+      headerRow.appendChild(th)
+    })
+    thead.appendChild(headerRow)
+    table.appendChild(thead)
+
+    const tbody = document.createElement('tbody')
+    values.forEach(row => {
+      const tr = document.createElement('tr')
+      row.forEach(cell => {
+        const td = document.createElement('td')
+        td.textContent = cell === null ? 'NULL' : cell
+        tr.appendChild(td)
+      })
+      tbody.appendChild(tr)
+    })
+    table.appendChild(tbody)
+    content.appendChild(table)
+
+  } catch(err) {
+    running.classList.remove('show')
+    content.innerHTML = `<div class="result-error">❌ Error: ${err.message}</div>`
+  }
+
+  runBtn.disabled = false
+}
+
+// ── EXPORT CSV ──
+function exportCSV() {
+  if (!lastResults.length) return
+  const rows = [lastColumns, ...lastResults]
+  const csv = rows.map(r => r.map(v => `"${v}"`).join(',')).join('\n')
+  const blob = new Blob([csv], { type: 'text/csv' })
+  const url = URL.createObjectURL(blob)
+  const a = document.createElement('a')
+  a.href = url
+  a.download = 'analytica_query_results.csv'
+  a.click()
+}
+
+// ── EXAMPLE QUERIES ──
+const examples = {
+  select_all: `SELECT *\nFROM households\nLIMIT 10;`,
+  count_by_state: `SELECT state, COUNT(*) AS total_households\nFROM households\nGROUP BY state\nORDER BY total_households DESC;`,
+  urban_rural: `SELECT sector,\n  COUNT(*) AS count,\n  ROUND(COUNT(*) * 100.0 / (SELECT COUNT(*) FROM households), 1) AS percentage\nFROM households\nGROUP BY sector;`,
+  avg_size: `SELECT zone,\n  ROUND(AVG(household_size), 2) AS avg_size,\n  MAX(household_size) AS max_size,\n  MIN(household_size) AS min_size\nFROM households\nGROUP BY zone\nORDER BY avg_size DESC;`,
+  large_hh: `SELECT household_id, state, lga, sector, household_size\nFROM households\nWHERE household_size >= 10\nORDER BY household_size DESC;`,
+  zone_summary: `SELECT region,\n  COUNT(*) AS households,\n  ROUND(AVG(household_size), 1) AS avg_size\nFROM households\nGROUP BY region\nORDER BY households DESC;`
+}
+
+function loadExample(key) {
+  document.getElementById('sql-editor').value = examples[key]
+}
+
+// ── TOGGLE TABLE COLUMNS ──
+function toggleTable(table, el) {
+  document.querySelectorAll('.table-item').forEach(t => t.classList.remove('active'))
+  el.classList.add('active')
+  document.querySelectorAll('.table-columns').forEach(c => c.classList.remove('show'))
+  document.getElementById(`cols-${table}`).classList.add('show')
+}
+
+// ── CLEAR ──
+function clearEditor() {
+  document.getElementById('sql-editor').value = ''
+  document.getElementById('results-content').innerHTML = `
+    <div class="result-placeholder">
+      <div class="result-placeholder-icon">📝</div>
+      <div class="result-placeholder-text">Write a query above and click Run to see results</div>
+    </div>`
+  document.getElementById('success-bar').className = 'result-success-bar'
+  document.getElementById('export-btn').className = 'btn-export'
+  document.getElementById('results-count').textContent = ''
+}
+
+// ── KEYBOARD SHORTCUT ──
+document.addEventListener('keydown', (e) => {
+  if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+    e.preventDefault()
+    runQuery()
+  }
+})
+
+// ── INIT ──
+initSQL()
+</script>
+</body>
+</html>

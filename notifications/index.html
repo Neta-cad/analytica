@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Notifications — Analytica</title>
+<link rel="stylesheet" href="../css/main.css">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+* { box-sizing: border-box; }
+body { background: #0A1628; min-height: 100vh; margin: 0; }
+.topnav {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  height: 60px;
+  background: rgba(10,22,40,0.95);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 20px;
+  z-index: 40;
+}
+.topnav-logo {
+  font-family: 'Playfair Display', serif;
+  font-size: 20px;
+  font-weight: 900;
+  color: #fff;
+  text-decoration: none;
+}
+.topnav-logo span { color: #F5A623; }
+.back-btn {
+  color: rgba(255,255,255,0.6);
+  font-size: 14px;
+  text-decoration: none;
+  transition: color 0.2s;
+}
+.back-btn:hover { color: #F5A623; }
+
+.page {
+  margin-top: 60px;
+  padding: 28px 20px;
+  max-width: 700px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.page-title {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(22px, 5vw, 30px);
+  font-weight: 700;
+}
+.page-title span { color: #F5A623; }
+
+.btn-mark-all {
+  padding: 8px 16px;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 8px;
+  color: rgba(255,255,255,0.5);
+  font-size: 13px;
+  font-family: 'DM Sans', sans-serif;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.btn-mark-all:hover { border-color: #F5A623; color: #F5A623; }
+
+/* Filter tabs */
+.filter-tabs {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding-bottom: 4px;
+  margin-bottom: 20px;
+}
+.filter-tabs::-webkit-scrollbar { display: none; }
+.tab {
+  padding: 7px 16px;
+  border-radius: 100px;
+  font-size: 13px;
+  font-weight: 500;
+  white-space: nowrap;
+  cursor: pointer;
+  border: 1px solid rgba(255,255,255,0.1);
+  color: rgba(255,255,255,0.5);
+  background: transparent;
+  font-family: 'DM Sans', sans-serif;
+  transition: all 0.2s;
+}
+.tab.active, .tab:hover {
+  background: rgba(245,166,35,0.12);
+  border-color: rgba(245,166,35,0.3);
+  color: #F5A623;
+}
+
+/* Notification groups */
+.notif-group { margin-bottom: 24px; }
+.group-label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.25);
+  margin-bottom: 10px;
+  padding: 0 4px;
+}
+
+/* Notification items */
+.notif-list { display: flex; flex-direction: column; gap: 8px; }
+
+.notif-item {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.07);
+  border-radius: 14px;
+  padding: 16px;
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+  cursor: pointer;
+  transition: all 0.2s;
+  position: relative;
+}
+.notif-item:hover { border-color: rgba(255,255,255,0.12); background: rgba(255,255,255,0.05); }
+.notif-item.unread {
+  background: rgba(245,166,35,0.04);
+  border-color: rgba(245,166,35,0.15);
+}
+.notif-item.unread::before {
+  content: '';
+  position: absolute;
+  top: 18px; left: -1px;
+  width: 3px; height: 24px;
+  background: #F5A623;
+  border-radius: 0 3px 3px 0;
+}
+
+.notif-icon {
+  width: 40px; height: 40px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  flex-shrink: 0;
+}
+.icon-forum { background: rgba(52,152,219,0.12); }
+.icon-job { background: rgba(245,166,35,0.12); }
+.icon-challenge { background: rgba(39,174,96,0.12); }
+.icon-dataset { background: rgba(155,89,182,0.12); }
+.icon-system { background: rgba(231,76,60,0.12); }
+.icon-mentor { background: rgba(155,89,182,0.12); }
+
+.notif-content { flex: 1; min-width: 0; }
+.notif-title {
+  font-size: 14px;
+  font-weight: 500;
+  color: rgba(255,255,255,0.85);
+  margin-bottom: 3px;
+  line-height: 1.4;
+}
+.notif-desc {
+  font-size: 12px;
+  color: rgba(255,255,255,0.4);
+  line-height: 1.5;
+  margin-bottom: 6px;
+}
+.notif-time {
+  font-size: 11px;
+  color: rgba(255,255,255,0.25);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.unread-dot {
+  width: 6px; height: 6px;
+  background: #F5A623;
+  border-radius: 50%;
+}
+
+.notif-action {
+  flex-shrink: 0;
+  align-self: center;
+}
+.notif-btn {
+  padding: 6px 14px;
+  border-radius: 7px;
+  font-size: 12px;
+  font-weight: 600;
+  font-family: 'DM Sans', sans-serif;
+  cursor: pointer;
+  transition: all 0.2s;
+  border: none;
+  white-space: nowrap;
+}
+.notif-btn.gold {
+  background: rgba(245,166,35,0.12);
+  color: #F5A623;
+  border: 1px solid rgba(245,166,35,0.2);
+}
+.notif-btn.gold:hover { background: rgba(245,166,35,0.2); }
+.notif-btn.blue {
+  background: rgba(52,152,219,0.12);
+  color: #3498db;
+  border: 1px solid rgba(52,152,219,0.2);
+}
+.notif-btn.blue:hover { background: rgba(52,152,219,0.2); }
+
+/* Empty state */
+.empty-state {
+  text-align: center;
+  padding: 80px 24px;
+  color: rgba(255,255,255,0.3);
+}
+.empty-icon { font-size: 48px; margin-bottom: 16px; }
+.empty-title { font-size: 16px; font-weight: 600; color: rgba(255,255,255,0.4); margin-bottom: 8px; }
+.empty-desc { font-size: 13px; }
+
+/* Stats row */
+.notif-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin-bottom: 24px;
+}
+.nstat {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.07);
+  border-radius: 12px;
+  padding: 14px;
+  text-align: center;
+}
+.nstat-num {
+  font-family: 'Playfair Display', serif;
+  font-size: 22px;
+  font-weight: 700;
+  color: #F5A623;
+}
+.nstat-label {
+  font-size: 11px;
+  color: rgba(255,255,255,0.35);
+  margin-top: 2px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+</style>
+</head>
+<body>
+
+<div class="topnav">
+  <a href="../dashboard/index.html" class="back-btn">← Dashboard</a>
+  <a href="../index.html" class="topnav-logo">Analytica<span>.</span></a>
+</div>
+
+<div class="page">
+
+  <div class="page-header">
+    <div class="page-title">🔔 <span>Notifications</span></div>
+    <button class="btn-mark-all" onclick="markAllRead()">✓ Mark all read</button>
+  </div>
+
+  <!-- Stats -->
+  <div class="notif-stats">
+    <div class="nstat">
+      <div class="nstat-num" id="unread-count">0</div>
+      <div class="nstat-label">Unread</div>
+    </div>
+    <div class="nstat">
+      <div class="nstat-num" id="total-count">0</div>
+      <div class="nstat-label">Total</div>
+    </div>
+    <div class="nstat">
+      <div class="nstat-num">Today</div>
+      <div class="nstat-label">Last Active</div>
+    </div>
+  </div>
+
+  <!-- Filter Tabs -->
+  <div class="filter-tabs">
+    <button class="tab active" onclick="setFilter('all', this)">All</button>
+    <button class="tab" onclick="setFilter('forum', this)">💬 Forum</button>
+    <button class="tab" onclick="setFilter('job', this)">💼 Jobs</button>
+    <button class="tab" onclick="setFilter('challenge', this)">🏆 Challenges</button>
+    <button class="tab" onclick="setFilter('dataset', this)">📊 Datasets</button>
+    <button class="tab" onclick="setFilter('system', this)">⚙️ System</button>
+  </div>
+
+  <!-- Notifications List -->
+  <div id="notifications-container"></div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="../js/supabase.js"></script>
+<script>
+
+let notifications = [
+  {
+    id: 1,
+    type: 'system',
+    icon: '🎉',
+    iconClass: 'icon-system',
+    title: 'Welcome to Analytica!',
+    desc: 'Your account is set up and ready. Start by exploring datasets or asking a question in the community forum.',
+    time: 'Just now',
+    unread: true,
+    action: { label: 'Explore', url: '../datasets/index.html', style: 'gold' }
+  },
+  {
+    id: 2,
+    type: 'challenge',
+    icon: '🏆',
+    iconClass: 'icon-challenge',
+    title: 'New Challenge: Nigeria GDP Analysis',
+    desc: 'A new data challenge is live! Analyze Nigeria GDP data from 2010-2023 and win ₦30,000.',
+    time: 'Today',
+    unread: true,
+    action: { label: 'View', url: '../challenges/index.html', style: 'gold' }
+  },
+  {
+    id: 3,
+    type: 'job',
+    icon: '💼',
+    iconClass: 'icon-job',
+    title: 'New Job Match: Data Analyst at Flutterwave',
+    desc: 'A new job matching your skills was posted. Hybrid role in Lagos, ₦350K-500K/month.',
+    time: 'Today',
+    unread: true,
+    action: { label: 'Apply', url: '../jobs/index.html', style: 'gold' }
+  },
+  {
+    id: 4,
+    type: 'dataset',
+    icon: '📊',
+    iconClass: 'icon-dataset',
+    title: 'New Dataset Available',
+    desc: 'Nigeria Agricultural Production 2023 dataset has been added to the library.',
+    time: 'Today',
+    unread: false,
+    action: { label: 'Download', url: '../datasets/index.html', style: 'blue' }
+  },
+  {
+    id: 5,
+    type: 'forum',
+    icon: '💬',
+    iconClass: 'icon-forum',
+    title: 'Your question got 3 replies',
+    desc: 'Someone answered your question about removing duplicates in SQL.',
+    time: 'Yesterday',
+    unread: false,
+    action: { label: 'View', url: '../community/index.html', style: 'blue' }
+  },
+  {
+    id: 6,
+    type: 'system',
+    icon: '⚡',
+    iconClass: 'icon-system',
+    title: 'Upgrade to Pro',
+    desc: 'Unlock AI Assistant, SQL Playground and unlimited downloads for just ₦2,500/month.',
+    time: 'Yesterday',
+    unread: false,
+    action: { label: 'Upgrade', url: '../pricing.html', style: 'gold' }
+  },
+  {
+    id: 7,
+    type: 'mentor',
+    icon: '🎓',
+    iconClass: 'icon-mentor',
+    title: 'Mentor Available',
+    desc: 'Chukwuemeka Obi (Senior Data Analyst @ Flutterwave) has a free slot this week.',
+    time: '2 days ago',
+    unread: false,
+    action: { label: 'Book', url: '../mentorship/index.html', style: 'gold' }
+  },
+  {
+    id: 8,
+    type: 'challenge',
+    icon: '🥇',
+    iconClass: 'icon-challenge',
+    title: 'Challenge Results: Nigeria Inflation',
+    desc: 'The Nigeria Inflation Deep Dive challenge has ended. View the winning submissions.',
+    time: '3 days ago',
+    unread: false,
+    action: { label: 'Results', url: '../challenges/index.html', style: 'blue' }
+  }
+]
+
+let currentFilter = 'all'
+
+function renderNotifications(data) {
+  const container = document.getElementById('notifications-container')
+
+  if (data.length === 0) {
+    container.innerHTML = `
+      <div class="empty-state">
+        <div class="empty-icon">🔔</div>
+        <div class="empty-title">No notifications</div>
+        <div class="empty-desc">You're all caught up!</div>
+      </div>`
+    return
+  }
+
+  // Group by time
+  const today = data.filter(n => n.time === 'Just now' || n.time === 'Today')
+  const yesterday = data.filter(n => n.time === 'Yesterday')
+  const older = data.filter(n => !['Just now', 'Today', 'Yesterday'].includes(n.time))
+
+  let html = ''
+
+  if (today.length > 0) {
+    html += `<div class="notif-group">
+      <div class="group-label">Today</div>
+      <div class="notif-list">${today.map(renderItem).join('')}</div>
+    </div>`
+  }
+
+  if (yesterday.length > 0) {
+    html += `<div class="notif-group">
+      <div class="group-label">Yesterday</div>
+      <div class="notif-list">${yesterday.map(renderItem).join('')}</div>
+    </div>`
+  }
+
+  if (older.length > 0) {
+    html += `<div class="notif-group">
+      <div class="group-label">Earlier</div>
+      <div class="notif-list">${older.map(renderItem).join('')}</div>
+    </div>`
+  }
+
+  container.innerHTML = html
+  updateStats()
+}
+
+function renderItem(n) {
+  return `
+    <div class="notif-item ${n.unread ? 'unread' : ''}" id="notif-${n.id}" onclick="markRead(${n.id})">
+      <div class="notif-icon ${n.iconClass}">${n.icon}</div>
+      <div class="notif-content">
+        <div class="notif-title">${n.title}</div>
+        <div class="notif-desc">${n.desc}</div>
+        <div class="notif-time">
+          ${n.unread ? '<div class="unread-dot"></div>' : ''}
+          ${n.time}
+        </div>
+      </div>
+      ${n.action ? `
+        <div class="notif-action">
+          <button class="notif-btn ${n.action.style}"
+            onclick="event.stopPropagation();window.location.href='${n.action.url}'">
+            ${n.action.label} →
+          </button>
+        </div>
+      ` : ''}
+    </div>
+  `
+}
+
+function updateStats() {
+  const unread = notifications.filter(n => n.unread).length
+  document.getElementById('unread-count').textContent = unread
+  document.getElementById('total-count').textContent = notifications.length
+
+  // Update dashboard bell if exists
+  const bell = document.querySelector('.notif-btn')
+  if (bell && unread > 0) bell.style.color = '#F5A623'
+}
+
+function markRead(id) {
+  const notif = notifications.find(n => n.id === id)
+  if (notif) {
+    notif.unread = false
+    const el = document.getElementById(`notif-${id}`)
+    if (el) el.classList.remove('unread')
+    updateStats()
+  }
+}
+
+function markAllRead() {
+  notifications.forEach(n => n.unread = false)
+  document.querySelectorAll('.notif-item').forEach(el => el.classList.remove('unread'))
+  updateStats()
+}
+
+function setFilter(filter, btn) {
+  currentFilter = filter
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'))
+  btn.classList.add('active')
+
+  const filtered = filter === 'all'
+    ? notifications
+    : notifications.filter(n => n.type === filter)
+
+  renderNotifications(filtered)
+}
+
+// ── INIT ──
+async function init() {
+  const { data: { session } } = await db.auth.getSession()
+  if (!session) {
+    window.location.href = '../auth/login.html'
+    return
+  }
+  renderNotifications(notifications)
+}
+
+init()
+</script>
+</body>
+</html>

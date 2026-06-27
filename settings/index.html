@@ -1,0 +1,660 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Settings — Analytica</title>
+<link rel="stylesheet" href="../css/main.css">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+* { box-sizing: border-box; }
+body { background: #0A1628; min-height: 100vh; margin: 0; }
+.topnav {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  height: 60px;
+  background: rgba(10,22,40,0.95);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 20px;
+  z-index: 40;
+}
+.topnav-logo {
+  font-family: 'Playfair Display', serif;
+  font-size: 20px;
+  font-weight: 900;
+  color: #fff;
+  text-decoration: none;
+}
+.topnav-logo span { color: #F5A623; }
+.back-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: rgba(255,255,255,0.6);
+  font-size: 14px;
+  text-decoration: none;
+  transition: color 0.2s;
+}
+.back-btn:hover { color: #F5A623; }
+
+.page {
+  margin-top: 60px;
+  padding: 28px 20px;
+  max-width: 700px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.page-title {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(24px, 5vw, 32px);
+  font-weight: 700;
+  margin-bottom: 6px;
+}
+.page-title span { color: #F5A623; }
+.page-sub { font-size: 14px; color: rgba(255,255,255,0.45); margin-bottom: 28px; }
+
+/* ── SETTINGS SECTIONS ── */
+.settings-section { margin-bottom: 28px; }
+.section-label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.3);
+  margin-bottom: 10px;
+  padding: 0 4px;
+}
+
+/* Setting rows */
+.setting-row {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.07);
+  border-radius: 12px;
+  padding: 16px 18px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  margin-bottom: 8px;
+  transition: all 0.2s;
+}
+.setting-row:hover { border-color: rgba(255,255,255,0.12); }
+.setting-row.danger:hover { border-color: rgba(231,76,60,0.3); }
+
+.setting-left { display: flex; align-items: center; gap: 14px; flex: 1; }
+.setting-icon {
+  width: 38px; height: 38px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  flex-shrink: 0;
+}
+.icon-gold { background: rgba(245,166,35,0.1); }
+.icon-blue { background: rgba(52,152,219,0.1); }
+.icon-green { background: rgba(39,174,96,0.1); }
+.icon-purple { background: rgba(155,89,182,0.1); }
+.icon-red { background: rgba(231,76,60,0.1); }
+
+.setting-info {}
+.setting-name {
+  font-size: 14px;
+  font-weight: 500;
+  color: rgba(255,255,255,0.85);
+  margin-bottom: 2px;
+}
+.setting-desc {
+  font-size: 12px;
+  color: rgba(255,255,255,0.35);
+}
+.setting-name.danger { color: #e74c3c; }
+
+/* Toggle switch */
+.toggle-wrap { flex-shrink: 0; }
+.toggle {
+  width: 44px; height: 24px;
+  background: rgba(255,255,255,0.1);
+  border-radius: 100px;
+  position: relative;
+  cursor: pointer;
+  transition: background 0.3s;
+  border: none;
+  outline: none;
+}
+.toggle.on { background: #27AE60; }
+.toggle::after {
+  content: '';
+  position: absolute;
+  top: 3px; left: 3px;
+  width: 18px; height: 18px;
+  background: #fff;
+  border-radius: 50%;
+  transition: transform 0.3s;
+}
+.toggle.on::after { transform: translateX(20px); }
+
+/* Arrow button */
+.setting-arrow {
+  color: rgba(255,255,255,0.25);
+  font-size: 14px;
+  flex-shrink: 0;
+  cursor: pointer;
+  background: none;
+  border: none;
+  padding: 4px;
+}
+
+/* Value display */
+.setting-value {
+  font-size: 13px;
+  color: rgba(255,255,255,0.35);
+  flex-shrink: 0;
+}
+
+/* ── INLINE EDIT FORMS ── */
+.edit-form {
+  display: none;
+  background: rgba(255,255,255,0.02);
+  border: 1px solid rgba(255,255,255,0.07);
+  border-radius: 12px;
+  padding: 18px;
+  margin-bottom: 8px;
+}
+.edit-form.show { display: block; }
+.form-group { margin-bottom: 14px; }
+label {
+  display: block;
+  font-size: 12px;
+  font-weight: 500;
+  color: rgba(255,255,255,0.5);
+  margin-bottom: 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+input, select {
+  width: 100%;
+  padding: 11px 14px;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 8px;
+  color: #fff;
+  font-size: 14px;
+  font-family: 'DM Sans', sans-serif;
+  outline: none;
+  transition: border-color 0.2s;
+}
+input:focus, select:focus { border-color: #F5A623; }
+input::placeholder { color: rgba(255,255,255,0.25); }
+select option { background: #112240; }
+
+.btn-save {
+  padding: 10px 22px;
+  background: #F5A623;
+  border: none;
+  border-radius: 8px;
+  color: #0A1628;
+  font-size: 13px;
+  font-weight: 700;
+  font-family: 'DM Sans', sans-serif;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.btn-save:hover { background: #FFD07A; }
+.btn-cancel {
+  padding: 10px 18px;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 8px;
+  color: rgba(255,255,255,0.5);
+  font-size: 13px;
+  font-family: 'DM Sans', sans-serif;
+  cursor: pointer;
+  margin-left: 8px;
+}
+
+/* Alert */
+.alert {
+  padding: 12px 16px;
+  border-radius: 8px;
+  font-size: 13px;
+  margin-bottom: 14px;
+  display: none;
+}
+.alert.success { background: rgba(39,174,96,0.15); border: 1px solid rgba(39,174,96,0.3); color: #2ecc71; display: block; }
+.alert.error { background: rgba(231,76,60,0.15); border: 1px solid rgba(231,76,60,0.3); color: #ff6b6b; display: block; }
+
+/* Plan card */
+.plan-card {
+  background: linear-gradient(135deg, rgba(245,166,35,0.08), rgba(17,34,64,0.5));
+  border: 1px solid rgba(245,166,35,0.2);
+  border-radius: 14px;
+  padding: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 8px;
+  flex-wrap: wrap;
+}
+.plan-info {}
+.plan-name { font-size: 16px; font-weight: 600; margin-bottom: 4px; }
+.plan-name span { color: #F5A623; }
+.plan-desc { font-size: 13px; color: rgba(255,255,255,0.4); }
+.btn-upgrade {
+  padding: 10px 22px;
+  background: #F5A623;
+  border: none;
+  border-radius: 8px;
+  color: #0A1628;
+  font-size: 13px;
+  font-weight: 700;
+  font-family: 'DM Sans', sans-serif;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.2s;
+  text-decoration: none;
+}
+.btn-upgrade:hover { background: #FFD07A; }
+
+/* Delete confirmation */
+.delete-confirm {
+  display: none;
+  background: rgba(231,76,60,0.06);
+  border: 1px solid rgba(231,76,60,0.2);
+  border-radius: 12px;
+  padding: 18px;
+  margin-bottom: 8px;
+}
+.delete-confirm.show { display: block; }
+.delete-confirm p {
+  font-size: 13px;
+  color: rgba(255,255,255,0.5);
+  margin-bottom: 14px;
+  line-height: 1.6;
+}
+.btn-delete-confirm {
+  padding: 10px 22px;
+  background: #e74c3c;
+  border: none;
+  border-radius: 8px;
+  color: #fff;
+  font-size: 13px;
+  font-weight: 700;
+  font-family: 'DM Sans', sans-serif;
+  cursor: pointer;
+}
+
+/* Toast */
+.toast {
+  position: fixed;
+  bottom: 24px; right: 24px;
+  padding: 12px 20px;
+  background: #27AE60;
+  color: #fff;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  z-index: 9999;
+  opacity: 0;
+  transform: translateY(10px);
+  transition: all 0.3s;
+}
+.toast.show { opacity: 1; transform: translateY(0); }
+</style>
+</head>
+<body>
+
+<div class="topnav">
+  <a href="../dashboard/index.html" class="back-btn">← Dashboard</a>
+  <a href="../index.html" class="topnav-logo">Analytica<span>.</span></a>
+</div>
+
+<div class="page">
+  <div class="page-title">⚙️ <span>Settings</span></div>
+  <div class="page-sub">Manage your account, notifications and privacy</div>
+
+  <div id="settings-alert" class="alert"></div>
+
+  <!-- ── ACCOUNT ── -->
+  <div class="settings-section">
+    <div class="section-label">Account</div>
+
+    <!-- Email -->
+    <div class="setting-row" onclick="toggleForm('email-form')">
+      <div class="setting-left">
+        <div class="setting-icon icon-blue">📧</div>
+        <div class="setting-info">
+          <div class="setting-name">Email Address</div>
+          <div class="setting-desc" id="current-email">Loading...</div>
+        </div>
+      </div>
+      <button class="setting-arrow">›</button>
+    </div>
+    <div class="edit-form" id="email-form">
+      <div class="alert" id="email-alert"></div>
+      <div class="form-group">
+        <label>New Email Address</label>
+        <input type="email" id="new-email" placeholder="newemail@example.com">
+      </div>
+      <button class="btn-save" onclick="updateEmail()">Save Email</button>
+      <button class="btn-cancel" onclick="toggleForm('email-form')">Cancel</button>
+    </div>
+
+    <!-- Password -->
+    <div class="setting-row" onclick="toggleForm('password-form')">
+      <div class="setting-left">
+        <div class="setting-icon icon-gold">🔑</div>
+        <div class="setting-info">
+          <div class="setting-name">Password</div>
+          <div class="setting-desc">Change your password</div>
+        </div>
+      </div>
+      <button class="setting-arrow">›</button>
+    </div>
+    <div class="edit-form" id="password-form">
+      <div class="alert" id="password-alert"></div>
+      <div class="form-group">
+        <label>New Password</label>
+        <input type="password" id="new-password" placeholder="Min. 8 characters">
+      </div>
+      <div class="form-group">
+        <label>Confirm New Password</label>
+        <input type="password" id="confirm-password" placeholder="Repeat new password">
+      </div>
+      <button class="btn-save" onclick="updatePassword()">Save Password</button>
+      <button class="btn-cancel" onclick="toggleForm('password-form')">Cancel</button>
+    </div>
+
+    <!-- Profile -->
+    <div class="setting-row" onclick="window.location.href='../profile/index.html'">
+      <div class="setting-left">
+        <div class="setting-icon icon-purple">👤</div>
+        <div class="setting-info">
+          <div class="setting-name">Edit Profile</div>
+          <div class="setting-desc">Update your name, bio, skills and projects</div>
+        </div>
+      </div>
+      <button class="setting-arrow">›</button>
+    </div>
+
+  </div>
+
+  <!-- ── SUBSCRIPTION ── -->
+  <div class="settings-section">
+    <div class="section-label">Subscription</div>
+
+    <div class="plan-card">
+      <div class="plan-info">
+        <div class="plan-name">Current Plan: <span id="current-plan">Free</span></div>
+        <div class="plan-desc" id="plan-desc">Upgrade to Pro for AI Assistant, SQL Playground and more</div>
+      </div>
+      <a href="../pricing.html" class="btn-upgrade">Upgrade →</a>
+    </div>
+
+    <div class="setting-row" onclick="window.location.href='../pricing.html'">
+      <div class="setting-left">
+        <div class="setting-icon icon-gold">💳</div>
+        <div class="setting-info">
+          <div class="setting-name">Billing & Payments</div>
+          <div class="setting-desc">View invoices and manage payment methods</div>
+        </div>
+      </div>
+      <button class="setting-arrow">›</button>
+    </div>
+  </div>
+
+  <!-- ── NOTIFICATIONS ── -->
+  <div class="settings-section">
+    <div class="section-label">Notifications</div>
+
+    <div class="setting-row">
+      <div class="setting-left">
+        <div class="setting-icon icon-blue">💬</div>
+        <div class="setting-info">
+          <div class="setting-name">Forum Replies</div>
+          <div class="setting-desc">Get notified when someone replies to your posts</div>
+        </div>
+      </div>
+      <button class="toggle on" id="notif-forum" onclick="toggleNotif('notif-forum')"></button>
+    </div>
+
+    <div class="setting-row">
+      <div class="setting-left">
+        <div class="setting-icon icon-gold">💼</div>
+        <div class="setting-info">
+          <div class="setting-name">Job Alerts</div>
+          <div class="setting-desc">New jobs matching your skills</div>
+        </div>
+      </div>
+      <button class="toggle on" id="notif-jobs" onclick="toggleNotif('notif-jobs')"></button>
+    </div>
+
+    <div class="setting-row">
+      <div class="setting-left">
+        <div class="setting-icon icon-green">🏆</div>
+        <div class="setting-info">
+          <div class="setting-name">Challenge Updates</div>
+          <div class="setting-desc">New challenges and results</div>
+        </div>
+      </div>
+      <button class="toggle on" id="notif-challenges" onclick="toggleNotif('notif-challenges')"></button>
+    </div>
+
+    <div class="setting-row">
+      <div class="setting-left">
+        <div class="setting-icon icon-purple">📊</div>
+        <div class="setting-info">
+          <div class="setting-name">New Datasets</div>
+          <div class="setting-desc">When new datasets are added</div>
+        </div>
+      </div>
+      <button class="toggle" id="notif-datasets" onclick="toggleNotif('notif-datasets')"></button>
+    </div>
+
+    <div class="setting-row">
+      <div class="setting-left">
+        <div class="setting-icon icon-blue">📰</div>
+        <div class="setting-info">
+          <div class="setting-name">Weekly Digest</div>
+          <div class="setting-desc">Weekly email with top posts and datasets</div>
+        </div>
+      </div>
+      <button class="toggle on" id="notif-digest" onclick="toggleNotif('notif-digest')"></button>
+    </div>
+  </div>
+
+  <!-- ── PRIVACY ── -->
+  <div class="settings-section">
+    <div class="section-label">Privacy</div>
+
+    <div class="setting-row">
+      <div class="setting-left">
+        <div class="setting-icon icon-green">🌍</div>
+        <div class="setting-info">
+          <div class="setting-name">Public Profile</div>
+          <div class="setting-desc">Allow others to view your profile</div>
+        </div>
+      </div>
+      <button class="toggle on" id="privacy-profile" onclick="toggleNotif('privacy-profile')"></button>
+    </div>
+
+    <div class="setting-row">
+      <div class="setting-left">
+        <div class="setting-icon icon-blue">📊</div>
+        <div class="setting-info">
+          <div class="setting-name">Show Activity</div>
+          <div class="setting-desc">Show your forum and challenge activity</div>
+        </div>
+      </div>
+      <button class="toggle on" id="privacy-activity" onclick="toggleNotif('privacy-activity')"></button>
+    </div>
+  </div>
+
+  <!-- ── DANGER ZONE ── -->
+  <div class="settings-section">
+    <div class="section-label">Danger Zone</div>
+
+    <div class="setting-row" onclick="signOut()">
+      <div class="setting-left">
+        <div class="setting-icon icon-red">🚪</div>
+        <div class="setting-info">
+          <div class="setting-name">Sign Out</div>
+          <div class="setting-desc">Sign out of your Analytica account</div>
+        </div>
+      </div>
+      <button class="setting-arrow">›</button>
+    </div>
+
+    <div class="setting-row danger" onclick="toggleDeleteConfirm()">
+      <div class="setting-left">
+        <div class="setting-icon icon-red">🗑️</div>
+        <div class="setting-info">
+          <div class="setting-name danger">Delete Account</div>
+          <div class="setting-desc">Permanently delete your account and all data</div>
+        </div>
+      </div>
+      <button class="setting-arrow" style="color:#e74c3c;">›</button>
+    </div>
+
+    <div class="delete-confirm" id="delete-confirm">
+      <p>⚠️ This action is <strong>permanent and cannot be undone.</strong> All your posts, downloads and data will be deleted forever.</p>
+      <button class="btn-delete-confirm" onclick="deleteAccount()">
+        Yes, Delete My Account
+      </button>
+      <button class="btn-cancel" onclick="toggleDeleteConfirm()">Cancel</button>
+    </div>
+  </div>
+
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast">✅ Saved!</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="../js/supabase.js"></script>
+<script>
+let currentUser = null
+
+// ── LOAD USER ──
+async function loadUser() {
+  const { data: { session } } = await db.auth.getSession()
+  if (!session) {
+    window.location.href = '../auth/login.html'
+    return
+  }
+  currentUser = session.user
+  document.getElementById('current-email').textContent = currentUser.email
+}
+
+// ── TOGGLE FORM ──
+function toggleForm(id) {
+  const form = document.getElementById(id)
+  const isOpen = form.classList.contains('show')
+  document.querySelectorAll('.edit-form').forEach(f => f.classList.remove('show'))
+  if (!isOpen) form.classList.add('show')
+}
+
+// ── UPDATE EMAIL ──
+async function updateEmail() {
+  const email = document.getElementById('new-email').value.trim()
+  const alertBox = document.getElementById('email-alert')
+
+  if (!email) {
+    alertBox.textContent = 'Please enter a new email.'
+    alertBox.className = 'alert error'
+    return
+  }
+
+  const { error } = await db.auth.updateUser({ email })
+
+  if (error) {
+    alertBox.textContent = error.message
+    alertBox.className = 'alert error'
+    return
+  }
+
+  alertBox.textContent = '✅ Confirmation sent to your new email!'
+  alertBox.className = 'alert success'
+  showToast('📧 Check your new email to confirm!')
+}
+
+// ── UPDATE PASSWORD ──
+async function updatePassword() {
+  const newPass = document.getElementById('new-password').value
+  const confirmPass = document.getElementById('confirm-password').value
+  const alertBox = document.getElementById('password-alert')
+
+  if (newPass.length < 8) {
+    alertBox.textContent = 'Password must be at least 8 characters.'
+    alertBox.className = 'alert error'
+    return
+  }
+
+  if (newPass !== confirmPass) {
+    alertBox.textContent = 'Passwords do not match.'
+    alertBox.className = 'alert error'
+    return
+  }
+
+  const { error } = await db.auth.updateUser({ password: newPass })
+
+  if (error) {
+    alertBox.textContent = error.message
+    alertBox.className = 'alert error'
+    return
+  }
+
+  alertBox.textContent = '✅ Password updated successfully!'
+  alertBox.className = 'alert success'
+  document.getElementById('new-password').value = ''
+  document.getElementById('confirm-password').value = ''
+  showToast('🔑 Password updated!')
+}
+
+// ── TOGGLE NOTIFICATIONS ──
+function toggleNotif(id) {
+  const btn = document.getElementById(id)
+  btn.classList.toggle('on')
+  showToast(btn.classList.contains('on') ? '🔔 Notifications enabled' : '🔕 Notifications disabled')
+}
+
+// ── SIGN OUT ──
+async function signOut() {
+  await db.auth.signOut()
+  window.location.href = '../index.html'
+}
+
+// ── DELETE ACCOUNT ──
+function toggleDeleteConfirm() {
+  const el = document.getElementById('delete-confirm')
+  el.classList.toggle('show')
+}
+
+async function deleteAccount() {
+  const alertBox = document.getElementById('settings-alert')
+  alertBox.textContent = 'Account deletion requires contacting support at hello@analytica.africa'
+  alertBox.className = 'alert error'
+  toggleDeleteConfirm()
+  window.scrollTo(0, 0)
+}
+
+// ── TOAST ──
+function showToast(msg = '✅ Saved!') {
+  const toast = document.getElementById('toast')
+  toast.textContent = msg
+  toast.classList.add('show')
+  setTimeout(() => toast.classList.remove('show'), 2500)
+}
+
+// ── INIT ──
+loadUser()
+</script>
+</body>
+</html>

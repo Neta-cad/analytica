@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Upgrade to Pro — Analytica</title>
+<link rel="stylesheet" href="../css/main.css">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script src="https://js.paystack.co/v1/inline.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+* { box-sizing: border-box; }
+body {
+  background: #0A1628;
+  min-height: 100vh;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 80px 20px 40px;
+}
+body::before {
+  content: '';
+  position: fixed; inset: 0;
+  background-image:
+    linear-gradient(rgba(245,166,35,0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(245,166,35,0.04) 1px, transparent 1px);
+  background-size: 50px 50px;
+  pointer-events: none;
+}
+.topnav {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  height: 60px;
+  background: rgba(10,22,40,0.95);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 20px;
+  z-index: 40;
+}
+.topnav-logo {
+  font-family: 'Playfair Display', serif;
+  font-size: 20px;
+  font-weight: 900;
+  color: #fff;
+  text-decoration: none;
+}
+.topnav-logo span { color: #F5A623; }
+.back-btn {
+  color: rgba(255,255,255,0.6);
+  font-size: 14px;
+  text-decoration: none;
+  transition: color 0.2s;
+}
+.back-btn:hover { color: #F5A623; }
+
+.payment-wrap {
+  width: 100%;
+  max-width: 480px;
+  position: relative;
+  z-index: 2;
+}
+
+/* Plan selector */
+.plan-toggle {
+  display: flex;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 100px;
+  padding: 4px;
+  margin-bottom: 28px;
+  gap: 4px;
+}
+.plan-toggle-btn {
+  flex: 1;
+  padding: 9px;
+  border-radius: 100px;
+  border: none;
+  background: transparent;
+  color: rgba(255,255,255,0.5);
+  font-size: 13px;
+  font-weight: 500;
+  font-family: 'DM Sans', sans-serif;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-align: center;
+  position: relative;
+}
+.plan-toggle-btn.active {
+  background: #F5A623;
+  color: #0A1628;
+  font-weight: 700;
+}
+.save-tag {
+  position: absolute;
+  top: -10px; right: -6px;
+  background: #27AE60;
+  color: #fff;
+  font-size: 9px;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 100px;
+}
+
+/* Payment card */
+.payment-card {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 20px;
+  padding: 32px 28px;
+  margin-bottom: 16px;
+}
+
+.plan-header {
+  text-align: center;
+  margin-bottom: 24px;
+  padding-bottom: 24px;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+.plan-icon { font-size: 36px; margin-bottom: 8px; }
+.plan-name {
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: #F5A623;
+  margin-bottom: 8px;
+}
+.plan-price {
+  font-family: 'Playfair Display', serif;
+  font-size: 48px;
+  font-weight: 900;
+  color: #fff;
+  line-height: 1;
+  margin-bottom: 4px;
+}
+.plan-price span { font-size: 20px; color: rgba(255,255,255,0.5); }
+.plan-period { font-size: 13px; color: rgba(255,255,255,0.4); }
+.plan-savings {
+  display: inline-block;
+  margin-top: 8px;
+  padding: 3px 12px;
+  background: rgba(39,174,96,0.12);
+  color: #27AE60;
+  border: 1px solid rgba(39,174,96,0.25);
+  border-radius: 100px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+/* Features list */
+.features-list { margin-bottom: 24px; }
+.feature-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.04);
+  font-size: 14px;
+  color: rgba(255,255,255,0.7);
+}
+.feature-item:last-child { border-bottom: none; }
+.feature-check { color: #27AE60; font-size: 14px; flex-shrink: 0; }
+
+/* Form */
+.form-group { margin-bottom: 16px; }
+label {
+  display: block;
+  font-size: 12px;
+  font-weight: 600;
+  color: rgba(255,255,255,0.5);
+  margin-bottom: 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+input {
+  width: 100%;
+  padding: 12px 16px;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 8px;
+  color: #fff;
+  font-size: 14px;
+  font-family: 'DM Sans', sans-serif;
+  outline: none;
+  transition: border-color 0.2s;
+}
+input:focus { border-color: #F5A623; }
+input::placeholder { color: rgba(255,255,255,0.25); }
+input:read-only { opacity: 0.7; cursor: not-allowed; }
+
+/* Pay button */
+.btn-pay {
+  width: 100%;
+  padding: 16px;
+  background: linear-gradient(135deg, #F5A623, #e8920f);
+  border: none;
+  border-radius: 10px;
+  color: #0A1628;
+  font-size: 16px;
+  font-weight: 700;
+  font-family: 'DM Sans', sans-serif;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+.btn-pay:hover { transform: translateY(-2px); box-shadow: 0 8px 32px rgba(245,166,35,0.3); }
+.btn-pay:disabled { opacity: 0.6; cursor: not-allowed; transform: none; box-shadow: none; }
+
+/* Security badges */
+.security-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  margin-top: 16px;
+  flex-wrap: wrap;
+}
+.security-badge {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+  color: rgba(255,255,255,0.3);
+}
+
+/* Guarantee */
+.guarantee {
+  background: rgba(39,174,96,0.06);
+  border: 1px solid rgba(39,174,96,0.15);
+  border-radius: 12px;
+  padding: 14px 16px;
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  margin-top: 16px;
+}
+.guarantee-icon { font-size: 24px; flex-shrink: 0; }
+.guarantee-text { font-size: 12px; color: rgba(255,255,255,0.5); line-height: 1.5; }
+.guarantee-text strong { color: #27AE60; }
+
+/* Alert */
+.alert {
+  padding: 12px 16px;
+  border-radius: 8px;
+  font-size: 13px;
+  margin-bottom: 16px;
+  display: none;
+  text-align: center;
+}
+.alert.success { background: rgba(39,174,96,0.15); border: 1px solid rgba(39,174,96,0.3); color: #2ecc71; display: block; }
+.alert.error { background: rgba(231,76,60,0.15); border: 1px solid rgba(231,76,60,0.3); color: #ff6b6b; display: block; }
+</style>
+</head>
+<body>
+
+<div class="topnav">
+  <a href="../dashboard/index.html" class="back-btn">← Back</a>
+  <a href="../index.html" class="topnav-logo">Analytica<span>.</span></a>
+</div>
+
+<div class="payment-wrap">
+
+  <!-- Plan Toggle -->
+  <div class="plan-toggle">
+    <button class="plan-toggle-btn active" id="monthly-btn" onclick="setPlan('monthly')">
+      Monthly
+    </button>
+    <button class="plan-toggle-btn" id="yearly-btn" onclick="setPlan('yearly')">
+      Yearly
+      <span class="save-tag">-20%</span>
+    </button>
+  </div>
+
+  <div class="alert" id="payment-alert"></div>
+
+  <!-- Payment Card -->
+  <div class="payment-card">
+
+    <div class="plan-header">
+      <div class="plan-icon">⚡</div>
+      <div class="plan-name">Pro Plan</div>
+      <div class="plan-price" id="price-display">₦2,500<span>/mo</span></div>
+      <div class="plan-period" id="period-display">Billed monthly • Cancel anytime</div>
+      <div class="plan-savings" id="savings-display" style="display:none;">Save ₦6,000/year</div>
+    </div>
+
+    <!-- Features -->
+    <div class="features-list">
+      <div class="feature-item"><span class="feature-check">✓</span> Everything in Free</div>
+      <div class="feature-item"><span class="feature-check">✓</span> 🤖 AI Data Assistant</div>
+      <div class="feature-item"><span class="feature-check">✓</span> 📝 SQL Playground</div>
+      <div class="feature-item"><span class="feature-check">✓</span> Unlimited Dataset Downloads</div>
+      <div class="feature-item"><span class="feature-check">✓</span> 📄 CV & Portfolio Builder</div>
+      <div class="feature-item"><span class="feature-check">✓</span> Apply to Jobs</div>
+      <div class="feature-item"><span class="feature-check">✓</span> Premium Certificates</div>
+      <div class="feature-item"><span class="feature-check">✓</span> Priority Forum Support</div>
+    </div>
+
+    <!-- Form -->
+    <div class="form-group">
+      <label>Full Name</label>
+      <input type="text" id="pay-name" placeholder="Your full name">
+    </div>
+    <div class="form-group">
+      <label>Email Address</label>
+      <input type="email" id="pay-email" placeholder="your@email.com">
+    </div>
+
+    <button class="btn-pay" id="pay-btn" onclick="initiatePayment()">
+      🔒 Pay <span id="pay-amount">₦2,500</span> — Upgrade Now
+    </button>
+
+    <div class="security-row">
+      <div class="security-badge">🔒 Secured by Paystack</div>
+      <div class="security-badge">🏦 Nigerian Banks Supported</div>
+      <div class="security-badge">📱 USSD & Cards</div>
+    </div>
+  </div>
+
+  <div class="guarantee">
+    <div class="guarantee-icon">🛡️</div>
+    <div class="guarantee-text">
+      <strong>30-Day Money-Back Guarantee.</strong> Not satisfied? Contact us within 30 days for a full refund — no questions asked.
+    </div>
+  </div>
+
+</div>
+
+<script src="https://js.paystack.co/v1/inline.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="../js/supabase.js"></script>
+<script>
+let currentPlan = 'monthly'
+let currentUser = null
+
+const PAYSTACK_PUBLIC_KEY = 'pk_test_xxxxxxxxxxxxxxxxxxxxxxxxxx'
+
+const plans = {
+  monthly: { amount: 250000, display: '₦2,500', period: 'Billed monthly • Cancel anytime' },
+  yearly: { amount: 2400000, display: '₦24,000', period: 'Billed yearly • Save ₦6,000' }
+}
+
+// ── LOAD USER ──
+async function loadUser() {
+  const { data: { session } } = await db.auth.getSession()
+  if (!session) {
+    window.location.href = '../auth/login.html'
+    return
+  }
+  currentUser = session.user
+  const meta = currentUser.user_metadata || {}
+  const name = meta.full_name || meta.first_name || ''
+  document.getElementById('pay-name').value = name
+  document.getElementById('pay-email').value = currentUser.email
+  document.getElementById('pay-email').readOnly = true
+}
+
+// ── SET PLAN ──
+function setPlan(plan) {
+  currentPlan = plan
+  document.getElementById('monthly-btn').classList.toggle('active', plan === 'monthly')
+  document.getElementById('yearly-btn').classList.toggle('active', plan === 'yearly')
+  document.getElementById('price-display').innerHTML = `${plans[plan].display}<span>/mo</span>`
+  document.getElementById('period-display').textContent = plans[plan].period
+  document.getElementById('pay-amount').textContent = plans[plan].display
+  const savings = document.getElementById('savings-display')
+  savings.style.display = plan === 'yearly' ? 'inline-block' : 'none'
+}
+
+// ── INITIATE PAYMENT ──
+function initiatePayment() {
+  const name = document.getElementById('pay-name').value.trim()
+  const email = document.getElementById('pay-email').value.trim()
+  const alertBox = document.getElementById('payment-alert')
+  const btn = document.getElementById('pay-btn')
+
+  if (!name) {
+    alertBox.textContent = 'Please enter your full name.'
+    alertBox.className = 'alert error'
+    return
+  }
+
+  alertBox.className = 'alert'
+  btn.disabled = true
+  btn.textContent = '⏳ Opening payment...'
+
+  const handler = PaystackPop.setup({
+    key: PAYSTACK_PUBLIC_KEY,
+    email: email,
+    amount: plans[currentPlan].amount,
+    currency: 'NGN',
+    ref: 'ANALYTICA_' + Date.now(),
+    metadata: {
+      custom_fields: [
+        { display_name: 'Plan', variable_name: 'plan', value: currentPlan },
+        { display_name: 'User ID', variable_name: 'user_id', value: currentUser?.id || '' }
+      ]
+    },
+    callback: async function(response) {
+      // Payment successful
+      alertBox.textContent = '🎉 Payment successful! Upgrading your account...'
+      alertBox.className = 'alert success'
+      btn.textContent = '✅ Payment Successful!'
+
+      // Update user metadata to Pro
+      await db.auth.updateUser({
+        data: { plan: 'pro', payment_ref: response.reference }
+      })
+
+      setTimeout(() => {
+        window.location.href = '../dashboard/index.html'
+      }, 2000)
+    },
+    onClose: function() {
+      btn.disabled = false
+      btn.innerHTML = `🔒 Pay <span id="pay-amount">${plans[currentPlan].display}</span> — Upgrade Now`
+    }
+  })
+
+  handler.openIframe()
+}
+
+loadUser()
+</script>
+</body>
+</html>

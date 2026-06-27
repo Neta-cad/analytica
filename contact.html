@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Contact Us — Analytica</title>
+<link rel="stylesheet" href="css/main.css">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+* { box-sizing: border-box; }
+body { background: #0A1628; min-height: 100vh; margin: 0; }
+
+.topnav {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  height: 60px;
+  background: rgba(10,22,40,0.95);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 20px;
+  z-index: 40;
+}
+.topnav-logo {
+  font-family: 'Playfair Display', serif;
+  font-size: 20px;
+  font-weight: 900;
+  color: #fff;
+  text-decoration: none;
+}
+.topnav-logo span { color: #F5A623; }
+.topnav-right { display: flex; gap: 10px; }
+.btn-sm {
+  padding: 7px 16px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  font-family: 'DM Sans', sans-serif;
+  cursor: pointer;
+  text-decoration: none;
+  transition: all 0.2s;
+  border: none;
+}
+.btn-gold { background: #F5A623; color: #0A1628; }
+.btn-gold:hover { background: #FFD07A; }
+.btn-outline {
+  background: transparent;
+  border: 1px solid rgba(255,255,255,0.2) !important;
+  color: #fff;
+}
+
+.page {
+  margin-top: 60px;
+  padding: 40px 20px;
+  max-width: 900px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* ── HEADER ── */
+.page-header {
+  text-align: center;
+  margin-bottom: 40px;
+}
+.page-label {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: #F5A623;
+  margin-bottom: 12px;
+}
+.page-title {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(28px, 5vw, 42px);
+  font-weight: 900;
+  margin-bottom: 14px;
+}
+.page-title span { color: #F5A623; }
+.page-sub {
+  font-size: 15px;
+  color: rgba(255,255,255,0.5);
+  line-height: 1.7;
+  max-width: 480px;
+  margin: 0 auto;
+}
+
+/* ── LAYOUT ── */
+.contact-layout {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+/* ── CONTACT CARDS ── */
+.contact-cards {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+}
+.contact-card {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.07);
+  border-radius: 14px;
+  padding: 20px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  text-decoration: none;
+  transition: all 0.3s;
+}
+.contact-card:hover {
+  border-color: rgba(245,166,35,0.25);
+  transform: translateY(-2px);
+}
+.contact-icon {
+  width: 46px; height: 46px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  flex-shrink: 0;
+}
+.icon-email { background: rgba(245,166,35,0.12); }
+.icon-twitter { background: rgba(29,161,242,0.12); }
+.icon-whatsapp { background: rgba(37,211,102,0.12); }
+.icon-location { background: rgba(231,76,60,0.12); }
+
+.contact-info {}
+.contact-label {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.35);
+  margin-bottom: 4px;
+}
+.contact-value {
+  font-size: 14px;
+  font-weight: 500;
+  color: rgba(255,255,255,0.8);
+}
+.contact-desc {
+  font-size: 12px;
+  color: rgba(255,255,255,0.35);
+  margin-top: 2px;
+}
+
+/* ── FORM ── */
+.contact-form-wrap {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.07);
+  border-radius: 20px;
+  padding: 28px 24px;
+}
+.form-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 22px;
+  font-weight: 700;
+  margin-bottom: 6px;
+}
+.form-sub {
+  font-size: 13px;
+  color: rgba(255,255,255,0.4);
+  margin-bottom: 24px;
+}
+
+.form-group { margin-bottom: 16px; }
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+label {
+  display: block;
+  font-size: 13px;
+  font-weight: 500;
+  color: rgba(255,255,255,0.6);
+  margin-bottom: 7px;
+}
+input, select, textarea {
+  width: 100%;
+  padding: 12px 16px;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 8px;
+  color: #fff;
+  font-size: 14px;
+  font-family: 'DM Sans', sans-serif;
+  outline: none;
+  transition: border-color 0.2s;
+}
+input:focus, select:focus, textarea:focus { border-color: #F5A623; }
+input::placeholder, textarea::placeholder { color: rgba(255,255,255,0.25); }
+select option { background: #112240; }
+textarea { resize: vertical; min-height: 130px; }
+
+.btn-submit {
+  width: 100%;
+  padding: 14px;
+  background: #F5A623;
+  border: none;
+  border-radius: 8px;
+  color: #0A1628;
+  font-size: 15px;
+  font-weight: 700;
+  font-family: 'DM Sans', sans-serif;
+  cursor: pointer;
+  transition: all 0.2s;
+  margin-top: 8px;
+}
+.btn-submit:hover { background: #FFD07A; transform: translateY(-1px); }
+.btn-submit:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+
+/* Alert */
+.alert {
+  padding: 12px 16px;
+  border-radius: 8px;
+  font-size: 13px;
+  margin-bottom: 16px;
+  display: none;
+}
+.alert.success {
+  background: rgba(39,174,96,0.15);
+  border: 1px solid rgba(39,174,96,0.3);
+  color: #2ecc71;
+  display: block;
+}
+.alert.error {
+  background: rgba(231,76,60,0.15);
+  border: 1px solid rgba(231,76,60,0.3);
+  color: #ff6b6b;
+  display: block;
+}
+
+/* ── FAQ ── */
+.faq-section { margin-top: 48px; }
+.faq-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 24px;
+  font-weight: 700;
+  margin-bottom: 20px;
+  text-align: center;
+}
+.faq-list { display: flex; flex-direction: column; gap: 10px; }
+.faq-item {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.07);
+  border-radius: 12px;
+  overflow: hidden;
+}
+.faq-question {
+  padding: 16px 20px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: rgba(255,255,255,0.8);
+  transition: color 0.2s;
+}
+.faq-question:hover { color: #F5A623; }
+.faq-arrow {
+  font-size: 12px;
+  color: rgba(255,255,255,0.3);
+  transition: transform 0.3s;
+  flex-shrink: 0;
+}
+.faq-item.open .faq-arrow { transform: rotate(180deg); color: #F5A623; }
+.faq-item.open .faq-question { color: #F5A623; }
+.faq-answer {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease;
+}
+.faq-answer-inner {
+  padding: 0 20px 16px;
+  font-size: 13px;
+  color: rgba(255,255,255,0.45);
+  line-height: 1.7;
+  border-top: 1px solid rgba(255,255,255,0.05);
+  padding-top: 12px;
+}
+.faq-item.open .faq-answer { max-height: 200px; }
+
+@media (min-width: 700px) {
+  .contact-layout { flex-direction: row; align-items: flex-start; }
+  .contact-cards { width: 300px; flex-shrink: 0; }
+  .contact-form-wrap { flex: 1; }
+}
+
+@media (min-width: 500px) {
+  .form-row { grid-template-columns: 1fr 1fr; }
+}
+</style>
+</head>
+<body>
+
+<div class="topnav">
+  <a href="index.html" class="topnav-logo">Analytica<span>.</span></a>
+  <div class="topnav-right">
+    <a href="auth/login.html" class="btn-sm btn-outline">Log In</a>
+    <a href="auth/signup.html" class="btn-sm btn-gold">Join Free</a>
+  </div>
+</div>
+
+<div class="page">
+
+  <!-- Header -->
+  <div class="page-header">
+    <div class="page-label">Get In Touch</div>
+    <h1 class="page-title">Contact <span>Us</span></h1>
+    <p class="page-sub">Have a question, partnership idea or just want to say hello? We'd love to hear from you.</p>
+  </div>
+
+  <!-- Layout -->
+  <div class="contact-layout">
+
+    <!-- Contact Cards -->
+    <div class="contact-cards">
+      <a href="mailto:hello@analytica.africa" class="contact-card">
+        <div class="contact-icon icon-email">📧</div>
+        <div class="contact-info">
+          <div class="contact-label">Email</div>
+          <div class="contact-value">hello@analytica.africa</div>
+          <div class="contact-desc">We reply within 24 hours</div>
+        </div>
+      </a>
+      <a href="https://twitter.com/analyticaAfrica" target="_blank" class="contact-card">
+        <div class="contact-icon icon-twitter">🐦</div>
+        <div class="contact-info">
+          <div class="contact-label">Twitter / X</div>
+          <div class="contact-value">@analyticaAfrica</div>
+          <div class="contact-desc">Follow for updates</div>
+        </div>
+      </a>
+      <a href="https://wa.me/2348000000000" target="_blank" class="contact-card">
+        <div class="contact-icon icon-whatsapp">💬</div>
+        <div class="contact-info">
+          <div class="contact-label">WhatsApp</div>
+          <div class="contact-value">+234 800 000 0000</div>
+          <div class="contact-desc">Mon–Fri, 9am–6pm WAT</div>
+        </div>
+      </a>
+      <div class="contact-card" style="cursor:default;">
+        <div class="contact-icon icon-location">📍</div>
+        <div class="contact-info">
+          <div class="contact-label">Location</div>
+          <div class="contact-value">Lagos, Nigeria</div>
+          <div class="contact-desc">Serving all of Africa</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Contact Form -->
+    <div class="contact-form-wrap">
+      <div class="form-title">Send a Message</div>
+      <div class="form-sub">Fill the form and we'll get back to you shortly.</div>
+
+      <div class="alert" id="form-alert"></div>
+
+      <form id="contact-form">
+        <div class="form-row">
+          <div class="form-group">
+            <label>First Name</label>
+            <input type="text" id="fname" placeholder="Ayomide" required>
+          </div>
+          <div class="form-group">
+            <label>Last Name</label>
+            <input type="text" id="lname" placeholder="Akingboye" required>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Email Address</label>
+          <input type="email" id="email" placeholder="you@example.com" required>
+        </div>
+
+        <div class="form-group">
+          <label>Subject</label>
+          <select id="subject">
+            <option value="">Select a subject</option>
+            <option>General Inquiry</option>
+            <option>Partnership / Sponsorship</option>
+            <option>Post a Job</option>
+            <option>Report a Bug</option>
+            <option>Dataset Submission</option>
+            <option>Press / Media</option>
+            <option>Other</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Message</label>
+          <textarea id="message" placeholder="Tell us what's on your mind..." required></textarea>
+        </div>
+
+        <button type="submit" class="btn-submit" id="submit-btn">
+          Send Message →
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- FAQ -->
+  <div class="faq-section">
+    <div class="faq-title">Frequently Asked Questions</div>
+    <div class="faq-list" id="faq-list"></div>
+  </div>
+
+</div>
+
+<script>
+// ── CONTACT FORM ──
+document.getElementById('contact-form').addEventListener('submit', (e) => {
+  e.preventDefault()
+  const btn = document.getElementById('submit-btn')
+  const alert = document.getElementById('form-alert')
+
+  btn.disabled = true
+  btn.textContent = 'Sending...'
+
+  setTimeout(() => {
+    alert.textContent = '✅ Message sent! We will get back to you within 24 hours.'
+    alert.className = 'alert success'
+    btn.textContent = 'Message Sent ✓'
+    document.getElementById('contact-form').reset()
+  }, 1500)
+})
+
+// ── FAQ ──
+const faqs = [
+  {
+    q: 'Is Analytica completely free?',
+    a: 'The core features — community forum, dataset library, learning resources and basic tools — are completely free. We have a Pro plan at ₦2,500/month that unlocks AI assistant, SQL playground, CV builder and more.'
+  },
+  {
+    q: 'How do I post a job on Analytica?',
+    a: 'Companies can post jobs starting from ₦15,000 per listing. Create a company account and go to the Job Board to post. For bulk posting or monthly subscriptions contact us directly.'
+  },
+  {
+    q: 'Can I upload my own datasets?',
+    a: 'Yes! Any registered user can upload datasets to the library. We review all submissions before publishing to ensure quality. Datasets must be relevant to Nigeria or Africa.'
+  },
+  {
+    q: 'How do I become a mentor on Analytica?',
+    a: 'Apply through the Mentorship page. We require at least 2 years of professional data experience. Once approved you can set your own rates and availability.'
+  },
+  {
+    q: 'Is Analytica available outside Nigeria?',
+    a: 'Yes! Analytica is built for all of Africa. We have users in Ghana, Kenya, South Africa, Ethiopia, Rwanda and 15+ other countries. All content is relevant to the broader African context.'
+  },
+  {
+    q: 'How do I report a bug or suggest a feature?',
+    a: 'Use the contact form above and select "Report a Bug" or email us at hello@analytica.africa. We read every message and act on feedback quickly.'
+  }
+]
+
+document.getElementById('faq-list').innerHTML = faqs.map((f, i) => `
+  <div class="faq-item" id="faq-${i}">
+    <div class="faq-question" onclick="toggleFaq(${i})">
+      ${f.q}
+      <span class="faq-arrow">▼</span>
+    </div>
+    <div class="faq-answer">
+      <div class="faq-answer-inner">${f.a}</div>
+    </div>
+  </div>
+`).join('')
+
+function toggleFaq(i) {
+  const item = document.getElementById(`faq-${i}`)
+  const isOpen = item.classList.contains('open')
+  document.querySelectorAll('.faq-item').forEach(f => f.classList.remove('open'))
+  if (!isOpen) item.classList.add('open')
+}
+</script>
+
+</body>
+</html>

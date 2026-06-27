@@ -1,0 +1,722 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chart Builder — Analytica</title>
+<link rel="stylesheet" href="../css/main.css">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+<style>
+* { box-sizing: border-box; }
+body { background: #0A1628; min-height: 100vh; margin: 0; }
+
+.topnav {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  height: 60px;
+  background: rgba(10,22,40,0.95);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 20px;
+  z-index: 40;
+}
+.topnav-logo {
+  font-family: 'Playfair Display', serif;
+  font-size: 20px;
+  font-weight: 900;
+  color: #fff;
+  text-decoration: none;
+}
+.topnav-logo span { color: #F5A623; }
+.topnav-right { display: flex; gap: 10px; }
+.btn-sm {
+  padding: 7px 16px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  font-family: 'DM Sans', sans-serif;
+  cursor: pointer;
+  text-decoration: none;
+  transition: all 0.2s;
+  border: none;
+}
+.btn-gold { background: #F5A623; color: #0A1628; }
+.btn-gold:hover { background: #FFD07A; }
+.btn-outline { background: transparent; border: 1px solid rgba(255,255,255,0.2) !important; color: #fff; }
+
+.page {
+  margin-top: 60px;
+  padding: 20px;
+  max-width: 1100px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.page-title {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(22px, 4vw, 30px);
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+.page-title span { color: #F5A623; }
+.page-sub { font-size: 13px; color: rgba(255,255,255,0.4); margin-bottom: 20px; }
+
+/* ── LAYOUT ── */
+.builder-layout {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* ── PANEL ── */
+.panel {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.07);
+  border-radius: 14px;
+  padding: 20px;
+}
+.panel-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: rgba(255,255,255,0.5);
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* ── UPLOAD AREA ── */
+.upload-area {
+  border: 2px dashed rgba(245,166,35,0.3);
+  border-radius: 12px;
+  padding: 32px 20px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s;
+  position: relative;
+}
+.upload-area:hover { border-color: #F5A623; background: rgba(245,166,35,0.04); }
+.upload-area.dragover { border-color: #F5A623; background: rgba(245,166,35,0.08); }
+.upload-icon { font-size: 36px; margin-bottom: 10px; }
+.upload-title { font-size: 15px; font-weight: 600; margin-bottom: 6px; }
+.upload-desc { font-size: 13px; color: rgba(255,255,255,0.4); margin-bottom: 14px; }
+.upload-input { display: none; }
+.btn-upload {
+  padding: 10px 22px;
+  background: rgba(245,166,35,0.12);
+  border: 1px solid rgba(245,166,35,0.3);
+  border-radius: 8px;
+  color: #F5A623;
+  font-size: 13px;
+  font-weight: 600;
+  font-family: 'DM Sans', sans-serif;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.btn-upload:hover { background: rgba(245,166,35,0.2); }
+
+/* Sample data buttons */
+.sample-row {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 14px;
+}
+.sample-btn {
+  padding: 6px 14px;
+  border-radius: 100px;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  border: 1px solid rgba(255,255,255,0.1);
+  color: rgba(255,255,255,0.5);
+  background: transparent;
+  font-family: 'DM Sans', sans-serif;
+  transition: all 0.2s;
+}
+.sample-btn:hover {
+  background: rgba(52,152,219,0.1);
+  border-color: rgba(52,152,219,0.3);
+  color: #3498db;
+}
+
+/* ── DATA PREVIEW ── */
+.data-preview { display: none; }
+.data-preview.show { display: block; }
+.preview-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 14px;
+  flex-wrap: wrap;
+}
+.preview-badge {
+  padding: 4px 12px;
+  border-radius: 100px;
+  font-size: 12px;
+  font-weight: 600;
+  background: rgba(39,174,96,0.1);
+  color: #27AE60;
+  border: 1px solid rgba(39,174,96,0.2);
+}
+.preview-table-wrap {
+  overflow-x: auto;
+  border-radius: 10px;
+  border: 1px solid rgba(255,255,255,0.06);
+  max-height: 180px;
+  overflow-y: auto;
+}
+.preview-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+}
+.preview-table th {
+  padding: 8px 12px;
+  background: rgba(255,255,255,0.04);
+  color: rgba(255,255,255,0.5);
+  font-weight: 600;
+  text-align: left;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+  white-space: nowrap;
+}
+.preview-table td {
+  padding: 8px 12px;
+  color: rgba(255,255,255,0.6);
+  border-bottom: 1px solid rgba(255,255,255,0.04);
+  white-space: nowrap;
+}
+
+/* ── CHART SETTINGS ── */
+.settings-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+.setting-group { display: flex; flex-direction: column; gap: 6px; }
+.setting-group.full { grid-column: 1 / -1; }
+.setting-label {
+  font-size: 12px;
+  font-weight: 500;
+  color: rgba(255,255,255,0.5);
+}
+.setting-input, .setting-select {
+  padding: 10px 12px;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 8px;
+  color: #fff;
+  font-size: 13px;
+  font-family: 'DM Sans', sans-serif;
+  outline: none;
+  transition: border-color 0.2s;
+}
+.setting-input:focus, .setting-select:focus { border-color: #F5A623; }
+.setting-select option { background: #112240; }
+
+/* Chart type selector */
+.chart-types {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin-bottom: 16px;
+}
+.chart-type-btn {
+  padding: 12px 8px;
+  border-radius: 10px;
+  border: 1px solid rgba(255,255,255,0.1);
+  background: rgba(255,255,255,0.03);
+  color: rgba(255,255,255,0.5);
+  font-size: 12px;
+  font-weight: 500;
+  font-family: 'DM Sans', sans-serif;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+.chart-type-btn span { font-size: 22px; }
+.chart-type-btn:hover, .chart-type-btn.active {
+  background: rgba(245,166,35,0.1);
+  border-color: rgba(245,166,35,0.3);
+  color: #F5A623;
+}
+
+/* Color picker row */
+.color-row {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.color-swatch {
+  width: 28px; height: 28px;
+  border-radius: 6px;
+  cursor: pointer;
+  border: 2px solid transparent;
+  transition: all 0.2s;
+}
+.color-swatch.active { border-color: #fff; transform: scale(1.15); }
+
+/* Generate button */
+.btn-generate {
+  width: 100%;
+  padding: 14px;
+  background: #F5A623;
+  border: none;
+  border-radius: 10px;
+  color: #0A1628;
+  font-size: 15px;
+  font-weight: 700;
+  font-family: 'DM Sans', sans-serif;
+  cursor: pointer;
+  transition: all 0.2s;
+  margin-top: 16px;
+}
+.btn-generate:hover { background: #FFD07A; transform: translateY(-1px); }
+.btn-generate:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+/* ── CHART DISPLAY ── */
+.chart-display { display: none; }
+.chart-display.show { display: block; }
+
+.chart-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.chart-name {
+  font-size: 16px;
+  font-weight: 600;
+  color: rgba(255,255,255,0.8);
+}
+.chart-actions { display: flex; gap: 8px; }
+.btn-download-chart {
+  padding: 8px 16px;
+  background: rgba(39,174,96,0.1);
+  border: 1px solid rgba(39,174,96,0.2);
+  border-radius: 7px;
+  color: #27AE60;
+  font-size: 13px;
+  font-weight: 600;
+  font-family: 'DM Sans', sans-serif;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.btn-download-chart:hover { background: rgba(39,174,96,0.2); }
+.btn-reset {
+  padding: 8px 16px;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 7px;
+  color: rgba(255,255,255,0.5);
+  font-size: 13px;
+  font-family: 'DM Sans', sans-serif;
+  cursor: pointer;
+}
+
+.chart-canvas-wrap {
+  background: rgba(255,255,255,0.02);
+  border-radius: 12px;
+  padding: 20px;
+  border: 1px solid rgba(255,255,255,0.05);
+}
+
+canvas { max-width: 100%; }
+
+/* Alert */
+.alert {
+  padding: 12px 16px;
+  border-radius: 8px;
+  font-size: 13px;
+  margin-bottom: 14px;
+  display: none;
+}
+.alert.error { background: rgba(231,76,60,0.15); border: 1px solid rgba(231,76,60,0.3); color: #ff6b6b; display: block; }
+
+@media (min-width: 900px) {
+  .builder-layout { flex-direction: row; align-items: flex-start; }
+  .controls-panel { width: 340px; flex-shrink: 0; }
+  .chart-panel { flex: 1; }
+}
+</style>
+</head>
+<body>
+
+<div class="topnav">
+  <a href="../index.html" class="topnav-logo">Analytica<span>.</span></a>
+  <div class="topnav-right">
+    <a href="../dashboard/index.html" class="btn-sm btn-outline">Dashboard</a>
+    <a href="../auth/signup.html" class="btn-sm btn-gold">Join Free</a>
+  </div>
+</div>
+
+<div class="page">
+  <div class="page-title">Chart <span>Builder</span></div>
+  <div class="page-sub">Upload any CSV and instantly generate beautiful charts — no code needed</div>
+
+  <div class="builder-layout">
+
+    <!-- Controls Panel -->
+    <div class="controls-panel">
+
+      <!-- Upload -->
+      <div class="panel" style="margin-bottom:16px;">
+        <div class="panel-title">📂 Upload Data</div>
+
+        <div class="alert" id="upload-alert"></div>
+
+        <div class="upload-area" id="upload-area" onclick="document.getElementById('file-input').click()">
+          <div class="upload-icon">📊</div>
+          <div class="upload-title">Drop your CSV here</div>
+          <div class="upload-desc">or click to browse files</div>
+          <button class="btn-upload" onclick="event.stopPropagation();document.getElementById('file-input').click()">Choose CSV File</button>
+          <input type="file" id="file-input" class="upload-input" accept=".csv">
+        </div>
+
+        <div class="sample-row">
+          <span style="font-size:12px;color:rgba(255,255,255,0.3);align-self:center;">Try sample:</span>
+          <button class="sample-btn" onclick="loadSample('households')">🏠 Households</button>
+          <button class="sample-btn" onclick="loadSample('gdp')">📈 GDP Data</button>
+          <button class="sample-btn" onclick="loadSample('population')">👥 Population</button>
+        </div>
+
+        <!-- Data Preview -->
+        <div class="data-preview" id="data-preview" style="margin-top:16px;">
+          <div class="preview-info">
+            <span class="preview-badge" id="preview-badge">0 rows loaded</span>
+            <span style="font-size:12px;color:rgba(255,255,255,0.3);" id="preview-filename"></span>
+          </div>
+          <div class="preview-table-wrap">
+            <table class="preview-table" id="preview-table"></table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Chart Settings -->
+      <div class="panel">
+        <div class="panel-title">⚙️ Chart Settings</div>
+
+        <!-- Chart Type -->
+        <div class="setting-label" style="margin-bottom:8px;">Chart Type</div>
+        <div class="chart-types">
+          <button class="chart-type-btn active" onclick="setChartType('bar', this)">
+            <span>📊</span> Bar
+          </button>
+          <button class="chart-type-btn" onclick="setChartType('line', this)">
+            <span>📈</span> Line
+          </button>
+          <button class="chart-type-btn" onclick="setChartType('pie', this)">
+            <span>🥧</span> Pie
+          </button>
+          <button class="chart-type-btn" onclick="setChartType('doughnut', this)">
+            <span>🍩</span> Doughnut
+          </button>
+          <button class="chart-type-btn" onclick="setChartType('radar', this)">
+            <span>🕸️</span> Radar
+          </button>
+          <button class="chart-type-btn" onclick="setChartType('polarArea', this)">
+            <span>🎯</span> Polar
+          </button>
+        </div>
+
+        <div class="settings-grid">
+          <div class="setting-group full">
+            <div class="setting-label">Chart Title</div>
+            <input type="text" class="setting-input" id="chart-title" placeholder="Enter chart title...">
+          </div>
+          <div class="setting-group">
+            <div class="setting-label">X Axis (Labels)</div>
+            <select class="setting-select" id="x-axis"></select>
+          </div>
+          <div class="setting-group">
+            <div class="setting-label">Y Axis (Values)</div>
+            <select class="setting-select" id="y-axis"></select>
+          </div>
+          <div class="setting-group full">
+            <div class="setting-label">Color Theme</div>
+            <div class="color-row" id="color-row">
+              <div class="color-swatch active" style="background:#F5A623" onclick="setColor('#F5A623', this)"></div>
+              <div class="color-swatch" style="background:#3498db" onclick="setColor('#3498db', this)"></div>
+              <div class="color-swatch" style="background:#27AE60" onclick="setColor('#27AE60', this)"></div>
+              <div class="color-swatch" style="background:#9b59b6" onclick="setColor('#9b59b6', this)"></div>
+              <div class="color-swatch" style="background:#e74c3c" onclick="setColor('#e74c3c', this)"></div>
+              <div class="color-swatch" style="background:#1abc9c" onclick="setColor('#1abc9c', this)"></div>
+              <div class="color-swatch" style="background:#e67e22" onclick="setColor('#e67e22', this)"></div>
+            </div>
+          </div>
+        </div>
+
+        <button class="btn-generate" id="generate-btn" onclick="generateChart()" disabled>
+          📊 Generate Chart
+        </button>
+      </div>
+
+    </div>
+
+    <!-- Chart Panel -->
+    <div class="chart-panel">
+      <div class="panel">
+
+        <!-- Placeholder -->
+        <div id="chart-placeholder" style="text-align:center;padding:80px 20px;color:rgba(255,255,255,0.2);">
+          <div style="font-size:56px;margin-bottom:16px;">📊</div>
+          <div style="font-size:16px;font-weight:600;margin-bottom:8px;color:rgba(255,255,255,0.3);">Your chart will appear here</div>
+          <div style="font-size:13px;">Upload a CSV file and click Generate Chart</div>
+        </div>
+
+        <!-- Chart Display -->
+        <div class="chart-display" id="chart-display">
+          <div class="chart-topbar">
+            <div class="chart-name" id="chart-display-title">Chart</div>
+            <div class="chart-actions">
+              <button class="btn-download-chart" onclick="downloadChart()">⬇️ Download PNG</button>
+              <button class="btn-reset" onclick="resetChart()">↺ Reset</button>
+            </div>
+          </div>
+          <div class="chart-canvas-wrap">
+            <canvas id="myChart"></canvas>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+<script>
+let csvData = []
+let csvHeaders = []
+let selectedChartType = 'bar'
+let selectedColor = '#F5A623'
+let myChart = null
+
+// ── SAMPLE DATASETS ──
+const samples = {
+  households: {
+    name: 'Nigeria Households by Zone',
+    data: `zone,households,avg_size\nNorth West,1680,6.5\nNorth Central,1660,5.2\nSouth West,1440,4.8\nSouth South,1429,5.1\nNorth East,1420,6.1\nSouth East,1192,4.6`
+  },
+  gdp: {
+    name: 'Nigeria GDP Growth (%)',
+    data: `year,gdp_growth\n2018,1.9\n2019,2.3\n2020,-1.8\n2021,3.4\n2022,3.1\n2023,2.9`
+  },
+  population: {
+    name: 'Top 6 States by Population',
+    data: `state,population_millions\nLagos,15.4\nKano,13.9\nOyo,7.8\nKaduna,8.3\nRivers,7.3\nZamfara,4.5`
+  }
+}
+
+function loadSample(key) {
+  const sample = samples[key]
+  const result = Papa.parse(sample.data, { header: true, skipEmptyLines: true })
+  processData(result.data, sample.name)
+}
+
+// ── FILE UPLOAD ──
+document.getElementById('file-input').addEventListener('change', (e) => {
+  const file = e.target.files[0]
+  if (!file) return
+
+  Papa.parse(file, {
+    header: true,
+    skipEmptyLines: true,
+    complete: (result) => {
+      processData(result.data, file.name)
+    },
+    error: () => {
+      showAlert('Could not read file. Please upload a valid CSV.')
+    }
+  })
+})
+
+// Drag and drop
+const uploadArea = document.getElementById('upload-area')
+uploadArea.addEventListener('dragover', (e) => {
+  e.preventDefault()
+  uploadArea.classList.add('dragover')
+})
+uploadArea.addEventListener('dragleave', () => uploadArea.classList.remove('dragover'))
+uploadArea.addEventListener('drop', (e) => {
+  e.preventDefault()
+  uploadArea.classList.remove('dragover')
+  const file = e.dataTransfer.files[0]
+  if (file && file.name.endsWith('.csv')) {
+    Papa.parse(file, {
+      header: true,
+      skipEmptyLines: true,
+      complete: (result) => processData(result.data, file.name)
+    })
+  }
+})
+
+// ── PROCESS DATA ──
+function processData(data, filename) {
+  if (!data || data.length === 0) {
+    showAlert('No data found in file.')
+    return
+  }
+
+  csvData = data
+  csvHeaders = Object.keys(data[0])
+
+  // Show preview
+  document.getElementById('data-preview').classList.add('show')
+  document.getElementById('preview-badge').textContent = `${data.length} rows loaded`
+  document.getElementById('preview-filename').textContent = filename
+
+  // Build preview table
+  const table = document.getElementById('preview-table')
+  const previewRows = data.slice(0, 5)
+  table.innerHTML = `
+    <thead><tr>${csvHeaders.map(h => `<th>${h}</th>`).join('')}</tr></thead>
+    <tbody>${previewRows.map(row =>
+      `<tr>${csvHeaders.map(h => `<td>${row[h] || ''}</td>`).join('')}</tr>`
+    ).join('')}</tbody>
+  `
+
+  // Populate axis selectors
+  const xSel = document.getElementById('x-axis')
+  const ySel = document.getElementById('y-axis')
+  xSel.innerHTML = csvHeaders.map(h => `<option value="${h}">${h}</option>`).join('')
+  ySel.innerHTML = csvHeaders.map((h, i) => `<option value="${h}" ${i === 1 ? 'selected' : ''}>${h}</option>`).join('')
+
+  document.getElementById('generate-btn').disabled = false
+  document.getElementById('upload-alert').style.display = 'none'
+}
+
+// ── GENERATE CHART ──
+function generateChart() {
+  const title = document.getElementById('chart-title').value || 'My Chart'
+  const xCol = document.getElementById('x-axis').value
+  const yCol = document.getElementById('y-axis').value
+
+  const labels = csvData.map(row => row[xCol])
+  const values = csvData.map(row => parseFloat(row[yCol]) || 0)
+
+  // Colors
+  const colors = generateColors(labels.length, selectedColor)
+
+  // Destroy old chart
+  if (myChart) myChart.destroy()
+
+  const ctx = document.getElementById('myChart').getContext('2d')
+
+  const isPie = ['pie', 'doughnut', 'polarArea'].includes(selectedChartType)
+
+  myChart = new Chart(ctx, {
+    type: selectedChartType,
+    data: {
+      labels,
+      datasets: [{
+        label: yCol,
+        data: values,
+        backgroundColor: isPie ? colors : colors[0] + '99',
+        borderColor: isPie ? colors : colors[0],
+        borderWidth: 2,
+        borderRadius: selectedChartType === 'bar' ? 6 : 0,
+        fill: selectedChartType === 'line' ? true : undefined,
+        tension: selectedChartType === 'line' ? 0.4 : undefined,
+        pointBackgroundColor: selectedColor,
+        pointRadius: selectedChartType === 'line' ? 5 : 0
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: {
+          labels: { color: 'rgba(255,255,255,0.6)', font: { size: 12 } }
+        },
+        title: {
+          display: true,
+          text: title,
+          color: '#fff',
+          font: { size: 16, weight: 'bold', family: 'DM Sans' },
+          padding: { bottom: 16 }
+        }
+      },
+      scales: isPie ? {} : {
+        x: {
+          ticks: { color: 'rgba(255,255,255,0.5)', font: { size: 11 } },
+          grid: { color: 'rgba(255,255,255,0.04)' }
+        },
+        y: {
+          ticks: { color: 'rgba(255,255,255,0.5)', font: { size: 11 } },
+          grid: { color: 'rgba(255,255,255,0.06)' }
+        }
+      }
+    }
+  })
+
+  // Show chart
+  document.getElementById('chart-placeholder').style.display = 'none'
+  document.getElementById('chart-display').classList.add('show')
+  document.getElementById('chart-display-title').textContent = title
+}
+
+// ── DOWNLOAD CHART ──
+function downloadChart() {
+  const canvas = document.getElementById('myChart')
+  const link = document.createElement('a')
+  link.download = 'analytica-chart.png'
+  link.href = canvas.toDataURL('image/png')
+  link.click()
+}
+
+// ── RESET ──
+function resetChart() {
+  if (myChart) { myChart.destroy(); myChart = null }
+  document.getElementById('chart-display').classList.remove('show')
+  document.getElementById('chart-placeholder').style.display = 'block'
+}
+
+// ── CHART TYPE ──
+function setChartType(type, btn) {
+  selectedChartType = type
+  document.querySelectorAll('.chart-type-btn').forEach(b => b.classList.remove('active'))
+  btn.classList.add('active')
+}
+
+// ── COLOR ──
+function setColor(color, el) {
+  selectedColor = color
+  document.querySelectorAll('.color-swatch').forEach(s => s.classList.remove('active'))
+  el.classList.add('active')
+}
+
+// ── GENERATE COLORS ──
+function generateColors(count, baseColor) {
+  const palette = [
+    '#F5A623','#3498db','#27AE60','#9b59b6',
+    '#e74c3c','#1abc9c','#e67e22','#2ecc71',
+    '#f39c12','#16a085','#8e44ad','#c0392b'
+  ]
+  if (count <= palette.length) return palette.slice(0, count)
+  const colors = []
+  for (let i = 0; i < count; i++) colors.push(palette[i % palette.length])
+  return colors
+}
+
+function showAlert(msg) {
+  const a = document.getElementById('upload-alert')
+  a.textContent = msg
+  a.className = 'alert error'
+}
+</script>
+</body>
+</html>

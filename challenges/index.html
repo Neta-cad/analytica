@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Challenges — Analytica</title>
+<link rel="stylesheet" href="../css/main.css">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body { background: #0A1628; color: #fff; font-family: 'DM Sans', sans-serif; min-height: 100vh; }
+a { text-decoration: none; color: inherit; }
+
+/* NAV */
+.topnav {
+  position: fixed; top: 0; left: 0; right: 0; height: 60px;
+  background: rgba(10,22,40,0.97); backdrop-filter: blur(20px);
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 24px; z-index: 40;
+}
+.topnav-logo { font-family: 'Playfair Display', serif; font-size: 20px; font-weight: 900; }
+.topnav-logo span { color: #F5A623; }
+.topnav-right { display: flex; gap: 10px; align-items: center; }
+.btn-sm { padding: 7px 16px; border-radius: 6px; font-size: 13px; font-weight: 600; font-family: 'DM Sans', sans-serif; cursor: pointer; border: none; transition: all 0.2s; text-decoration: none; display: inline-block; }
+.btn-gold { background: #F5A623; color: #0A1628; }
+.btn-gold:hover { background: #ffc14d; }
+.btn-outline { background: transparent; border: 1px solid rgba(255,255,255,0.2) !important; color: #fff; }
+.btn-outline:hover { border-color: #F5A623 !important; color: #F5A623; }
+
+/* PAGE */
+.page { margin-top: 60px; }
+
+/* HERO */
+.challenges-hero {
+  background: linear-gradient(135deg, rgba(245,166,35,0.08), rgba(10,22,40,0));
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+  padding: 52px 24px 40px; text-align: center;
+  position: relative; overflow: hidden;
+}
+.challenges-hero::before {
+  content: '';
+  position: absolute; inset: 0;
+  background-image: linear-gradient(rgba(245,166,35,0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(245,166,35,0.03) 1px, transparent 1px);
+  background-size: 50px 50px;
+}
+.hero-badge {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: rgba(245,166,35,0.1); border: 1px solid rgba(245,166,35,0.25);
+  padding: 6px 16px; border-radius: 50px; font-size: 12px; font-weight: 600;
+  color: #F5A623; margin-bottom: 20px; position: relative;
+}
+.pulse { width: 7px; height: 7px; background: #F5A623; border-radius: 50%; animation: pulse 2s infinite; }
+@keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.5;transform:scale(1.5)} }
+.challenges-hero h1 {
+  font-family: 'Playfair Display', serif; font-size: clamp(30px, 5vw, 56px);
+  font-weight: 900; line-height: 1.15; margin-bottom: 14px; position: relative;
+}
+.challenges-hero h1 em { font-style: italic; color: #F5A623; }
+.challenges-hero p { color: rgba(255,255,255,0.5); font-size: 16px; line-height: 1.7; max-width: 560px; margin: 0 auto 32px; position: relative; }
+
+/* HERO STATS */
+.hero-stats { display: flex; gap: 0; justify-content: center; flex-wrap: wrap; position: relative; }
+.hero-stat { padding: 16px 32px; border-right: 1px solid rgba(255,255,255,0.06); text-align: center; }
+.hero-stat:last-child { border-right: none; }
+.hero-stat-num { font-family: 'Playfair Display', serif; font-size: 28px; font-weight: 900; color: #F5A623; }
+.hero-stat-label { font-size: 11px; color: rgba(255,255,255,0.35); text-transform: uppercase; letter-spacing: 1px; margin-top: 2px; }
+
+/* LEADERBOARD STRIP */
+.leaderboard-strip {
+  background: rgba(255,255,255,0.02); border-bottom: 1px solid rgba(255,255,255,0.05);
+  padding: 14px 24px; display: flex; align-items: center; gap: 16px; overflow-x: auto;
+}
+.lb-title { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; color: rgba(255,255,255,0.3); white-space: nowrap; }
+.lb-winners { display: flex; gap: 12px; align-items: center; }
+.lb-winner { display: flex; align-items: center; gap: 8px; padding: 6px 12px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.07); border-radius: 20px; white-space: nowrap; }
+.lb-avatar { width: 24px; height: 24px; border-radius: 50%; background: linear-gradient(135deg, #F5A623, #e8920f); display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 700; color: #0A1628; }
+.lb-name { font-size: 12px; font-weight: 600; }
+.lb-badge { font-size: 10px; color: #F5A623; }
+
+/* MAIN CONTENT */
+.challenges-layout { max-width: 1100px; margin: 0 auto; padding: 32px 24px; }
+
+/* FILTERS */
+.filters-row { display: flex; gap: 10px; margin-bottom: 32px; flex-wrap: wrap; align-items: center; }
+.filter-pill { padding: 7px 18px; border-radius: 20px; font-size: 13px; font-weight: 500; cursor: pointer; border: 1px solid rgba(255,255,255,0.1); background: transparent; color: rgba(255,255,255,0.5); transition: all 0.2s; font-family: 'DM Sans', sans-serif; }
+.filter-pill:hover, .filter-pill.active { background: rgba(245,166,35,0.1); border-color: rgba(245,166,35,0.4); color: #F5A623; }
+.filter-pill.difficulty-easy { }
+.filter-pill.difficulty-easy.active { background: rgba(39,174,96,0.1); border-color: rgba(39,174,96,0.4); color: #27AE60; }
+.filter-pill.difficulty-hard.active { background: rgba(231,76,60,0.1); border-color: rgba(231,76,60,0.4); color: #E74C3C; }
+.search-pill { margin-left: auto; padding: 8px 16px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); border-radius: 20px; color: #fff; font-size: 13px; font-family: 'DM Sans', sans-serif; outline: none; width: 200px; }
+.search-pill:focus { border-color: rgba(245,166,35,0.4); }
+.search-pill::placeholder { color: rgba(255,255,255,0.3); }
+
+/* WEEKLY FEATURED */
+.weekly-card {
+  background: linear-gradient(135deg, rgba(245,166,35,0.12), rgba(245,166,35,0.03));
+  border: 1px solid rgba(245,166,35,0.3); border-radius: 20px;
+  padding: 32px; margin-bottom: 32px; position: relative; overflow: hidden;
+}
+.weekly-card::before {
+  content: '';
+  position: absolute; top: -40px; right: -40px;
+  width: 200px; height: 200px; background: rgba(245,166,35,0.05);
+  border-radius: 50%;
+}
+.weekly-tag { display: inline-flex; align-items: center; gap: 6px; background: #F5A623; color: #0A1628; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; padding: 4px 12px; border-radius: 4px; margin-bottom: 16px; }
+.weekly-card h2 { font-family: 'Playfair Display', serif; font-size: clamp(20px, 3vw, 32px); font-weight: 900; margin-bottom: 10px; line-height: 1.3; }
+.weekly-card p { font-size: 14px; color: rgba(255,255,255,0.55); line-height: 1.7; margin-bottom: 20px; max-width: 600px; }
+.weekly-meta { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 24px; }
+.weekly-meta-item { display: flex; align-items: center; gap: 6px; font-size: 13px; color: rgba(255,255,255,0.5); }
+.weekly-meta-item strong { color: #fff; }
+.weekly-actions { display: flex; gap: 12px; flex-wrap: wrap; }
+.btn-take { padding: 12px 28px; background: #F5A623; color: #0A1628; border: none; border-radius: 10px; font-size: 15px; font-weight: 700; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: all 0.2s; }
+.btn-take:hover { background: #ffc14d; transform: translateY(-2px); }
+.btn-preview { padding: 12px 22px; background: transparent; border: 1px solid rgba(255,255,255,0.2); color: #fff; border-radius: 10px; font-size: 14px; font-weight: 600; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: all 0.2s; }
+.btn-preview:hover { border-color: #F5A623; color: #F5A623; }
+.prize-badge { position: absolute; top: 24px; right: 24px; background: rgba(245,166,35,0.15); border: 1px solid rgba(245,166,35,0.3); border-radius: 12px; padding: 12px 16px; text-align: center; }
+.prize-amount { font-family: 'Playfair Display', serif; font-size: 24px; font-weight: 900; color: #F5A623; }
+.prize-label { font-size: 10px; color: rgba(255,255,255,0.4); text-transform: uppercase; letter-spacing: 1px; }
+
+/* COUNTDOWN */
+.countdown { display: flex; gap: 8px; align-items: center; margin-bottom: 20px; }
+.countdown-label { font-size: 12px; color: rgba(255,255,255,0.4); }
+.countdown-time { display: flex; gap: 6px; }
+.time-block { background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); border-radius: 6px; padding: 4px 8px; text-align: center; }
+.time-num { font-family: 'Playfair Display', serif; font-size: 18px; font-weight: 900; color: #F5A623; line-height: 1; }
+.time-unit { font-size: 9px; color: rgba(255,255,255,0.3); text-transform: uppercase; }
+.time-sep { font-size: 18px; color: #F5A623; font-weight: 900; line-height: 1.4; }
+
+/* SECTION HEADER */
+.section-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
+.section-header h2 { font-family: 'Playfair Display', serif; font-size: 22px; font-weight: 900; }
+.section-header span { font-size: 13px; color: rgba(255,255,255,0.4); }
+
+/* CHALLENGES GRID */
+.challenges-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 16px; margin-bottom: 48px; }
+
+.challenge-card {
+  background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.07);
+  border-radius: 16px; padding: 24px; transition: all 0.3s; cursor: pointer;
+  position: relative; overflow: hidden;
+}
+.challenge-card:hover { background: rgba(245,166,35,0.04); border-color: rgba(245,166,35,0.2); transform: translateY(-4px); }
+.challenge-card::after {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+  opacity: 0; transition: opacity 0.3s;
+}
+.challenge-card:hover::after { opacity: 1; }
+.card-easy::after { background: linear-gradient(90deg, #27AE60, transparent); }
+.card-medium::after { background: linear-gradient(90deg, #F5A623, transparent); }
+.card-hard::after { background: linear-gradient(90deg, #E74C3C, transparent); }
+.card-expert::after { background: linear-gradient(90deg, #8E44AD, transparent); }
+
+.card-top { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 14px; }
+.card-icon { font-size: 32px; }
+.difficulty-badge { font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 4px; text-transform: uppercase; letter-spacing: 0.5px; }
+.diff-easy { background: rgba(39,174,96,0.12); color: #27AE60; border: 1px solid rgba(39,174,96,0.2); }
+.diff-medium { background: rgba(245,166,35,0.12); color: #F5A623; border: 1px solid rgba(245,166,35,0.2); }
+.diff-hard { background: rgba(231,76,60,0.12); color: #E74C3C; border: 1px solid rgba(231,76,60,0.2); }
+.diff-expert { background: rgba(142,68,173,0.12); color: #9B59B6; border: 1px solid rgba(142,68,173,0.2); }
+
+.card-category { font-size: 11px; color: rgba(255,255,255,0.3); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px; }
+.card-title { font-size: 16px; font-weight: 700; margin-bottom: 8px; line-height: 1.4; }
+.card-desc { font-size: 13px; color: rgba(255,255,255,0.45); line-height: 1.6; margin-bottom: 16px; }
+
+.card-tags { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 16px; }
+.card-tag { font-size: 11px; padding: 3px 9px; border-radius: 4px; background: rgba(255,255,255,0.05); color: rgba(255,255,255,0.4); border: 1px solid rgba(255,255,255,0.07); }
+
+.card-footer { display: flex; align-items: center; justify-content: space-between; }
+.card-stats { display: flex; gap: 14px; }
+.card-stat { font-size: 12px; color: rgba(255,255,255,0.35); display: flex; align-items: center; gap: 4px; }
+.card-stat strong { color: rgba(255,255,255,0.6); }
+
+.btn-start { padding: 7px 18px; border-radius: 7px; font-size: 13px; font-weight: 700; border: none; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: all 0.2s; }
+.btn-start-gold { background: #F5A623; color: #0A1628; }
+.btn-start-gold:hover { background: #ffc14d; }
+.btn-start-outline { background: transparent; border: 1px solid rgba(255,255,255,0.15) !important; color: rgba(255,255,255,0.5); }
+.btn-start-outline:hover { border-color: #F5A623 !important; color: #F5A623; }
+.btn-start-done { background: rgba(39,174,96,0.1); color: #27AE60; border: 1px solid rgba(39,174,96,0.2) !important; }
+
+/* BADGE SHOWCASE */
+.badges-section { background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.06); border-radius: 20px; padding: 32px; margin-bottom: 48px; }
+.badges-title { font-family: 'Playfair Display', serif; font-size: 22px; font-weight: 900; margin-bottom: 6px; }
+.badges-sub { font-size: 14px; color: rgba(255,255,255,0.4); margin-bottom: 28px; }
+.badges-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 14px; }
+.badge-card { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.07); border-radius: 12px; padding: 20px 14px; text-align: center; transition: all 0.3s; cursor: pointer; }
+.badge-card:hover { transform: translateY(-3px); border-color: rgba(245,166,35,0.2); }
+.badge-card.locked { opacity: 0.4; filter: grayscale(1); }
+.badge-icon { font-size: 36px; margin-bottom: 10px; }
+.badge-name { font-size: 12px; font-weight: 700; margin-bottom: 4px; }
+.badge-earned { font-size: 10px; color: #27AE60; }
+.badge-locked-text { font-size: 10px; color: rgba(255,255,255,0.3); }
+
+/* TOAST */
+.toast { position: fixed; bottom: 24px; right: 24px; padding: 13px 20px; border-radius: 10px; font-size: 14px; font-weight: 500; color: #fff; z-index: 999; animation: slideUp 0.3s ease; box-shadow: 0 8px 32px rgba(0,0,0,0.4); }
+.toast-success { background: #27AE60; }
+.toast-error { background: #E74C3C; }
+.toast-info { background: #2980B9; }
+@keyframes slideUp { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
+
+@media (max-width: 600px) {
+  .prize-badge { position: relative; top: auto; right: auto; display: inline-block; margin-bottom: 16px; }
+  .weekly-card { padding: 24px 20px; }
+  .search-pill { width: 100%; margin-left: 0; }
+  .filters-row { flex-direction: column; align-items: stretch; }
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="topnav">
+  <a href="../index.html" class="topnav-logo">Analytica<span>.</span></a>
+  <div class="topnav-right" id="topnav-right">
+    <a href="../auth/login.html" class="btn-sm btn-outline">Log In</a>
+    <a href="../auth/signup.html" class="btn-sm btn-gold">Join Free</a>
+  </div>
+</nav>
+
+<div class="page">
+
+  <!-- HERO -->
+  <div class="challenges-hero">
+    <div class="hero-badge"><div class="pulse"></div> New challenges every Monday</div>
+    <h1>Don't Just List Skills.<br><em>Prove Them.</em></h1>
+    <p>Solve real-world tech challenges. Earn verified badges that sit on your profile and actually mean something to employers worldwide.</p>
+    <div class="hero-stats">
+      <div class="hero-stat"><div class="hero-stat-num">2,400+</div><div class="hero-stat-label">Challenges</div></div>
+      <div class="hero-stat"><div class="hero-stat-num">840K</div><div class="hero-stat-label">Submissions</div></div>
+      <div class="hero-stat"><div class="hero-stat-num">120K</div><div class="hero-stat-label">Badges Earned</div></div>
+      <div class="hero-stat"><div class="hero-stat-num">$50K+</div><div class="hero-stat-label">Prizes Given</div></div>
+    </div>
+  </div>
+
+  <!-- LEADERBOARD STRIP -->
+  <div class="leaderboard-strip">
+    <div class="lb-title">🏆 This Week's Top</div>
+    <div class="lb-winners" id="lb-winners"></div>
+  </div>
+
+  <div class="challenges-layout">
+
+    <!-- WEEKLY FEATURED -->
+    <div class="weekly-card">
+      <div class="prize-badge">
+        <div class="prize-amount">$500</div>
+        <div class="prize-label">Prize Pool</div>
+      </div>
+      <div class="weekly-tag">🔥 Weekly Challenge</div>
+      <h2>Build a Real-Time Collaborative<br>Code Editor</h2>
+      <p>Create a browser-based code editor that allows multiple users to edit simultaneously with live cursors, syntax highlighting, and instant sync. Think Google Docs but for code.</p>
+      <div class="countdown">
+        <span class="countdown-label">Ends in:</span>
+        <div class="countdown-time" id="countdown"></div>
+      </div>
+      <div class="weekly-meta">
+        <div class="weekly-meta-item">🎯 Difficulty: <strong>Hard</strong></div>
+        <div class="weekly-meta-item">⏱ Est. Time: <strong>8–12 hrs</strong></div>
+        <div class="weekly-meta-item">👥 <strong>1,240</strong> participants</div>
+        <div class="weekly-meta-item">🏅 Badge: <strong>Real-Time Expert</strong></div>
+      </div>
+      <div class="weekly-actions">
+        <button class="btn-take" onclick="startChallenge('Weekly Challenge')">🚀 Take Challenge</button>
+        <button class="btn-preview" onclick="showToast('Challenge brief opening...', 'info')">📄 View Brief</button>
+      </div>
+    </div>
+
+    <!-- FILTERS -->
+    <div class="filters-row">
+      <button class="filter-pill active" onclick="setFilter('all', this)">All</button>
+      <button class="filter-pill" onclick="setFilter('web', this)">🌐 Web</button>
+      <button class="filter-pill" onclick="setFilter('mobile', this)">📱 Mobile</button>
+      <button class="filter-pill" onclick="setFilter('ai', this)">🤖 AI / ML</button>
+      <button class="filter-pill" onclick="setFilter('data', this)">📊 Data</button>
+      <button class="filter-pill" onclick="setFilter('design', this)">🎨 Design</button>
+      <button class="filter-pill" onclick="setFilter('backend', this)">⚙️ Backend</button>
+      <button class="filter-pill difficulty-easy" onclick="setFilter('easy', this)">🟢 Easy</button>
+      <button class="filter-pill difficulty-hard" onclick="setFilter('hard', this)">🔴 Hard</button>
+      <input class="search-pill" type="text" placeholder="🔍 Search challenges..." oninput="searchChallenges(this.value)">
+    </div>
+
+    <!-- CHALLENGES GRID -->
+    <div class="section-header">
+      <h2>All Challenges</h2>
+      <span id="challenge-count">Showing all</span>
+    </div>
+    <div class="challenges-grid" id="challenges-grid"></div>
+
+    <!-- BADGES SHOWCASE -->
+    <div class="badges-section">
+      <div class="badges-title">🏅 Earnable Badges</div>
+      <div class="badges-sub">Complete challenges to unlock verified badges that employers can see on your profile</div>
+      <div class="badges-grid" id="badges-grid"></div>
+    </div>
+
+  </div>
+</div>
+
+<script src="../js/supabase.js"></script>
+<script>
+
+const CHALLENGES = [
+  { id:1, icon:'🌐', title:'Build a Responsive Portfolio Website', category:'Web', categoryKey:'web', difficulty:'easy', diffKey:'easy', tags:['HTML','CSS','JavaScript'], desc:'Create a stunning personal portfolio that works perfectly on all screen sizes.', participants:4200, submissions:3100, time:'2–4 hrs', badge:'Portfolio Pro', done:false },
+  { id:2, icon:'🤖', title:'Build a Chatbot with the OpenAI API', category:'AI / ML', categoryKey:'ai', difficulty:'medium', diffKey:'medium', tags:['Python','OpenAI','API'], desc:'Create a context-aware chatbot that remembers conversation history and handles edge cases gracefully.', participants:2800, submissions:1900, time:'4–6 hrs', badge:'AI Builder', done:false },
+  { id:3, icon:'📊', title:'Sales Dashboard with Real Data', category:'Data', categoryKey:'data', difficulty:'medium', diffKey:'medium', tags:['Python','Pandas','Plotly'], desc:'Analyze a real sales dataset and build an interactive dashboard revealing key business insights.', participants:1900, submissions:1400, time:'3–5 hrs', badge:'Data Visualizer', done:true },
+  { id:4, icon:'📱', title:'Cross-Platform Todo App', category:'Mobile', categoryKey:'mobile', difficulty:'easy', diffKey:'easy', tags:['Flutter','Dart','Firebase'], desc:'Build a feature-rich todo app with categories, reminders and cloud sync using Flutter.', participants:3100, submissions:2200, time:'3–5 hrs', badge:'Mobile Dev', done:false },
+  { id:5, icon:'⚙️', title:'Design a REST API from Scratch', category:'Backend', categoryKey:'backend', difficulty:'medium', diffKey:'medium', tags:['Node.js','Express','PostgreSQL'], desc:'Build a fully documented REST API with auth, rate limiting, and proper error handling.', participants:2400, submissions:1600, time:'5–8 hrs', badge:'API Architect', done:false },
+  { id:6, icon:'🎨', title:'Redesign a Real App UI', category:'Design', categoryKey:'design', difficulty:'easy', diffKey:'easy', tags:['Figma','UX','Prototyping'], desc:'Pick any popular app and redesign it to be more intuitive, accessible and beautiful.', participants:1600, submissions:1100, time:'4–6 hrs', badge:'UI Master', done:false },
+  { id:7, icon:'🧠', title:'Train an Image Classification Model', category:'AI / ML', categoryKey:'ai', difficulty:'hard', diffKey:'hard', tags:['Python','TensorFlow','CNN'], desc:'Train a convolutional neural network to classify images with 90%+ accuracy on a custom dataset.', participants:980, submissions:540, time:'8–12 hrs', badge:'ML Engineer', done:false },
+  { id:8, icon:'🔐', title:'Build a Secure Auth System', category:'Backend', categoryKey:'backend', difficulty:'hard', diffKey:'hard', tags:['Node.js','JWT','OAuth','Security'], desc:'Implement a production-ready auth system with JWT, refresh tokens, OAuth2 and brute-force protection.', participants:1200, submissions:700, time:'6–10 hrs', badge:'Security Expert', done:false },
+  { id:9, icon:'🚀', title:'Full Stack SaaS MVP in 48 Hours', category:'Web', categoryKey:'web', difficulty:'expert', diffKey:'expert', tags:['Next.js','Supabase','Stripe','Tailwind'], desc:'Build a complete SaaS product with auth, payments, and a real feature — in 48 hours. Expert only.', participants:420, submissions:180, time:'48 hrs', badge:'SaaS Builder', done:false },
+];
+
+const BADGES = [
+  { icon:'🏆', name:'Weekly Winner', earned:false },
+  { icon:'🌐', name:'Portfolio Pro', earned:true },
+  { icon:'📊', name:'Data Visualizer', earned:true },
+  { icon:'🤖', name:'AI Builder', earned:false },
+  { icon:'📱', name:'Mobile Dev', earned:false },
+  { icon:'⚙️', name:'API Architect', earned:false },
+  { icon:'🎨', name:'UI Master', earned:false },
+  { icon:'🧠', name:'ML Engineer', earned:false },
+  { icon:'🔐', name:'Security Expert', earned:false },
+  { icon:'🚀', name:'SaaS Builder', earned:false },
+  { icon:'⭐', name:'Top 10%', earned:false },
+  { icon:'🌍', name:'Global Competitor', earned:false },
+];
+
+const LEADERBOARD = [
+  { init:'AO', name:'Adaeze O.', badge:'🏆 #1' },
+  { init:'KM', name:'Kofi M.', badge:'🥈 #2' },
+  { init:'PS', name:'Priya S.', badge:'🥉 #3' },
+  { init:'JL', name:'James L.', badge:'#4' },
+  { init:'FM', name:'Fatima M.', badge:'#5' },
+];
+
+let currentFilter = 'all';
+let currentSearch = '';
+
+// RENDER CHALLENGES
+function renderChallenges() {
+  const grid = document.getElementById('challenges-grid');
+  let list = CHALLENGES.filter(c => {
+    const matchFilter = currentFilter === 'all' || c.categoryKey === currentFilter ||
+      (currentFilter === 'easy' && c.diffKey === 'easy') ||
+      (currentFilter === 'hard' && (c.diffKey === 'hard' || c.diffKey === 'expert'));
+    const matchSearch = !currentSearch || c.title.toLowerCase().includes(currentSearch) || c.tags.some(t => t.toLowerCase().includes(currentSearch));
+    return matchFilter && matchSearch;
+  });
+
+  document.getElementById('challenge-count').textContent = `${list.length} challenge${list.length !== 1 ? 's' : ''}`;
+
+  if (!list.length) {
+    grid.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:60px 20px;">
+      <div style="font-size:48px;margin-bottom:16px;">🔍</div>
+      <h3 style="font-size:18px;margin-bottom:8px;">No challenges found</h3>
+      <p style="color:rgba(255,255,255,0.4);font-size:14px;">Try a different filter</p>
+    </div>`;
+    return;
+  }
+
+  grid.innerHTML = list.map(c => {
+    const diffClass = { easy:'diff-easy', medium:'diff-medium', hard:'diff-hard', expert:'diff-expert' }[c.diffKey];
+    const cardClass = `card-${c.diffKey === 'expert' ? 'hard' : c.diffKey}`;
+    const btnHtml = c.done
+      ? `<button class="btn-start btn-start-done" onclick="showToast('Already completed! View your badge in your profile.','success')">✓ Completed</button>`
+      : `<button class="btn-start btn-start-gold" onclick="startChallenge('${c.title}')">Start →</button>`;
+    return `
+      <div class="challenge-card ${cardClass}">
+        <div class="card-top">
+          <div class="card-icon">${c.icon}</div>
+          <div class="difficulty-badge ${diffClass}">${c.difficulty}</div>
+        </div>
+        <div class="card-category">${c.category} · ⏱ ${c.time}</div>
+        <div class="card-title">${c.title}</div>
+        <div class="card-desc">${c.desc}</div>
+        <div class="card-tags">${c.tags.map(t => `<span class="card-tag">${t}</span>`).join('')}</div>
+        <div class="card-footer">
+          <div class="card-stats">
+            <div class="card-stat">👥 <strong>${c.participants.toLocaleString()}</strong></div>
+            <div class="card-stat">🏅 <strong>${c.badge}</strong></div>
+          </div>
+          ${btnHtml}
+        </div>
+      </div>`;
+  }).join('');
+}
+
+// RENDER BADGES
+function renderBadges() {
+  document.getElementById('badges-grid').innerHTML = BADGES.map(b => `
+    <div class="badge-card ${b.earned ? '' : 'locked'}" onclick="${b.earned ? `showToast('Badge earned! Showing on your profile.','success')` : `showToast('Complete the challenge to unlock this badge!','info')`}">
+      <div class="badge-icon">${b.icon}</div>
+      <div class="badge-name">${b.name}</div>
+      ${b.earned ? '<div class="badge-earned">✓ Earned</div>' : '<div class="badge-locked-text">🔒 Locked</div>'}
+    </div>`).join('');
+}
+
+// RENDER LEADERBOARD
+function renderLeaderboard() {
+  document.getElementById('lb-winners').innerHTML = LEADERBOARD.map(w => `
+    <div class="lb-winner">
+      <div class="lb-avatar">${w.init}</div>
+      <div class="lb-name">${w.name}</div>
+      <div class="lb-badge">${w.badge}</div>
+    </div>`).join('');
+}
+
+// COUNTDOWN
+function renderCountdown() {
+  const end = new Date();
+  end.setDate(end.getDate() + (7 - end.getDay()));
+  end.setHours(23, 59, 59, 0);
+  function update() {
+    const diff = end - new Date();
+    if (diff <= 0) { document.getElementById('countdown').innerHTML = '<span style="color:#E74C3C;font-size:13px;">Ended</span>'; return; }
+    const d = Math.floor(diff / 86400000);
+    const h = Math.floor((diff % 86400000) / 3600000);
+    const m = Math.floor((diff % 3600000) / 60000);
+    const s = Math.floor((diff % 60000) / 1000);
+    document.getElementById('countdown').innerHTML = `
+      <div class="time-block"><div class="time-num">${String(d).padStart(2,'0')}</div><div class="time-unit">Days</div></div>
+      <span class="time-sep">:</span>
+      <div class="time-block"><div class="time-num">${String(h).padStart(2,'0')}</div><div class="time-unit">Hrs</div></div>
+      <span class="time-sep">:</span>
+      <div class="time-block"><div class="time-num">${String(m).padStart(2,'0')}</div><div class="time-unit">Min</div></div>
+      <span class="time-sep">:</span>
+      <div class="time-block"><div class="time-num">${String(s).padStart(2,'0')}</div><div class="time-unit">Sec</div></div>`;
+  }
+  update();
+  setInterval(update, 1000);
+}
+
+function setFilter(f, btn) {
+  currentFilter = f;
+  document.querySelectorAll('.filter-pill').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderChallenges();
+}
+
+function searchChallenges(val) {
+  currentSearch = val.toLowerCase();
+  renderChallenges();
+}
+
+function startChallenge(title) {
+  showToast(`🚀 Opening "${title}" — good luck!`, 'success');
+}
+
+function showToast(msg, type = 'success') {
+  const t = document.createElement('div');
+  t.className = `toast toast-${type}`;
+  t.textContent = msg;
+  document.body.appendChild(t);
+  setTimeout(() => t.remove(), 3500);
+}
+
+renderChallenges();
+renderBadges();
+renderLeaderboard();
+renderCountdown();
+</script>
+</body>
+</html>

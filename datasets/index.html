@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dataset Library — Analytica</title>
+<link rel="stylesheet" href="../css/main.css">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+body { background: #0A1628; min-height: 100vh; }
+
+.topnav {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  height: 60px;
+  background: rgba(10,22,40,0.95);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 20px;
+  z-index: 40;
+}
+.topnav-logo {
+  font-family: 'Playfair Display', serif;
+  font-size: 20px;
+  font-weight: 900;
+  color: #fff;
+  text-decoration: none;
+}
+.topnav-logo span { color: #F5A623; }
+.topnav-right { display: flex; gap: 10px; align-items: center; }
+.btn-sm {
+  padding: 7px 16px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  font-family: 'DM Sans', sans-serif;
+  cursor: pointer;
+  text-decoration: none;
+  transition: all 0.2s;
+  border: none;
+}
+.btn-gold { background: #F5A623; color: #0A1628; }
+.btn-gold:hover { background: #FFD07A; }
+.btn-outline { background: transparent; border: 1px solid rgba(255,255,255,0.2); color: #fff; }
+.btn-outline:hover { border-color: #F5A623; color: #F5A623; }
+
+.page {
+  margin-top: 60px;
+  padding: 28px 20px;
+  max-width: 1000px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* ── HEADER ── */
+.page-header { margin-bottom: 24px; }
+.page-title {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(24px, 5vw, 36px);
+  font-weight: 700;
+  margin-bottom: 6px;
+}
+.page-title span { color: #F5A623; }
+.page-sub { font-size: 14px; color: rgba(255,255,255,0.45); }
+
+/* ── STATS ── */
+.lib-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin-bottom: 24px;
+}
+.lstat {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.07);
+  border-radius: 12px;
+  padding: 14px;
+  text-align: center;
+}
+.lstat-num {
+  font-family: 'Playfair Display', serif;
+  font-size: 22px;
+  font-weight: 700;
+  color: #F5A623;
+}
+.lstat-label {
+  font-size: 11px;
+  color: rgba(255,255,255,0.4);
+  margin-top: 2px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* ── SEARCH & FILTER ── */
+.search-box {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 10px;
+  padding: 10px 16px;
+  margin-bottom: 14px;
+}
+.search-box input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  color: #fff;
+  font-size: 14px;
+  font-family: 'DM Sans', sans-serif;
+  outline: none;
+}
+.search-box input::placeholder { color: rgba(255,255,255,0.3); }
+
+.filter-tabs {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding-bottom: 4px;
+  margin-bottom: 20px;
+}
+.filter-tabs::-webkit-scrollbar { display: none; }
+.tab {
+  padding: 7px 16px;
+  border-radius: 100px;
+  font-size: 13px;
+  font-weight: 500;
+  white-space: nowrap;
+  cursor: pointer;
+  border: 1px solid rgba(255,255,255,0.1);
+  color: rgba(255,255,255,0.5);
+  background: transparent;
+  font-family: 'DM Sans', sans-serif;
+  transition: all 0.2s;
+}
+.tab.active, .tab:hover {
+  background: rgba(245,166,35,0.12);
+  border-color: rgba(245,166,35,0.3);
+  color: #F5A623;
+}
+
+/* ── DATASET GRID ── */
+.datasets-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+}
+
+.dataset-card {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.07);
+  border-radius: 16px;
+  padding: 20px;
+  transition: all 0.3s;
+  position: relative;
+  overflow: hidden;
+}
+.dataset-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, #F5A623, transparent);
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+.dataset-card:hover {
+  border-color: rgba(245,166,35,0.2);
+  transform: translateY(-2px);
+}
+.dataset-card:hover::before { opacity: 1; }
+
+.dataset-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+.dataset-icon {
+  width: 44px; height: 44px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  flex-shrink: 0;
+}
+.icon-blue { background: rgba(52,152,219,0.15); }
+.icon-green { background: rgba(39,174,96,0.15); }
+.icon-gold { background: rgba(245,166,35,0.15); }
+.icon-purple { background: rgba(155,89,182,0.15); }
+.icon-red { background: rgba(231,76,60,0.15); }
+
+.dataset-badges { display: flex; gap: 6px; flex-wrap: wrap; justify-content: flex-end; }
+.badge {
+  padding: 3px 10px;
+  border-radius: 100px;
+  font-size: 11px;
+  font-weight: 600;
+  border: 1px solid;
+}
+.badge-free { background: rgba(39,174,96,0.1); color: #27AE60; border-color: rgba(39,174,96,0.3); }
+.badge-pro { background: rgba(245,166,35,0.1); color: #F5A623; border-color: rgba(245,166,35,0.3); }
+.badge-csv { background: rgba(52,152,219,0.1); color: #3498db; border-color: rgba(52,152,219,0.3); }
+.badge-xlsx { background: rgba(39,174,96,0.1); color: #27AE60; border-color: rgba(39,174,96,0.2); }
+.badge-json { background: rgba(155,89,182,0.1); color: #9b59b6; border-color: rgba(155,89,182,0.3); }
+
+.dataset-name {
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 6px;
+  color: #fff;
+}
+.dataset-desc {
+  font-size: 13px;
+  color: rgba(255,255,255,0.45);
+  line-height: 1.6;
+  margin-bottom: 14px;
+}
+.dataset-meta {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+.meta-tag {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  color: rgba(255,255,255,0.35);
+}
+.dataset-actions {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+.btn-download {
+  flex: 1;
+  padding: 10px;
+  background: #F5A623;
+  border: none;
+  border-radius: 8px;
+  color: #0A1628;
+  font-size: 13px;
+  font-weight: 700;
+  font-family: 'DM Sans', sans-serif;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-align: center;
+  text-decoration: none;
+  display: block;
+}
+.btn-download:hover { background: #FFD07A; }
+.btn-preview {
+  padding: 10px 16px;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 8px;
+  color: rgba(255,255,255,0.7);
+  font-size: 13px;
+  font-weight: 500;
+  font-family: 'DM Sans', sans-serif;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.btn-preview:hover { border-color: #F5A623; color: #F5A623; }
+
+/* Source tag */
+.source-tag {
+  font-size: 11px;
+  color: rgba(255,255,255,0.25);
+  margin-top: 10px;
+}
+.source-tag span { color: rgba(255,255,255,0.4); }
+
+/* Upload CTA */
+.upload-cta {
+  background: linear-gradient(135deg, rgba(245,166,35,0.08), rgba(17,34,64,0.5));
+  border: 1px dashed rgba(245,166,35,0.3);
+  border-radius: 16px;
+  padding: 28px;
+  text-align: center;
+  margin-top: 24px;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+.upload-cta:hover { background: rgba(245,166,35,0.1); }
+.upload-icon { font-size: 36px; margin-bottom: 10px; }
+.upload-title { font-size: 16px; font-weight: 600; margin-bottom: 6px; }
+.upload-desc { font-size: 13px; color: rgba(255,255,255,0.4); }
+
+/* Empty state */
+.empty-state {
+  text-align: center;
+  padding: 60px 24px;
+  color: rgba(255,255,255,0.3);
+}
+
+@media (min-width: 600px) {
+  .datasets-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (min-width: 900px) {
+  .datasets-grid { grid-template-columns: repeat(3, 1fr); }
+}
+</style>
+</head>
+<body>
+
+<div class="topnav">
+  <a href="../index.html" class="topnav-logo">Analytica<span>.</span></a>
+  <div class="topnav-right">
+    <a href="../dashboard/index.html" class="btn-sm btn-outline">Dashboard</a>
+    <a href="../auth/signup.html" class="btn-sm btn-gold">Join Free</a>
+  </div>
+</div>
+
+<div class="page">
+
+  <div class="page-header">
+    <h1 class="page-title">Dataset <span>Library</span></h1>
+    <p class="page-sub">Free Nigerian and African datasets for your analysis</p>
+  </div>
+
+  <!-- Stats -->
+  <div class="lib-stats">
+    <div class="lstat">
+      <div class="lstat-num">24</div>
+      <div class="lstat-label">Datasets</div>
+    </div>
+    <div class="lstat">
+      <div class="lstat-num">37</div>
+      <div class="lstat-label">States</div>
+    </div>
+    <div class="lstat">
+      <div class="lstat-num">Free</div>
+      <div class="lstat-label">To Download</div>
+    </div>
+  </div>
+
+  <!-- Search -->
+  <div class="search-box">
+    <span>🔍</span>
+    <input type="text" id="search-input" placeholder="Search datasets..." oninput="filterDatasets()">
+  </div>
+
+  <!-- Filter Tabs -->
+  <div class="filter-tabs">
+    <button class="tab active" onclick="setFilter('all', this)">All</button>
+    <button class="tab" onclick="setFilter('economy', this)">Economy</button>
+    <button class="tab" onclick="setFilter('population', this)">Population</button>
+    <button class="tab" onclick="setFilter('health', this)">Health</button>
+    <button class="tab" onclick="setFilter('education', this)">Education</button>
+    <button class="tab" onclick="setFilter('agriculture', this)">Agriculture</button>
+    <button class="tab" onclick="setFilter('crime', this)">Crime</button>
+  </div>
+
+  <!-- Datasets Grid -->
+  <div class="datasets-grid" id="datasets-grid">
+    <!-- rendered by JS -->
+  </div>
+
+  <!-- Upload CTA -->
+  <div class="upload-cta" onclick="window.location.href='../auth/signup.html'">
+    <div class="upload-icon">📤</div>
+    <div class="upload-title">Share Your Dataset</div>
+    <div class="upload-desc">Have a dataset others would find useful? Upload and contribute to the community.</div>
+  </div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="../js/supabase.js"></script>
+<script>
+
+// ── DATASET CATALOG ──
+const datasets = [
+  {
+    id: 1,
+    name: 'Nigeria Labour Force Survey Q1 2024',
+    desc: 'Household identification and employment data across all 36 states and FCT. 8,821 households surveyed.',
+    category: 'economy',
+    icon: '👷',
+    iconClass: 'icon-blue',
+    source: 'National Bureau of Statistics (NBS)',
+    rows: '8,821',
+    size: '1.5 MB',
+    format: 'CSV',
+    free: true,
+    downloads: 234,
+    url: 'https://microdata.nigerianstat.gov.ng'
+  },
+  {
+    id: 2,
+    name: 'Nigeria GDP by Sector 2010–2023',
+    desc: 'Gross Domestic Product breakdown by sector including oil, agriculture, services and manufacturing.',
+    category: 'economy',
+    icon: '📈',
+    iconClass: 'icon-gold',
+    source: 'Central Bank of Nigeria (CBN)',
+    rows: '13 years',
+    size: '420 KB',
+    format: 'XLSX',
+    free: true,
+    downloads: 412,
+    url: 'https://www.cbn.gov.ng/documents/statistics.asp'
+  },
+  {
+    id: 3,
+    name: 'Nigeria Population by State 2023',
+    desc: 'Estimated population figures for all 36 states and FCT with urban/rural breakdown and growth rates.',
+    category: 'population',
+    icon: '👥',
+    iconClass: 'icon-green',
+    source: 'National Population Commission',
+    rows: '37 states',
+    size: '280 KB',
+    format: 'CSV',
+    free: true,
+    downloads: 678,
+    url: 'https://www.nigerianstat.gov.ng'
+  },
+  {
+    id: 4,
+    name: 'Nigeria Inflation Rate 2015–2024',
+    desc: 'Monthly consumer price index and inflation rate data covering food and non-food categories.',
+    category: 'economy',
+    icon: '💹',
+    iconClass: 'icon-red',
+    source: 'National Bureau of Statistics',
+    rows: '108 months',
+    size: '180 KB',
+    format: 'CSV',
+    free: true,
+    downloads: 521,
+    url: 'https://www.nigerianstat.gov.ng'
+  },
+  {
+    id: 5,
+    name: 'Nigeria Primary School Enrollment 2022',
+    desc: 'Primary school enrollment rates by state, gender, and LGA. Includes dropout rates and teacher ratios.',
+    category: 'education',
+    icon: '🎓',
+    iconClass: 'icon-purple',
+    source: 'Universal Basic Education Commission',
+    rows: '774 LGAs',
+    size: '2.1 MB',
+    format: 'XLSX',
+    free: true,
+    downloads: 189,
+    url: 'https://www.ubec.gov.ng'
+  },
+  {
+    id: 6,
+    name: 'Nigeria Agricultural Production 2023',
+    desc: 'Crop production data including yam, cassava, maize and rice across all farming zones in Nigeria.',
+    category: 'agriculture',
+    icon: '🌾',
+    iconClass: 'icon-green',
+    source: 'Federal Ministry of Agriculture',
+    rows: '4,200+',
+    size: '3.4 MB',
+    format: 'CSV',
+    free: true,
+    downloads: 143,
+    url: 'https://www.fmard.gov.ng'
+  },
+  {
+    id: 7,
+    name: 'Nigeria Health Facilities Database',
+    desc: 'Complete database of all public and private health facilities in Nigeria including hospitals, clinics and PHCs.',
+    category: 'health',
+    icon: '🏥',
+    iconClass: 'icon-red',
+    source: 'Federal Ministry of Health',
+    rows: '35,000+',
+    size: '8.2 MB',
+    format: 'CSV',
+    free: false,
+    downloads: 302,
+    url: '#'
+  },
+  {
+    id: 8,
+    name: 'Nigeria Crime Statistics 2018–2022',
+    desc: 'Crime reports by state and type including theft, assault, fraud and cybercrime from Nigeria Police Force.',
+    category: 'crime',
+    icon: '🔒',
+    iconClass: 'icon-purple',
+    source: 'Nigeria Police Force / NBS',
+    rows: '5 years',
+    size: '1.8 MB',
+    format: 'XLSX',
+    free: false,
+    downloads: 267,
+    url: '#'
+  },
+  {
+    id: 9,
+    name: 'Africa Internet Usage 2023',
+    desc: 'Internet penetration rates, mobile vs desktop usage, and digital access data across 54 African countries.',
+    category: 'population',
+    icon: '🌍',
+    iconClass: 'icon-blue',
+    source: 'Internet World Stats / ITU',
+    rows: '54 countries',
+    size: '560 KB',
+    format: 'CSV',
+    free: true,
+    downloads: 891,
+    url: 'https://www.internetworldstats.com'
+  }
+]
+
+let currentFilter = 'all'
+
+// ── RENDER ──
+function renderDatasets(data) {
+  const grid = document.getElementById('datasets-grid')
+
+  if (data.length === 0) {
+    grid.innerHTML = '<div class="empty-state">No datasets found. Try a different search.</div>'
+    return
+  }
+
+  grid.innerHTML = data.map(d => `
+    <div class="dataset-card">
+      <div class="dataset-top">
+        <div class="dataset-icon ${d.iconClass}">${d.icon}</div>
+        <div class="dataset-badges">
+          <span class="badge ${d.free ? 'badge-free' : 'badge-pro'}">${d.free ? 'Free' : 'Pro'}</span>
+          <span class="badge badge-csv">${d.format}</span>
+        </div>
+      </div>
+      <div class="dataset-name">${d.name}</div>
+      <div class="dataset-desc">${d.desc}</div>
+      <div class="dataset-meta">
+        <span class="meta-tag">📋 ${d.rows} rows</span>
+        <span class="meta-tag">💾 ${d.size}</span>
+        <span class="meta-tag">⬇️ ${d.downloads}</span>
+      </div>
+      <div class="dataset-actions">
+        ${d.free
+          ? `<a href="${d.url}" target="_blank" class="btn-download">⬇️ Download</a>`
+          : `<a href="../auth/signup.html" class="btn-download">🔒 Pro Only</a>`
+        }
+        <button class="btn-preview">👁️ Preview</button>
+      </div>
+      <div class="source-tag">Source: <span>${d.source}</span></div>
+    </div>
+  `).join('')
+}
+
+// ── FILTER ──
+function setFilter(filter, btn) {
+  currentFilter = filter
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'))
+  btn.classList.add('active')
+  filterDatasets()
+}
+
+function filterDatasets() {
+  const search = document.getElementById('search-input').value.toLowerCase()
+  let filtered = datasets
+
+  if (currentFilter !== 'all') {
+    filtered = filtered.filter(d => d.category === currentFilter)
+  }
+
+  if (search) {
+    filtered = filtered.filter(d =>
+      d.name.toLowerCase().includes(search) ||
+      d.desc.toLowerCase().includes(search) ||
+      d.source.toLowerCase().includes(search)
+    )
+  }
+
+  renderDatasets(filtered)
+}
+
+// ── INIT ──
+renderDatasets(datasets)
+</script>
+</body>
+</html>

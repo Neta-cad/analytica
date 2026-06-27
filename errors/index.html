@@ -1,0 +1,737 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Error Encyclopedia — Analytica</title>
+<link rel="stylesheet" href="../css/main.css">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+* { box-sizing: border-box; }
+body { background: #0A1628; min-height: 100vh; margin: 0; }
+
+.topnav {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  height: 60px;
+  background: rgba(10,22,40,0.95);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 20px;
+  z-index: 40;
+}
+.topnav-logo {
+  font-family: 'Playfair Display', serif;
+  font-size: 20px;
+  font-weight: 900;
+  color: #fff;
+  text-decoration: none;
+}
+.topnav-logo span { color: #F5A623; }
+.topnav-right { display: flex; gap: 10px; }
+.btn-sm {
+  padding: 7px 16px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  font-family: 'DM Sans', sans-serif;
+  cursor: pointer;
+  text-decoration: none;
+  transition: all 0.2s;
+  border: none;
+}
+.btn-gold { background: #F5A623; color: #0A1628; }
+.btn-gold:hover { background: #FFD07A; }
+.btn-outline {
+  background: transparent;
+  border: 1px solid rgba(255,255,255,0.2) !important;
+  color: #fff;
+}
+
+.page {
+  margin-top: 60px;
+  padding: 28px 20px;
+  max-width: 900px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.page-title {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(24px, 5vw, 36px);
+  font-weight: 700;
+  margin-bottom: 6px;
+}
+.page-title span { color: #F5A623; }
+.page-sub { font-size: 14px; color: rgba(255,255,255,0.45); margin-bottom: 24px; }
+
+/* ── SEARCH HERO ── */
+.search-hero {
+  background: linear-gradient(135deg, rgba(231,76,60,0.08), rgba(17,34,64,0.8));
+  border: 1px solid rgba(231,76,60,0.15);
+  border-radius: 16px;
+  padding: 28px 24px;
+  margin-bottom: 24px;
+}
+.search-hero-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: rgba(255,255,255,0.6);
+  margin-bottom: 12px;
+  text-align: center;
+}
+.big-search {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 12px;
+  padding: 14px 18px;
+  transition: border-color 0.2s;
+}
+.big-search:focus-within { border-color: #e74c3c; }
+.big-search input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  color: #fff;
+  font-size: 15px;
+  font-family: 'DM Sans', sans-serif;
+  outline: none;
+}
+.big-search input::placeholder { color: rgba(255,255,255,0.3); }
+.search-icon { font-size: 20px; }
+
+/* ── STATS ── */
+.err-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin-bottom: 24px;
+}
+.estat {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.07);
+  border-radius: 12px;
+  padding: 14px;
+  text-align: center;
+}
+.estat-num {
+  font-family: 'Playfair Display', serif;
+  font-size: 22px;
+  font-weight: 700;
+  color: #F5A623;
+}
+.estat-label {
+  font-size: 11px;
+  color: rgba(255,255,255,0.4);
+  margin-top: 2px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* ── FILTER TABS ── */
+.filter-tabs {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding-bottom: 4px;
+  margin-bottom: 20px;
+}
+.filter-tabs::-webkit-scrollbar { display: none; }
+.tab {
+  padding: 7px 16px;
+  border-radius: 100px;
+  font-size: 13px;
+  font-weight: 500;
+  white-space: nowrap;
+  cursor: pointer;
+  border: 1px solid rgba(255,255,255,0.1);
+  color: rgba(255,255,255,0.5);
+  background: transparent;
+  font-family: 'DM Sans', sans-serif;
+  transition: all 0.2s;
+}
+.tab.active, .tab:hover {
+  background: rgba(231,76,60,0.1);
+  border-color: rgba(231,76,60,0.3);
+  color: #e74c3c;
+}
+
+/* ── ERROR CARDS ── */
+.errors-list { display: flex; flex-direction: column; gap: 14px; }
+
+.error-card {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.07);
+  border-radius: 14px;
+  overflow: hidden;
+  transition: all 0.3s;
+}
+.error-card:hover { border-color: rgba(231,76,60,0.2); }
+
+.error-header {
+  padding: 16px 20px;
+  cursor: pointer;
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+}
+
+.error-tool-badge {
+  padding: 3px 10px;
+  border-radius: 100px;
+  font-size: 11px;
+  font-weight: 600;
+  border: 1px solid;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.tool-excel { background: rgba(39,174,96,0.1); color: #27AE60; border-color: rgba(39,174,96,0.3); }
+.tool-sql { background: rgba(52,152,219,0.1); color: #3498db; border-color: rgba(52,152,219,0.3); }
+.tool-powerbi { background: rgba(245,166,35,0.1); color: #F5A623; border-color: rgba(245,166,35,0.3); }
+.tool-python { background: rgba(155,89,182,0.1); color: #9b59b6; border-color: rgba(155,89,182,0.3); }
+
+.error-header-info { flex: 1; }
+.error-name {
+  font-size: 15px;
+  font-weight: 600;
+  color: #fff;
+  margin-bottom: 4px;
+}
+.error-code {
+  font-family: 'Courier New', monospace;
+  font-size: 12px;
+  color: #e74c3c;
+  background: rgba(231,76,60,0.08);
+  padding: 2px 8px;
+  border-radius: 4px;
+  display: inline-block;
+  margin-bottom: 6px;
+}
+.error-short-desc {
+  font-size: 13px;
+  color: rgba(255,255,255,0.4);
+  line-height: 1.5;
+}
+
+.expand-icon {
+  font-size: 12px;
+  color: rgba(255,255,255,0.3);
+  transition: transform 0.3s;
+  flex-shrink: 0;
+  margin-top: 4px;
+}
+.error-card.open .expand-icon { transform: rotate(180deg); color: #e74c3c; }
+
+/* Expandable body */
+.error-body {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.4s ease;
+}
+.error-card.open .error-body { max-height: 600px; }
+
+.error-body-inner {
+  padding: 0 20px 20px;
+  border-top: 1px solid rgba(255,255,255,0.05);
+}
+
+.error-section-title {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.35);
+  margin: 14px 0 8px;
+}
+
+.error-cause {
+  font-size: 13px;
+  color: rgba(255,255,255,0.55);
+  line-height: 1.7;
+  background: rgba(231,76,60,0.05);
+  border-left: 3px solid rgba(231,76,60,0.3);
+  padding: 10px 14px;
+  border-radius: 0 8px 8px 0;
+}
+
+.error-fix {
+  font-size: 13px;
+  color: rgba(255,255,255,0.6);
+  line-height: 1.7;
+  background: rgba(39,174,96,0.05);
+  border-left: 3px solid rgba(39,174,96,0.3);
+  padding: 10px 14px;
+  border-radius: 0 8px 8px 0;
+}
+
+.error-code-block {
+  background: #0d1f3c;
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 8px;
+  padding: 12px 14px;
+  font-family: 'Courier New', monospace;
+  font-size: 12px;
+  color: #F5A623;
+  overflow-x: auto;
+  white-space: pre;
+  margin-top: 8px;
+  line-height: 1.6;
+}
+
+.error-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 14px;
+}
+.btn-copy-fix {
+  padding: 7px 16px;
+  background: rgba(39,174,96,0.1);
+  border: 1px solid rgba(39,174,96,0.2);
+  border-radius: 7px;
+  color: #27AE60;
+  font-size: 12px;
+  font-weight: 600;
+  font-family: 'DM Sans', sans-serif;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.btn-copy-fix:hover { background: rgba(39,174,96,0.2); }
+.btn-copy-fix.copied { background: rgba(39,174,96,0.25); }
+.upvote-btn {
+  padding: 7px 14px;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 7px;
+  color: rgba(255,255,255,0.4);
+  font-size: 12px;
+  font-family: 'DM Sans', sans-serif;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.upvote-btn:hover { border-color: #F5A623; color: #F5A623; }
+
+/* Submit error CTA */
+.submit-cta {
+  background: rgba(255,255,255,0.02);
+  border: 1px dashed rgba(255,255,255,0.1);
+  border-radius: 14px;
+  padding: 24px;
+  text-align: center;
+  margin-top: 24px;
+}
+.submit-cta h3 {
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+.submit-cta p {
+  font-size: 13px;
+  color: rgba(255,255,255,0.4);
+  margin-bottom: 16px;
+}
+
+/* Empty state */
+.empty-state {
+  text-align: center;
+  padding: 60px 24px;
+  color: rgba(255,255,255,0.3);
+}
+
+/* Toast */
+.toast {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  padding: 12px 20px;
+  background: #27AE60;
+  color: #fff;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  z-index: 9999;
+  opacity: 0;
+  transform: translateY(10px);
+  transition: all 0.3s;
+}
+.toast.show { opacity: 1; transform: translateY(0); }
+</style>
+</head>
+<body>
+
+<div class="topnav">
+  <a href="../index.html" class="topnav-logo">Analytica<span>.</span></a>
+  <div class="topnav-right">
+    <a href="../dashboard/index.html" class="btn-sm btn-outline">Dashboard</a>
+    <a href="../auth/signup.html" class="btn-sm btn-gold">Join Free</a>
+  </div>
+</div>
+
+<div class="page">
+  <div class="page-title">Error <span>Encyclopedia</span></div>
+  <div class="page-sub">Search any error message and get an instant explanation and fix</div>
+
+  <!-- Search Hero -->
+  <div class="search-hero">
+    <div class="search-hero-title">🔍 Paste your error message below</div>
+    <div class="big-search">
+      <span class="search-icon">⚠️</span>
+      <input type="text" id="search-input" placeholder="e.g. #VALUE!, ORA-00907, KeyError, Cannot read properties of undefined..." oninput="filterErrors()">
+    </div>
+  </div>
+
+  <!-- Stats -->
+  <div class="err-stats">
+    <div class="estat"><div class="estat-num">120+</div><div class="estat-label">Errors</div></div>
+    <div class="estat"><div class="estat-num">4</div><div class="estat-label">Tools</div></div>
+    <div class="estat"><div class="estat-num">Free</div><div class="estat-label">Always</div></div>
+  </div>
+
+  <!-- Filter Tabs -->
+  <div class="filter-tabs">
+    <button class="tab active" onclick="setFilter('all', this)">All</button>
+    <button class="tab" onclick="setFilter('excel', this)">📗 Excel</button>
+    <button class="tab" onclick="setFilter('sql', this)">🗄️ SQL</button>
+    <button class="tab" onclick="setFilter('powerbi', this)">📊 Power BI</button>
+    <button class="tab" onclick="setFilter('python', this)">🐍 Python</button>
+  </div>
+
+  <!-- Errors List -->
+  <div class="errors-list" id="errors-list"></div>
+
+  <!-- Submit CTA -->
+  <div class="submit-cta">
+    <h3>🐛 Found an error not listed here?</h3>
+    <p>Help the community by submitting errors and fixes you've encountered.</p>
+    <button onclick="window.location.href='../auth/signup.html'" style="padding:10px 24px;background:#F5A623;border:none;border-radius:8px;color:#0A1628;font-size:14px;font-weight:700;font-family:'DM Sans',sans-serif;cursor:pointer;">
+      Submit an Error →
+    </button>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast">✅ Fix copied to clipboard!</div>
+
+<script>
+const errors = [
+  // ── EXCEL ──
+  {
+    tool: 'excel',
+    name: '#VALUE! Error',
+    code: '#VALUE!',
+    shortDesc: 'Formula has the wrong type of argument or operand.',
+    cause: 'You are trying to perform a math operation on a cell that contains text instead of a number. For example: =A1+B1 where A1 contains "Lagos" instead of a number.',
+    fix: 'Check all cells referenced in your formula. Make sure they contain numbers not text. Use =ISNUMBER(A1) to check. You can also wrap with =IFERROR(your_formula, 0) to hide the error.',
+    code_example: '=IFERROR(A1+B1, 0)\n-- or check the cell type:\n=IF(ISNUMBER(A1), A1+B1, "Cell A1 is not a number")',
+    upvotes: 234
+  },
+  {
+    tool: 'excel',
+    name: '#REF! Error',
+    code: '#REF!',
+    shortDesc: 'Formula refers to a cell that is not valid — usually deleted.',
+    cause: 'You deleted a row, column or cell that was referenced in a formula. The formula no longer knows where to look.',
+    fix: 'Press Ctrl+Z to undo the deletion. Then fix your formula to reference the correct cells. Avoid using direct cell references in formulas that may be deleted — use named ranges instead.',
+    code_example: '-- Before deletion (working):\n=VLOOKUP(A2, B1:D10, 2, FALSE)\n-- After deleting column B, becomes:\n=VLOOKUP(A2, #REF!, 2, FALSE)',
+    upvotes: 189
+  },
+  {
+    tool: 'excel',
+    name: '#DIV/0! Error',
+    code: '#DIV/0!',
+    shortDesc: 'Formula is trying to divide a number by zero or an empty cell.',
+    cause: 'Division by zero is mathematically impossible. This happens when the denominator in your formula is 0 or blank.',
+    fix: 'Use IFERROR or IF to handle the zero case gracefully.',
+    code_example: '-- Bad:\n=A1/B1\n\n-- Good:\n=IFERROR(A1/B1, 0)\n-- or\n=IF(B1=0, "N/A", A1/B1)',
+    upvotes: 312
+  },
+  {
+    tool: 'excel',
+    name: '#N/A Error',
+    code: '#N/A',
+    shortDesc: 'Value not available — VLOOKUP or MATCH cannot find what you are looking for.',
+    cause: 'The lookup value does not exist in the lookup range. This is very common with VLOOKUP, XLOOKUP, INDEX/MATCH and MATCH functions.',
+    fix: 'Check that your lookup value exists in the table. Check for extra spaces using TRIM(). Make sure data types match (text vs number). Use IFERROR to handle gracefully.',
+    code_example: '-- Wrap with IFERROR:\n=IFERROR(VLOOKUP(A2, Table, 2, FALSE), "Not Found")\n\n-- Or use XLOOKUP with if_not_found:\n=XLOOKUP(A2, B:B, C:C, "Not Found")',
+    upvotes: 445
+  },
+  {
+    tool: 'excel',
+    name: '#NAME? Error',
+    code: '#NAME?',
+    shortDesc: 'Excel does not recognize the formula name — usually a typo.',
+    cause: 'You misspelled a function name, used a function not available in your Excel version, or forgot to put text in quotes.',
+    fix: 'Check your formula spelling carefully. Use Excel\'s autocomplete to select function names. Make sure text values are in double quotes.',
+    code_example: '-- Wrong:\n=SUMIF(A:A, Lagos, B:B)\n\n-- Correct:\n=SUMIF(A:A, "Lagos", B:B)',
+    upvotes: 178
+  },
+  {
+    tool: 'excel',
+    name: 'Circular Reference Warning',
+    code: 'Circular Reference',
+    shortDesc: 'A formula refers back to its own cell, creating an endless loop.',
+    cause: 'Your formula directly or indirectly references the cell it lives in. Excel cannot calculate this.',
+    fix: 'Go to Formulas → Error Checking → Circular References to find the cell. Redesign your formula to not reference itself.',
+    code_example: '-- If this formula is in cell C1:\n=A1+B1+C1  <-- C1 references itself!\n\n-- Fix: remove C1 from its own formula:\n=A1+B1',
+    upvotes: 134
+  },
+
+  // ── SQL ──
+  {
+    tool: 'sql',
+    name: 'ORA-00907: Missing Right Parenthesis',
+    code: 'ORA-00907',
+    shortDesc: 'SQL syntax error — you have an opening bracket without a closing one.',
+    cause: 'You opened a parenthesis somewhere in your query but forgot to close it. Also happens with subqueries and function calls.',
+    fix: 'Count your opening and closing brackets. Every ( needs a matching ). Check your WHERE clauses and subqueries carefully.',
+    code_example: '-- Wrong:\nSELECT * FROM employees WHERE (salary > 50000\n\n-- Correct:\nSELECT * FROM employees WHERE (salary > 50000)',
+    upvotes: 267
+  },
+  {
+    tool: 'sql',
+    name: 'Column Does Not Exist',
+    code: 'column does not exist',
+    shortDesc: 'You referenced a column name that is not in the table.',
+    cause: 'Misspelled column name, wrong table alias, or the column doesn\'t exist in that table. SQL is case-sensitive in some databases.',
+    fix: 'Run SELECT * FROM your_table LIMIT 1 to see actual column names. Check spelling carefully. In PostgreSQL column names are case-sensitive when quoted.',
+    code_example: '-- Check column names first:\nSELECT * FROM employees LIMIT 1;\n\n-- Then use exact column name:\nSELECT employee_name FROM employees;',
+    upvotes: 198
+  },
+  {
+    tool: 'sql',
+    name: 'Syntax Error at or near...',
+    code: 'syntax error at or near',
+    shortDesc: 'PostgreSQL found something unexpected in your SQL statement.',
+    cause: 'Missing comma between columns, wrong keyword order, missing FROM keyword, or using a reserved word as a column name without quotes.',
+    fix: 'Read the error message carefully — it tells you exactly which word caused the problem. Check for missing commas, wrong keyword order, and reserved word conflicts.',
+    code_example: '-- Wrong (missing comma):\nSELECT name salary FROM employees;\n\n-- Correct:\nSELECT name, salary FROM employees;',
+    upvotes: 223
+  },
+  {
+    tool: 'sql',
+    name: 'Aggregation Error — Must Appear in GROUP BY',
+    code: 'must appear in GROUP BY',
+    shortDesc: 'You selected a column that is not in your GROUP BY clause.',
+    cause: 'When using aggregate functions (SUM, COUNT, AVG), every non-aggregated column in SELECT must appear in GROUP BY.',
+    fix: 'Add the missing column to your GROUP BY clause, or wrap it in an aggregate function.',
+    code_example: '-- Wrong:\nSELECT state, city, COUNT(*)\nFROM employees\nGROUP BY state;\n\n-- Correct:\nSELECT state, city, COUNT(*)\nFROM employees\nGROUP BY state, city;',
+    upvotes: 312
+  },
+  {
+    tool: 'sql',
+    name: 'Relation Does Not Exist',
+    code: 'relation does not exist',
+    shortDesc: 'The table you are querying does not exist in the database.',
+    cause: 'Misspelled table name, wrong schema, or table hasn\'t been created yet. In PostgreSQL, table names are case-sensitive when quoted.',
+    fix: 'Check your table name spelling. Run SELECT table_name FROM information_schema.tables to list all tables.',
+    code_example: '-- List all tables:\nSELECT table_name\nFROM information_schema.tables\nWHERE table_schema = \'public\';\n\n-- Then use exact name:\nSELECT * FROM employees;',
+    upvotes: 156
+  },
+
+  // ── POWER BI ──
+  {
+    tool: 'powerbi',
+    name: 'A circular dependency was detected',
+    code: 'circular dependency',
+    shortDesc: 'A DAX measure or calculated column references itself directly or indirectly.',
+    cause: 'Measure A references Measure B, and Measure B references Measure A — creating an infinite loop.',
+    fix: 'Review your measures and find the circular chain. Break the cycle by using CALCULATE or intermediate variables.',
+    code_example: '-- Use VAR to break circular dependency:\nMyMeasure =\nVAR BaseValue = SUM(Sales[Amount])\nVAR Result = BaseValue * 1.1\nRETURN Result',
+    upvotes: 145
+  },
+  {
+    tool: 'powerbi',
+    name: 'DataFormat.Error: We couldn\'t convert to Number',
+    code: 'DataFormat.Error',
+    shortDesc: 'Power BI cannot convert a column value to the expected number format.',
+    cause: 'The column contains mixed data types — some rows have text, some have numbers. Also caused by currency symbols (₦, $) or commas in numbers.',
+    fix: 'In Power Query, select the column → Transform → Replace Values to remove symbols. Then change the data type to Decimal Number.',
+    code_example: '-- In Power Query M:\n= Table.TransformColumns(Source,\n  {{\"Amount\", each\n    Number.FromText(\n      Text.Replace(Text.Replace(_, \"₦\", \"\"), \",\", \"\")\n    )\n  }}\n)',
+    upvotes: 189
+  },
+  {
+    tool: 'powerbi',
+    name: 'BLANK() vs 0 confusion',
+    code: 'BLANK vs 0',
+    shortDesc: 'DAX measures returning BLANK instead of 0, causing issues in charts and calculations.',
+    cause: 'DAX returns BLANK when there is no data for a combination. BLANK behaves differently from 0 in calculations and visuals.',
+    fix: 'Use the + 0 trick or IF(ISBLANK()) to convert BLANK to 0.',
+    code_example: '-- Convert BLANK to 0:\nSales Amount =\nIF(\n  ISBLANK(SUM(Sales[Amount])),\n  0,\n  SUM(Sales[Amount])\n)\n\n-- Or simpler:\nSales Amount = SUM(Sales[Amount]) + 0',
+    upvotes: 203
+  },
+
+  // ── PYTHON ──
+  {
+    tool: 'python',
+    name: 'KeyError',
+    code: 'KeyError',
+    shortDesc: 'You tried to access a dictionary key or DataFrame column that doesn\'t exist.',
+    cause: 'Misspelled column name, extra spaces in column name, or the column was renamed or dropped earlier in your code.',
+    fix: 'Print df.columns to see exact column names. Check for leading/trailing spaces. Use df.get(key, default) for dictionaries.',
+    code_example: '# Check column names:\nprint(df.columns.tolist())\n\n# Safe access:\nvalue = df.get("column_name", None)\n\n# Strip spaces from column names:\ndf.columns = df.columns.str.strip()',
+    upvotes: 378
+  },
+  {
+    tool: 'python',
+    name: 'ValueError: could not convert string to float',
+    code: 'ValueError: could not convert',
+    shortDesc: 'Trying to convert a text value to a number but the text contains non-numeric characters.',
+    cause: 'Column contains values like "N/A", "₦50,000", "-", or empty strings that cannot be converted to float directly.',
+    fix: 'Clean the column first — replace non-numeric values, remove symbols, then convert.',
+    code_example: '# Clean and convert:\ndf["salary"] = (\n  df["salary"]\n  .str.replace("₦", "")\n  .str.replace(",", "")\n  .str.strip()\n)\ndf["salary"] = pd.to_numeric(df["salary"], errors="coerce")',
+    upvotes: 256
+  },
+  {
+    tool: 'python',
+    name: 'ModuleNotFoundError',
+    code: 'ModuleNotFoundError',
+    shortDesc: 'Python cannot find the library you are trying to import.',
+    cause: 'The library is not installed in your current Python environment.',
+    fix: 'Install the missing library using pip. Make sure you\'re installing in the right environment.',
+    code_example: '# Install missing library:\npip install pandas\npip install matplotlib\npip install seaborn\npip install openpyxl  # for Excel files\n\n# Then import:\nimport pandas as pd',
+    upvotes: 445
+  },
+  {
+    tool: 'python',
+    name: 'SettingWithCopyWarning',
+    code: 'SettingWithCopyWarning',
+    shortDesc: 'You are trying to modify a copy of a DataFrame slice, not the original.',
+    cause: 'When you slice a DataFrame and then try to modify it, pandas isn\'t sure if you want to modify the original or the copy.',
+    fix: 'Use .copy() when creating a subset, or use .loc[] for assignment.',
+    code_example: '# Wrong:\ndf_lagos = df[df["state"] == "Lagos"]\ndf_lagos["salary"] = 0  # Warning!\n\n# Correct:\ndf_lagos = df[df["state"] == "Lagos"].copy()\ndf_lagos["salary"] = 0  # No warning\n\n# Or use .loc[]:\ndf.loc[df["state"] == "Lagos", "salary"] = 0',
+    upvotes: 189
+  }
+]
+
+let currentFilter = 'all'
+let openCard = null
+
+function renderErrors(data) {
+  const list = document.getElementById('errors-list')
+  if (data.length === 0) {
+    list.innerHTML = '<div class="empty-state"><div style="font-size:40px;margin-bottom:12px;">🔍</div><div style="font-size:15px;font-weight:600;color:rgba(255,255,255,0.4);">No errors found</div><div style="font-size:13px;margin-top:6px;">Try a different search term</div></div>'
+    return
+  }
+
+  list.innerHTML = data.map((e, i) => `
+    <div class="error-card" id="error-${i}">
+      <div class="error-header" onclick="toggleError(${i})">
+        <div>
+          <span class="error-tool-badge tool-${e.tool}">${e.tool.toUpperCase()}</span>
+        </div>
+        <div class="error-header-info">
+          <div class="error-name">${e.name}</div>
+          <div class="error-code">${e.code}</div>
+          <div class="error-short-desc">${e.shortDesc}</div>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px;flex-shrink:0;">
+          <span style="font-size:11px;color:rgba(255,255,255,0.3);">👍 ${e.upvotes}</span>
+          <span class="expand-icon">▼</span>
+        </div>
+      </div>
+      <div class="error-body">
+        <div class="error-body-inner">
+          <div class="error-section-title">🔴 What Causes It</div>
+          <div class="error-cause">${e.cause}</div>
+
+          <div class="error-section-title">✅ How to Fix It</div>
+          <div class="error-fix">${e.fix}</div>
+
+          <div class="error-section-title">💻 Code Example</div>
+          <div class="error-code-block">${escapeHtml(e.code_example)}</div>
+
+          <div class="error-actions">
+            <button class="btn-copy-fix" id="copy-btn-${i}" onclick="copyFix('${escapeJs(e.fix + '\n\n' + e.code_example)}', ${i})">
+              📋 Copy Fix
+            </button>
+            <button class="upvote-btn" onclick="upvoteError(${i}, this)">
+              👍 Helpful (${e.upvotes})
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  `).join('')
+}
+
+function toggleError(i) {
+  const card = document.getElementById(`error-${i}`)
+  const isOpen = card.classList.contains('open')
+  document.querySelectorAll('.error-card').forEach(c => c.classList.remove('open'))
+  if (!isOpen) card.classList.add('open')
+}
+
+function setFilter(filter, btn) {
+  currentFilter = filter
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'))
+  btn.classList.add('active')
+  filterErrors()
+}
+
+function filterErrors() {
+  const search = document.getElementById('search-input').value.toLowerCase()
+  let filtered = errors
+
+  if (currentFilter !== 'all') {
+    filtered = filtered.filter(e => e.tool === currentFilter)
+  }
+
+  if (search) {
+    filtered = filtered.filter(e =>
+      e.name.toLowerCase().includes(search) ||
+      e.code.toLowerCase().includes(search) ||
+      e.shortDesc.toLowerCase().includes(search) ||
+      e.cause.toLowerCase().includes(search) ||
+      e.fix.toLowerCase().includes(search)
+    )
+  }
+
+  renderErrors(filtered)
+}
+
+function copyFix(text, i) {
+  navigator.clipboard.writeText(text).then(() => {
+    const btn = document.getElementById(`copy-btn-${i}`)
+    btn.textContent = '✅ Copied!'
+    btn.classList.add('copied')
+    showToast()
+    setTimeout(() => {
+      btn.textContent = '📋 Copy Fix'
+      btn.classList.remove('copied')
+    }, 2000)
+  })
+}
+
+function upvoteError(i, btn) {
+  const current = parseInt(btn.textContent.match(/\d+/)[0])
+  btn.textContent = `👍 Helpful (${current + 1})`
+  btn.style.color = '#F5A623'
+  btn.style.borderColor = 'rgba(245,166,35,0.3)'
+}
+
+function showToast() {
+  const toast = document.getElementById('toast')
+  toast.classList.add('show')
+  setTimeout(() => toast.classList.remove('show'), 2000)
+}
+
+function escapeHtml(str) {
+  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+}
+
+function escapeJs(str) {
+  return str.replace(/'/g, "\\'").replace(/\n/g, '\\n')
+}
+
+renderErrors(errors)
+</script>
+</body>
+</html>

@@ -1,0 +1,148 @@
+/* ── ANALYTICA GLOBAL STYLES ── */
+
+:root {
+  --navy: #0A1628;
+  --navy-mid: #112240;
+  --navy-light: #1a3a6b;
+  --gold: #F5A623;
+  --gold-light: #FFD07A;
+  --white: #FFFFFF;
+  --grey-bg: #F4F6F9;
+  --grey-text: #8896A8;
+  --green: #27AE60;
+  --red: #E74C3C;
+
+  --font-heading: 'Playfair Display', serif;
+  --font-body: 'DM Sans', sans-serif;
+
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 20px;
+
+  --shadow: 0 4px 24px rgba(0,0,0,0.2);
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: var(--font-body);
+  background: var(--navy);
+  color: var(--white);
+  overflow-x: hidden;
+  line-height: 1.6;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+  transition: color 0.2s;
+}
+
+img { max-width: 100%; display: block; }
+
+button { cursor: pointer; font-family: var(--font-body); }
+
+/* ── TYPOGRAPHY ── */
+h1, h2, h3, h4 {
+  font-family: var(--font-heading);
+  line-height: 1.15;
+  letter-spacing: -0.3px;
+}
+
+/* ── BUTTONS ── */
+.btn-primary {
+  padding: 12px 24px;
+  background: var(--gold);
+  border: none;
+  border-radius: var(--radius-sm);
+  color: var(--navy);
+  font-size: 14px;
+  font-weight: 700;
+  transition: all 0.2s;
+  display: inline-block;
+}
+.btn-primary:hover {
+  background: var(--gold-light);
+  transform: translateY(-2px);
+}
+
+.btn-ghost {
+  padding: 12px 24px;
+  background: transparent;
+  border: 1.5px solid rgba(255,255,255,0.25);
+  border-radius: var(--radius-sm);
+  color: var(--white);
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.2s;
+  display: inline-block;
+}
+.btn-ghost:hover {
+  border-color: var(--gold);
+  color: var(--gold);
+}
+
+/* ── CARDS ── */
+.card {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.07);
+  border-radius: var(--radius-lg);
+  padding: 24px;
+  transition: all 0.3s;
+}
+.card:hover {
+  border-color: rgba(245,166,35,0.2);
+  transform: translateY(-3px);
+}
+
+/* ── SECTION ── */
+.section {
+  padding: 70px 24px;
+}
+
+.section-label {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: 12px;
+}
+
+.section-title {
+  font-size: clamp(28px, 5vw, 42px);
+  font-weight: 700;
+  margin-bottom: 14px;
+}
+
+.section-sub {
+  font-size: 15px;
+  color: rgba(255,255,255,0.5);
+  line-height: 1.7;
+  margin-bottom: 40px;
+  max-width: 480px;
+}
+
+/* ── UTILITIES ── */
+.text-gold { color: var(--gold); }
+.text-muted { color: rgba(255,255,255,0.45); }
+.text-center { text-align: center; }
+.mt-8 { margin-top: 8px; }
+.mt-16 { margin-top: 16px; }
+.mt-24 { margin-top: 24px; }
+.mt-32 { margin-top: 32px; }
+.mb-8 { margin-bottom: 8px; }
+.mb-16 { margin-bottom: 16px; }
+.mb-24 { margin-bottom: 24px; }
+.mb-32 { margin-bottom: 32px; }
+
+/* ── DESKTOP ── */
+@media (min-width: 900px) {
+  .section { padding: 100px 60px; }
+}

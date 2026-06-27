@@ -1,0 +1,911 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Dashboard — Analytica</title>
+<link rel="stylesheet" href="../css/main.css">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+* { box-sizing: border-box; }
+body { background: #0A1628; min-height: 100vh; margin: 0; }
+
+/* ── SIDEBAR ── */
+.sidebar {
+  width: 240px;
+  background: #0d1f3c;
+  border-right: 1px solid rgba(255,255,255,0.06);
+  position: fixed;
+  top: 0; left: 0; bottom: 0;
+  display: flex;
+  flex-direction: column;
+  z-index: 50;
+  transform: translateX(-100%);
+  transition: transform 0.3s;
+}
+.sidebar.open { transform: translateX(0); }
+.sidebar-logo {
+  font-family: 'Playfair Display', serif;
+  font-size: 18px;
+  font-weight: 900;
+  color: #fff;
+  padding: 20px 20px 16px;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+  text-decoration: none;
+  display: block;
+}
+.sidebar-logo span { color: #e74c3c; }
+.admin-badge {
+  display: inline-block;
+  background: rgba(231,76,60,0.15);
+  color: #e74c3c;
+  border: 1px solid rgba(231,76,60,0.3);
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 10px;
+  font-weight: 700;
+  margin-left: 6px;
+  vertical-align: middle;
+}
+.nav-section {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.25);
+  padding: 14px 20px 6px;
+}
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 20px;
+  color: rgba(255,255,255,0.5);
+  font-size: 13px;
+  font-weight: 500;
+  text-decoration: none;
+  transition: all 0.2s;
+  cursor: pointer;
+  border-left: 3px solid transparent;
+  border: none;
+  background: none;
+  width: 100%;
+  text-align: left;
+  font-family: 'DM Sans', sans-serif;
+}
+.nav-item:hover { color: #fff; background: rgba(255,255,255,0.04); }
+.nav-item.active { color: #e74c3c; background: rgba(231,76,60,0.08); border-left: 3px solid #e74c3c; }
+.nav-icon { font-size: 15px; width: 18px; }
+.sidebar-bottom { margin-top: auto; border-top: 1px solid rgba(255,255,255,0.06); padding: 12px 0; }
+
+/* ── TOPNAV ── */
+.topnav {
+  position: fixed;
+  top: 0; right: 0; left: 0;
+  height: 60px;
+  background: rgba(10,22,40,0.95);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 20px;
+  z-index: 40;
+}
+.topnav-left { display: flex; align-items: center; gap: 14px; }
+.hamburger {
+  background: transparent;
+  border: none;
+  color: #fff;
+  font-size: 22px;
+  cursor: pointer;
+}
+.topnav-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 18px;
+  font-weight: 700;
+  color: #fff;
+}
+.topnav-title span { color: #e74c3c; }
+.topnav-right { display: flex; align-items: center; gap: 12px; }
+.admin-tag {
+  padding: 4px 12px;
+  background: rgba(231,76,60,0.12);
+  border: 1px solid rgba(231,76,60,0.25);
+  border-radius: 6px;
+  color: #e74c3c;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+/* ── MAIN ── */
+.main {
+  margin-top: 60px;
+  padding: 24px 20px;
+}
+
+/* ── SECTIONS ── */
+.section { display: none; }
+.section.active { display: block; }
+
+.section-title {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(20px, 4vw, 28px);
+  font-weight: 700;
+  margin-bottom: 6px;
+}
+.section-sub {
+  font-size: 13px;
+  color: rgba(255,255,255,0.4);
+  margin-bottom: 24px;
+}
+
+/* ── STATS GRID ── */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 14px;
+  margin-bottom: 28px;
+}
+.stat-card {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.07);
+  border-radius: 14px;
+  padding: 18px;
+  transition: all 0.3s;
+}
+.stat-card:hover { border-color: rgba(255,255,255,0.12); }
+.stat-icon { font-size: 22px; margin-bottom: 10px; }
+.stat-num {
+  font-family: 'Playfair Display', serif;
+  font-size: 28px;
+  font-weight: 700;
+  color: #F5A623;
+  line-height: 1;
+  margin-bottom: 4px;
+}
+.stat-label { font-size: 12px; color: rgba(255,255,255,0.4); }
+.stat-change {
+  font-size: 11px;
+  margin-top: 6px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.change-up { color: #27AE60; }
+.change-down { color: #e74c3c; }
+
+/* ── TABLE ── */
+.admin-table-wrap {
+  background: rgba(255,255,255,0.02);
+  border: 1px solid rgba(255,255,255,0.07);
+  border-radius: 14px;
+  overflow: hidden;
+  margin-bottom: 20px;
+}
+.table-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.table-title { font-size: 14px; font-weight: 600; color: rgba(255,255,255,0.7); }
+.search-input {
+  padding: 7px 14px;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 8px;
+  color: #fff;
+  font-size: 13px;
+  font-family: 'DM Sans', sans-serif;
+  outline: none;
+  width: 180px;
+}
+.search-input:focus { border-color: #F5A623; }
+.search-input::placeholder { color: rgba(255,255,255,0.3); }
+
+.admin-table { width: 100%; border-collapse: collapse; }
+.admin-table th {
+  padding: 10px 16px;
+  text-align: left;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.35);
+  background: rgba(255,255,255,0.02);
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+  white-space: nowrap;
+}
+.admin-table td {
+  padding: 12px 16px;
+  font-size: 13px;
+  color: rgba(255,255,255,0.65);
+  border-bottom: 1px solid rgba(255,255,255,0.04);
+  white-space: nowrap;
+}
+.admin-table tr:hover td { background: rgba(255,255,255,0.02); }
+.admin-table tr:last-child td { border-bottom: none; }
+
+/* Status badges */
+.status {
+  padding: 3px 10px;
+  border-radius: 100px;
+  font-size: 11px;
+  font-weight: 600;
+}
+.status-active { background: rgba(39,174,96,0.12); color: #27AE60; }
+.status-pending { background: rgba(245,166,35,0.12); color: #F5A623; }
+.status-banned { background: rgba(231,76,60,0.12); color: #e74c3c; }
+.status-free { background: rgba(255,255,255,0.06); color: rgba(255,255,255,0.4); }
+.status-pro { background: rgba(245,166,35,0.12); color: #F5A623; }
+
+/* Action buttons */
+.action-btn {
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  font-family: 'DM Sans', sans-serif;
+  cursor: pointer;
+  border: none;
+  transition: all 0.2s;
+  margin-right: 4px;
+}
+.btn-view { background: rgba(52,152,219,0.12); color: #3498db; }
+.btn-ban { background: rgba(231,76,60,0.12); color: #e74c3c; }
+.btn-approve { background: rgba(39,174,96,0.12); color: #27AE60; }
+.btn-delete { background: rgba(231,76,60,0.12); color: #e74c3c; }
+.btn-feature { background: rgba(245,166,35,0.12); color: #F5A623; }
+
+/* Revenue chart */
+.revenue-bars {
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+  height: 120px;
+  padding: 0 4px;
+  margin-bottom: 8px;
+}
+.rev-bar-wrap { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; }
+.rev-bar {
+  width: 100%;
+  background: linear-gradient(180deg, #F5A623, rgba(245,166,35,0.3));
+  border-radius: 4px 4px 0 0;
+  transition: all 0.3s;
+  cursor: pointer;
+  min-height: 4px;
+}
+.rev-bar:hover { background: linear-gradient(180deg, #FFD07A, rgba(245,166,35,0.5)); }
+.rev-label { font-size: 10px; color: rgba(255,255,255,0.3); }
+.rev-amount { font-size: 10px; color: rgba(255,255,255,0.5); }
+
+/* Announcement form */
+.announce-form {
+  background: rgba(255,255,255,0.02);
+  border: 1px solid rgba(255,255,255,0.07);
+  border-radius: 14px;
+  padding: 20px;
+  margin-bottom: 20px;
+}
+.announce-form textarea {
+  width: 100%;
+  padding: 12px 14px;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 8px;
+  color: #fff;
+  font-size: 14px;
+  font-family: 'DM Sans', sans-serif;
+  outline: none;
+  resize: vertical;
+  min-height: 80px;
+  margin-bottom: 12px;
+}
+.announce-form textarea:focus { border-color: #F5A623; }
+.announce-form textarea::placeholder { color: rgba(255,255,255,0.25); }
+.btn-announce {
+  padding: 10px 22px;
+  background: #e74c3c;
+  border: none;
+  border-radius: 8px;
+  color: #fff;
+  font-size: 13px;
+  font-weight: 700;
+  font-family: 'DM Sans', sans-serif;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.btn-announce:hover { background: #c0392b; }
+
+/* Overlay */
+.overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  z-index: 45;
+}
+.overlay.show { display: block; }
+
+/* Toast */
+.toast {
+  position: fixed;
+  bottom: 24px; right: 24px;
+  padding: 12px 20px;
+  background: #27AE60;
+  color: #fff;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  z-index: 9999;
+  opacity: 0;
+  transform: translateY(10px);
+  transition: all 0.3s;
+}
+.toast.show { opacity: 1; transform: translateY(0); }
+
+@media (min-width: 900px) {
+  .sidebar { transform: translateX(0); }
+  .hamburger { display: none; }
+  .topnav { left: 240px; }
+  .main { margin-left: 240px; padding: 32px 40px; }
+  .stats-grid { grid-template-columns: repeat(4, 1fr); }
+}
+</style>
+</head>
+<body>
+
+<div class="overlay" id="overlay"></div>
+
+<!-- SIDEBAR -->
+<div class="sidebar" id="sidebar">
+  <a href="../index.html" class="sidebar-logo">
+    Analytica<span>.</span>
+    <span class="admin-badge">ADMIN</span>
+  </a>
+
+  <div class="nav-section">Overview</div>
+  <button class="nav-item active" onclick="showSection('dashboard', this)">
+    <span class="nav-icon">📊</span> Dashboard
+  </button>
+
+  <div class="nav-section">Management</div>
+  <button class="nav-item" onclick="showSection('users', this)">
+    <span class="nav-icon">👥</span> Users
+  </button>
+  <button class="nav-item" onclick="showSection('content', this)">
+    <span class="nav-icon">📝</span> Content
+  </button>
+  <button class="nav-item" onclick="showSection('jobs', this)">
+    <span class="nav-icon">💼</span> Jobs
+  </button>
+  <button class="nav-item" onclick="showSection('datasets', this)">
+    <span class="nav-icon">📊</span> Datasets
+  </button>
+
+  <div class="nav-section">Finance</div>
+  <button class="nav-item" onclick="showSection('revenue', this)">
+    <span class="nav-icon">💰</span> Revenue
+  </button>
+
+  <div class="nav-section">Tools</div>
+  <button class="nav-item" onclick="showSection('announce', this)">
+    <span class="nav-icon">📢</span> Announcements
+  </button>
+
+  <div class="sidebar-bottom">
+    <a href="../index.html" class="nav-item" style="text-decoration:none;">
+      <span class="nav-icon">🌍</span> View Site
+    </a>
+    <button class="nav-item" onclick="signOut()">
+      <span class="nav-icon">🚪</span> Sign Out
+    </button>
+  </div>
+</div>
+
+<!-- TOPNAV -->
+<div class="topnav">
+  <div class="topnav-left">
+    <button class="hamburger" id="hamburger">☰</button>
+    <div class="topnav-title">Analytica <span>Admin</span></div>
+  </div>
+  <div class="topnav-right">
+    <span class="admin-tag">🛡️ Admin</span>
+  </div>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+
+  <!-- ── DASHBOARD SECTION ── -->
+  <div class="section active" id="section-dashboard">
+    <div class="section-title">Overview</div>
+    <div class="section-sub">Platform stats as of today</div>
+
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-icon">👥</div>
+        <div class="stat-num">50,247</div>
+        <div class="stat-label">Total Users</div>
+        <div class="stat-change change-up">↑ +247 this week</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">⭐</div>
+        <div class="stat-num">1,834</div>
+        <div class="stat-label">Pro Members</div>
+        <div class="stat-change change-up">↑ +34 this week</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">💰</div>
+        <div class="stat-num">₦4.6M</div>
+        <div class="stat-label">Monthly Revenue</div>
+        <div class="stat-change change-up">↑ +12% vs last month</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">🗣️</div>
+        <div class="stat-num">12,451</div>
+        <div class="stat-label">Forum Posts</div>
+        <div class="stat-change change-up">↑ +451 this week</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">📥</div>
+        <div class="stat-num">89,234</div>
+        <div class="stat-label">Dataset Downloads</div>
+        <div class="stat-change change-up">↑ +5,234 this week</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">💼</div>
+        <div class="stat-num">340</div>
+        <div class="stat-label">Active Jobs</div>
+        <div class="stat-change change-up">↑ +12 this week</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">🏆</div>
+        <div class="stat-num">4,287</div>
+        <div class="stat-label">Challenge Submissions</div>
+        <div class="stat-change change-up">↑ +287 this week</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">🎓</div>
+        <div class="stat-num">892</div>
+        <div class="stat-label">Active Mentors</div>
+        <div class="stat-change change-down">↓ -8 this week</div>
+      </div>
+    </div>
+
+    <!-- Recent signups -->
+    <div class="admin-table-wrap">
+      <div class="table-header">
+        <div class="table-title">Recent Signups</div>
+      </div>
+      <div style="overflow-x:auto;">
+        <table class="admin-table">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Email</th>
+              <th>Country</th>
+              <th>Plan</th>
+              <th>Joined</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>Ayomide A.</td><td>ayomide@gmail.com</td><td>🇳🇬 Nigeria</td><td><span class="status status-free">Free</span></td><td>Today</td></tr>
+            <tr><td>Fatima K.</td><td>fatima@yahoo.com</td><td>🇳🇬 Nigeria</td><td><span class="status status-pro">Pro</span></td><td>Today</td></tr>
+            <tr><td>John O.</td><td>john@gmail.com</td><td>🇬🇭 Ghana</td><td><span class="status status-free">Free</span></td><td>Today</td></tr>
+            <tr><td>Amina S.</td><td>amina@outlook.com</td><td>🇰🇪 Kenya</td><td><span class="status status-free">Free</span></td><td>Yesterday</td></tr>
+            <tr><td>Chukwu E.</td><td>chukwu@gmail.com</td><td>🇳🇬 Nigeria</td><td><span class="status status-pro">Pro</span></td><td>Yesterday</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── USERS SECTION ── -->
+  <div class="section" id="section-users">
+    <div class="section-title">User Management</div>
+    <div class="section-sub">View, search and manage all platform users</div>
+
+    <div class="admin-table-wrap">
+      <div class="table-header">
+        <div class="table-title">All Users (50,247)</div>
+        <input type="text" class="search-input" placeholder="🔍 Search users...">
+      </div>
+      <div style="overflow-x:auto;">
+        <table class="admin-table">
+          <thead>
+            <tr>
+              <th>User</th>
+              <th>Email</th>
+              <th>Country</th>
+              <th>Plan</th>
+              <th>Status</th>
+              <th>Joined</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Ayomide A.</td>
+              <td>ayomide@gmail.com</td>
+              <td>🇳🇬 Nigeria</td>
+              <td><span class="status status-free">Free</span></td>
+              <td><span class="status status-active">Active</span></td>
+              <td>Jun 1, 2026</td>
+              <td>
+                <button class="action-btn btn-view">View</button>
+                <button class="action-btn btn-ban" onclick="showToast('User banned')">Ban</button>
+              </td>
+            </tr>
+            <tr>
+              <td>Fatima K.</td>
+              <td>fatima@yahoo.com</td>
+              <td>🇳🇬 Nigeria</td>
+              <td><span class="status status-pro">Pro</span></td>
+              <td><span class="status status-active">Active</span></td>
+              <td>May 28, 2026</td>
+              <td>
+                <button class="action-btn btn-view">View</button>
+                <button class="action-btn btn-ban" onclick="showToast('User banned')">Ban</button>
+              </td>
+            </tr>
+            <tr>
+              <td>Spam User</td>
+              <td>spam@fake.com</td>
+              <td>❓ Unknown</td>
+              <td><span class="status status-free">Free</span></td>
+              <td><span class="status status-banned">Banned</span></td>
+              <td>May 20, 2026</td>
+              <td>
+                <button class="action-btn btn-view">View</button>
+                <button class="action-btn btn-approve" onclick="showToast('User unbanned')">Unban</button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── CONTENT SECTION ── -->
+  <div class="section" id="section-content">
+    <div class="section-title">Content Moderation</div>
+    <div class="section-sub">Review and moderate forum posts and comments</div>
+
+    <div class="admin-table-wrap">
+      <div class="table-header">
+        <div class="table-title">Flagged Posts</div>
+      </div>
+      <div style="overflow-x:auto;">
+        <table class="admin-table">
+          <thead>
+            <tr>
+              <th>Post</th>
+              <th>Author</th>
+              <th>Reason</th>
+              <th>Date</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>How to hack databases...</td>
+              <td>unknown_user</td>
+              <td><span class="status status-banned">Spam</span></td>
+              <td>Today</td>
+              <td>
+                <button class="action-btn btn-approve" onclick="showToast('Post approved')">Approve</button>
+                <button class="action-btn btn-delete" onclick="showToast('Post deleted')">Delete</button>
+              </td>
+            </tr>
+            <tr>
+              <td>Buy cheap followers...</td>
+              <td>spammer123</td>
+              <td><span class="status status-banned">Spam</span></td>
+              <td>Yesterday</td>
+              <td>
+                <button class="action-btn btn-approve" onclick="showToast('Post approved')">Approve</button>
+                <button class="action-btn btn-delete" onclick="showToast('Post deleted')">Delete</button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── JOBS SECTION ── -->
+  <div class="section" id="section-jobs">
+    <div class="section-title">Job Approvals</div>
+    <div class="section-sub">Review and approve company job postings</div>
+
+    <div class="admin-table-wrap">
+      <div class="table-header">
+        <div class="table-title">Pending Jobs (3)</div>
+      </div>
+      <div style="overflow-x:auto;">
+        <table class="admin-table">
+          <thead>
+            <tr>
+              <th>Job Title</th>
+              <th>Company</th>
+              <th>Location</th>
+              <th>Salary</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Data Analyst</td>
+              <td>TechCorp Nigeria</td>
+              <td>Lagos</td>
+              <td>₦300K/mo</td>
+              <td><span class="status status-pending">Pending</span></td>
+              <td>
+                <button class="action-btn btn-approve" onclick="showToast('Job approved!')">Approve</button>
+                <button class="action-btn btn-delete" onclick="showToast('Job rejected')">Reject</button>
+              </td>
+            </tr>
+            <tr>
+              <td>BI Developer</td>
+              <td>FinanceHub</td>
+              <td>Remote</td>
+              <td>₦450K/mo</td>
+              <td><span class="status status-pending">Pending</span></td>
+              <td>
+                <button class="action-btn btn-approve" onclick="showToast('Job approved!')">Approve</button>
+                <button class="action-btn btn-delete" onclick="showToast('Job rejected')">Reject</button>
+              </td>
+            </tr>
+            <tr>
+              <td>Data Engineer</td>
+              <td>StartupNG</td>
+              <td>Abuja</td>
+              <td>₦500K/mo</td>
+              <td><span class="status status-pending">Pending</span></td>
+              <td>
+                <button class="action-btn btn-approve" onclick="showToast('Job approved!')">Approve</button>
+                <button class="action-btn btn-delete" onclick="showToast('Job rejected')">Reject</button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── DATASETS SECTION ── -->
+  <div class="section" id="section-datasets">
+    <div class="section-title">Dataset Management</div>
+    <div class="section-sub">Manage and feature datasets in the library</div>
+
+    <div class="admin-table-wrap">
+      <div class="table-header">
+        <div class="table-title">All Datasets (24)</div>
+        <input type="text" class="search-input" placeholder="🔍 Search datasets...">
+      </div>
+      <div style="overflow-x:auto;">
+        <table class="admin-table">
+          <thead>
+            <tr>
+              <th>Dataset Name</th>
+              <th>Source</th>
+              <th>Downloads</th>
+              <th>Type</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Nigeria Labour Force Q1 2024</td>
+              <td>NBS</td>
+              <td>234</td>
+              <td><span class="status status-active">Free</span></td>
+              <td>
+                <button class="action-btn btn-feature" onclick="showToast('Dataset featured!')">Feature</button>
+                <button class="action-btn btn-delete" onclick="showToast('Dataset removed')">Remove</button>
+              </td>
+            </tr>
+            <tr>
+              <td>Nigeria GDP 2010-2023</td>
+              <td>CBN</td>
+              <td>412</td>
+              <td><span class="status status-active">Free</span></td>
+              <td>
+                <button class="action-btn btn-feature" onclick="showToast('Dataset featured!')">Feature</button>
+                <button class="action-btn btn-delete" onclick="showToast('Dataset removed')">Remove</button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── REVENUE SECTION ── -->
+  <div class="section" id="section-revenue">
+    <div class="section-title">Revenue Analytics</div>
+    <div class="section-sub">Monthly revenue breakdown</div>
+
+    <div class="stats-grid" style="margin-bottom:24px;">
+      <div class="stat-card">
+        <div class="stat-icon">💰</div>
+        <div class="stat-num">₦4.6M</div>
+        <div class="stat-label">This Month</div>
+        <div class="stat-change change-up">↑ +12%</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">⭐</div>
+        <div class="stat-num">₦4.6M</div>
+        <div class="stat-label">Pro Subscriptions</div>
+        <div class="stat-change change-up">↑ 1,834 members</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">💼</div>
+        <div class="stat-num">₦315K</div>
+        <div class="stat-label">Job Postings</div>
+        <div class="stat-change change-up">↑ 21 posts</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">🎓</div>
+        <div class="stat-num">₦180K</div>
+        <div class="stat-label">Mentorship Commission</div>
+        <div class="stat-change change-up">↑ +18 sessions</div>
+      </div>
+    </div>
+
+    <div class="admin-table-wrap" style="padding:20px;">
+      <div class="table-title" style="margin-bottom:16px;">Monthly Revenue (2026)</div>
+      <div class="revenue-bars" id="revenue-chart"></div>
+      <div style="display:flex;justify-content:space-around;margin-top:4px;">
+        ${['Jan','Feb','Mar','Apr','May','Jun'].map(m => `<span style="font-size:10px;color:rgba(255,255,255,0.3);">${m}</span>`).join('')}
+      </div>
+    </div>
+  </div>
+
+  <!-- ── ANNOUNCEMENTS SECTION ── */
+  <div class="section" id="section-announce">
+    <div class="section-title">Send Announcement</div>
+    <div class="section-sub">Send a notification to all platform users</div>
+
+    <div class="announce-form">
+      <div style="font-size:14px;font-weight:600;margin-bottom:12px;color:rgba(255,255,255,0.7);">📢 New Announcement</div>
+      <select style="width:100%;padding:10px 14px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:8px;color:#fff;font-family:'DM Sans',sans-serif;font-size:13px;outline:none;margin-bottom:12px;">
+        <option value="">Select audience</option>
+        <option>All Users</option>
+        <option>Free Users Only</option>
+        <option>Pro Users Only</option>
+        <option>Companies Only</option>
+      </select>
+      <textarea placeholder="Write your announcement message here..."></textarea>
+      <button class="btn-announce" onclick="sendAnnouncement()">📢 Send to All Users</button>
+    </div>
+
+    <div class="admin-table-wrap">
+      <div class="table-header">
+        <div class="table-title">Previous Announcements</div>
+      </div>
+      <div style="overflow-x:auto;">
+        <table class="admin-table">
+          <thead>
+            <tr>
+              <th>Message</th>
+              <th>Audience</th>
+              <th>Sent</th>
+              <th>Reach</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Welcome to Analytica v2.0!</td>
+              <td>All Users</td>
+              <td>Jun 1, 2026</td>
+              <td>50,247</td>
+            </tr>
+            <tr>
+              <td>New challenge: Nigeria GDP Analysis</td>
+              <td>All Users</td>
+              <td>May 28, 2026</td>
+              <td>50,103</td>
+            </tr>
+            <tr>
+              <td>Pro plan now includes AI Assistant</td>
+              <td>Pro Users</td>
+              <td>May 20, 2026</td>
+              <td>1,800</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast">✅ Done!</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="../js/supabase.js"></script>
+<script>
+
+// ── SECTION NAVIGATION ──
+function showSection(name, btn) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'))
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'))
+  document.getElementById(`section-${name}`).classList.add('active')
+  btn.classList.add('active')
+
+  // Close sidebar on mobile
+  document.getElementById('sidebar').classList.remove('open')
+  document.getElementById('overlay').classList.remove('show')
+}
+
+// ── REVENUE CHART ──
+function renderRevenueChart() {
+  const data = [1200000, 1800000, 2100000, 2800000, 3900000, 4600000]
+  const max = Math.max(...data)
+  const chart = document.getElementById('revenue-chart')
+  if (!chart) return
+
+  chart.innerHTML = data.map((val, i) => `
+    <div class="rev-bar-wrap">
+      <div class="rev-amount">₦${(val/1000000).toFixed(1)}M</div>
+      <div class="rev-bar" style="height:${(val/max)*90}px;" title="₦${val.toLocaleString()}"></div>
+    </div>
+  `).join('')
+}
+
+// ── HAMBURGER ──
+const hamburger = document.getElementById('hamburger')
+const sidebar = document.getElementById('sidebar')
+const overlay = document.getElementById('overlay')
+
+hamburger.addEventListener('click', () => {
+  sidebar.classList.toggle('open')
+  overlay.classList.toggle('show')
+})
+overlay.addEventListener('click', () => {
+  sidebar.classList.remove('open')
+  overlay.classList.remove('show')
+})
+
+// ── SIGN OUT ──
+async function signOut() {
+  await db.auth.signOut()
+  window.location.href = '../index.html'
+}
+
+// ── ANNOUNCE ──
+function sendAnnouncement() {
+  showToast('📢 Announcement sent to all users!')
+}
+
+// ── TOAST ──
+function showToast(msg = '✅ Done!') {
+  const toast = document.getElementById('toast')
+  toast.textContent = msg
+  toast.classList.add('show')
+  setTimeout(() => toast.classList.remove('show'), 2500)
+}
+
+// ── INIT ──
+async function init() {
+  const { data: { session } } = await db.auth.getSession()
+  if (!session) {
+    window.location.href = '../auth/login.html'
+    return
+  }
+  renderRevenueChart()
+}
+
+init()
+</script>
+</body>
+</html>

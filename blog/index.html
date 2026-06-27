@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Blog & News — Analytica</title>
+<link rel="stylesheet" href="../css/main.css">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+* { box-sizing: border-box; }
+body { background: #0A1628; min-height: 100vh; margin: 0; }
+.topnav {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  height: 60px;
+  background: rgba(10,22,40,0.95);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 20px;
+  z-index: 40;
+}
+.topnav-logo {
+  font-family: 'Playfair Display', serif;
+  font-size: 20px;
+  font-weight: 900;
+  color: #fff;
+  text-decoration: none;
+}
+.topnav-logo span { color: #F5A623; }
+.topnav-right { display: flex; gap: 10px; }
+.btn-sm {
+  padding: 7px 16px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  font-family: 'DM Sans', sans-serif;
+  cursor: pointer;
+  text-decoration: none;
+  transition: all 0.2s;
+  border: none;
+}
+.btn-gold { background: #F5A623; color: #0A1628; }
+.btn-gold:hover { background: #FFD07A; }
+.btn-outline {
+  background: transparent;
+  border: 1px solid rgba(255,255,255,0.2) !important;
+  color: #fff;
+}
+
+.page {
+  margin-top: 60px;
+  padding: 28px 20px;
+  max-width: 1000px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* ── HERO ── */
+.blog-hero {
+  background: linear-gradient(135deg, rgba(52,152,219,0.1), rgba(17,34,64,0.8));
+  border: 1px solid rgba(52,152,219,0.2);
+  border-radius: 20px;
+  padding: 36px 24px;
+  margin-bottom: 28px;
+  text-align: center;
+}
+.hero-label {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: #3498db;
+  margin-bottom: 12px;
+}
+.hero-title {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(24px, 5vw, 36px);
+  font-weight: 900;
+  margin-bottom: 10px;
+}
+.hero-title span { color: #F5A623; }
+.hero-sub {
+  font-size: 14px;
+  color: rgba(255,255,255,0.5);
+  margin-bottom: 20px;
+}
+
+/* Newsletter signup */
+.newsletter-row {
+  display: flex;
+  gap: 10px;
+  max-width: 400px;
+  margin: 0 auto;
+  flex-wrap: wrap;
+}
+.newsletter-input {
+  flex: 1;
+  padding: 11px 16px;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 8px;
+  color: #fff;
+  font-size: 13px;
+  font-family: 'DM Sans', sans-serif;
+  outline: none;
+  min-width: 200px;
+}
+.newsletter-input:focus { border-color: #F5A623; }
+.newsletter-input::placeholder { color: rgba(255,255,255,0.3); }
+.btn-subscribe {
+  padding: 11px 20px;
+  background: #F5A623;
+  border: none;
+  border-radius: 8px;
+  color: #0A1628;
+  font-size: 13px;
+  font-weight: 700;
+  font-family: 'DM Sans', sans-serif;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.2s;
+}
+.btn-subscribe:hover { background: #FFD07A; }
+
+/* ── FILTER TABS ── */
+.filter-tabs {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding-bottom: 4px;
+  margin-bottom: 24px;
+}
+.filter-tabs::-webkit-scrollbar { display: none; }
+.tab {
+  padding: 7px 16px;
+  border-radius: 100px;
+  font-size: 13px;
+  font-weight: 500;
+  white-space: nowrap;
+  cursor: pointer;
+  border: 1px solid rgba(255,255,255,0.1);
+  color: rgba(255,255,255,0.5);
+  background: transparent;
+  font-family: 'DM Sans', sans-serif;
+  transition: all 0.2s;
+}
+.tab.active, .tab:hover {
+  background: rgba(52,152,219,0.12);
+  border-color: rgba(52,152,219,0.3);
+  color: #3498db;
+}
+
+/* ── FEATURED POST ── */
+.featured-post {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 18px;
+  padding: 28px;
+  margin-bottom: 24px;
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+.featured-post::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, #F5A623, #3498db);
+}
+.featured-post:hover { border-color: rgba(245,166,35,0.2); transform: translateY(-2px); }
+.featured-badge {
+  display: inline-block;
+  padding: 3px 12px;
+  background: rgba(245,166,35,0.12);
+  color: #F5A623;
+  border: 1px solid rgba(245,166,35,0.25);
+  border-radius: 100px;
+  font-size: 11px;
+  font-weight: 600;
+  margin-bottom: 14px;
+}
+.featured-title {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(20px, 4vw, 28px);
+  font-weight: 700;
+  margin-bottom: 10px;
+  line-height: 1.3;
+}
+.featured-desc {
+  font-size: 14px;
+  color: rgba(255,255,255,0.5);
+  line-height: 1.7;
+  margin-bottom: 16px;
+}
+.post-meta {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+.meta-author {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.author-avatar {
+  width: 28px; height: 28px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #F5A623, #e8920f);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 700;
+  color: #0A1628;
+}
+.author-name { font-size: 12px; color: rgba(255,255,255,0.5); }
+.meta-dot { color: rgba(255,255,255,0.2); font-size: 12px; }
+.meta-date { font-size: 12px; color: rgba(255,255,255,0.35); }
+.meta-read { font-size: 12px; color: rgba(255,255,255,0.35); }
+.post-category {
+  padding: 3px 10px;
+  border-radius: 100px;
+  font-size: 11px;
+  font-weight: 600;
+  border: 1px solid;
+}
+.cat-tutorial { background: rgba(39,174,96,0.1); color: #27AE60; border-color: rgba(39,174,96,0.3); }
+.cat-news { background: rgba(52,152,219,0.1); color: #3498db; border-color: rgba(52,152,219,0.3); }
+.cat-career { background: rgba(245,166,35,0.1); color: #F5A623; border-color: rgba(245,166,35,0.3); }
+.cat-data { background: rgba(155,89,182,0.1); color: #9b59b6; border-color: rgba(155,89,182,0.3); }
+.cat-tool { background: rgba(231,76,60,0.1); color: #e74c3c; border-color: rgba(231,76,60,0.3); }
+
+/* ── POSTS GRID ── */
+.posts-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+  margin-bottom: 32px;
+}
+
+.post-card {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.07);
+  border-radius: 14px;
+  padding: 20px;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+.post-card:hover { border-color: rgba(52,152,219,0.2); transform: translateY(-2px); }
+
+.post-card-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+.post-title {
+  font-size: 15px;
+  font-weight: 600;
+  color: #fff;
+  margin-bottom: 8px;
+  line-height: 1.4;
+}
+.post-desc {
+  font-size: 13px;
+  color: rgba(255,255,255,0.4);
+  line-height: 1.6;
+  margin-bottom: 14px;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.post-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.read-more {
+  font-size: 12px;
+  color: #3498db;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* ── TRENDING TOPICS ── */
+.trending-section {
+  background: rgba(255,255,255,0.02);
+  border: 1px solid rgba(255,255,255,0.07);
+  border-radius: 16px;
+  padding: 20px;
+  margin-bottom: 28px;
+}
+.trending-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: rgba(255,255,255,0.6);
+  margin-bottom: 14px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.trending-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.trending-tag {
+  padding: 6px 14px;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 100px;
+  font-size: 12px;
+  color: rgba(255,255,255,0.5);
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.trending-tag:hover {
+  background: rgba(52,152,219,0.1);
+  border-color: rgba(52,152,219,0.25);
+  color: #3498db;
+}
+.tag-count {
+  font-size: 10px;
+  color: rgba(255,255,255,0.25);
+}
+
+@media (min-width: 600px) {
+  .posts-grid { grid-template-columns: repeat(2, 1fr); }
+}
+@media (min-width: 900px) {
+  .posts-grid { grid-template-columns: repeat(3, 1fr); }
+}
+</style>
+</head>
+<body>
+
+<div class="topnav">
+  <a href="../index.html" class="topnav-logo">Analytica<span>.</span></a>
+  <div class="topnav-right">
+    <a href="../dashboard/index.html" class="btn-sm btn-outline">Dashboard</a>
+    <a href="../auth/signup.html" class="btn-sm btn-gold">Join Free</a>
+  </div>
+</div>
+
+<div class="page">
+
+  <!-- Hero -->
+  <div class="blog-hero">
+    <div class="hero-label">Blog & News</div>
+    <h1 class="hero-title">African <span>Data Stories</span></h1>
+    <p class="hero-sub">Tutorials, news, dataset releases and career tips for African data analysts</p>
+    <div class="newsletter-row">
+      <input type="email" class="newsletter-input" placeholder="your@email.com">
+      <button class="btn-subscribe" onclick="subscribe()">📧 Subscribe</button>
+    </div>
+  </div>
+
+  <!-- Trending Topics -->
+  <div class="trending-section">
+    <div class="trending-title">🔥 Trending Topics</div>
+    <div class="trending-tags">
+      <div class="trending-tag">SQL <span class="tag-count">142</span></div>
+      <div class="trending-tag">Power BI <span class="tag-count">98</span></div>
+      <div class="trending-tag">Nigeria Data <span class="tag-count">87</span></div>
+      <div class="trending-tag">Python <span class="tag-count">76</span></div>
+      <div class="trending-tag">Career <span class="tag-count">65</span></div>
+      <div class="trending-tag">NBS Datasets <span class="tag-count">54</span></div>
+      <div class="trending-tag">Excel <span class="tag-count">48</span></div>
+      <div class="trending-tag">Machine Learning <span class="tag-count">41</span></div>
+    </div>
+  </div>
+
+  <!-- Filter Tabs -->
+  <div class="filter-tabs">
+    <button class="tab active" onclick="setFilter('all', this)">All</button>
+    <button class="tab" onclick="setFilter('tutorial', this)">📚 Tutorials</button>
+    <button class="tab" onclick="setFilter('news', this)">📰 News</button>
+    <button class="tab" onclick="setFilter('career', this)">💼 Career</button>
+    <button class="tab" onclick="setFilter('data', this)">📊 Data Stories</button>
+    <button class="tab" onclick="setFilter('tool', this)">🛠️ Tools</button>
+  </div>
+
+  <!-- Featured Post -->
+  <div class="featured-post" id="featured-post"></div>
+
+  <!-- Posts Grid -->
+  <div class="posts-grid" id="posts-grid"></div>
+
+</div>
+
+<script>
+const posts = [
+  {
+    id: 1,
+    category: 'tutorial',
+    catLabel: 'Tutorial',
+    catClass: 'cat-tutorial',
+    title: 'How to Analyze Nigeria Labour Force Data with SQL',
+    desc: 'A step-by-step guide to downloading, cleaning and querying the NBS Labour Force Survey 2024 data using PostgreSQL.',
+    author: 'Analytica Team',
+    authorInitial: 'A',
+    date: 'June 2, 2026',
+    readTime: '8 min read',
+    featured: true,
+    views: 1243
+  },
+  {
+    id: 2,
+    category: 'news',
+    catLabel: 'News',
+    catClass: 'cat-news',
+    title: 'NBS Releases Q1 2024 Labour Force Survey — Key Findings',
+    desc: 'The National Bureau of Statistics released its latest labour force data. Unemployment rose to 5.3% while underemployment remained high at 14.2%.',
+    author: 'Data Desk',
+    authorInitial: 'D',
+    date: 'June 1, 2026',
+    readTime: '5 min read',
+    featured: false,
+    views: 892
+  },
+  {
+    id: 3,
+    category: 'career',
+    catLabel: 'Career',
+    catClass: 'cat-career',
+    title: '10 Data Analyst Jobs in Nigeria Paying Above ₦400K',
+    desc: 'We researched the top paying data analyst roles in Nigeria right now. Here are 10 companies hiring and what they pay.',
+    author: 'Career Team',
+    authorInitial: 'C',
+    date: 'May 30, 2026',
+    readTime: '6 min read',
+    featured: false,
+    views: 2341
+  },
+  {
+    id: 4,
+    category: 'tutorial',
+    catLabel: 'Tutorial',
+    catClass: 'cat-tutorial',
+    title: 'Power BI Dashboard Tutorial: Nigeria Population Analysis',
+    desc: 'Build a beautiful interactive Power BI dashboard using Nigeria population data. Includes DAX formulas and drill-through pages.',
+    author: 'Analytica Team',
+    authorInitial: 'A',
+    date: 'May 28, 2026',
+    readTime: '12 min read',
+    featured: false,
+    views: 678
+  },
+  {
+    id: 5,
+    category: 'data',
+    catLabel: 'Data Story',
+    catClass: 'cat-data',
+    title: 'Nigeria GDP: What the Numbers Really Say About Our Economy',
+    desc: 'We analyzed 13 years of Nigerian GDP data to understand the real story behind the numbers — oil dependency, service sector growth and what it means for jobs.',
+    author: 'Analysis Team',
+    authorInitial: 'A',
+    date: 'May 25, 2026',
+    readTime: '10 min read',
+    featured: false,
+    views: 1567
+  },
+  {
+    id: 6,
+    category: 'tool',
+    catLabel: 'Tools',
+    catClass: 'cat-tool',
+    title: 'Excel vs Power BI: Which Should Nigerian Analysts Learn First?',
+    desc: 'The eternal debate settled with data. We surveyed 500 Nigerian data analysts about their tool preferences and career outcomes.',
+    author: 'Research Team',
+    authorInitial: 'R',
+    date: 'May 22, 2026',
+    readTime: '7 min read',
+    featured: false,
+    views: 3421
+  },
+  {
+    id: 7,
+    category: 'career',
+    catLabel: 'Career',
+    catClass: 'cat-career',
+    title: 'From Teacher to Data Analyst: A Nigerian Success Story',
+    desc: 'How a secondary school mathematics teacher in Lagos transitioned into a data analyst role at a fintech company in 8 months.',
+    author: 'Community',
+    authorInitial: 'C',
+    date: 'May 20, 2026',
+    readTime: '5 min read',
+    featured: false,
+    views: 4567
+  },
+  {
+    id: 8,
+    category: 'tutorial',
+    catLabel: 'Tutorial',
+    catClass: 'cat-tutorial',
+    title: 'Python Pandas: Clean Nigerian Census Data in 10 Lines',
+    desc: 'A quick tutorial showing how to load, clean and analyze Nigerian census data using pandas. Perfect for beginners.',
+    author: 'Analytica Team',
+    authorInitial: 'A',
+    date: 'May 18, 2026',
+    readTime: '6 min read',
+    featured: false,
+    views: 934
+  }
+]
+
+let currentFilter = 'all'
+
+function renderPosts(data) {
+  const featured = data.find(p => p.featured) || data[0]
+  const rest = data.filter(p => p.id !== featured.id)
+
+  // Featured post
+  document.getElementById('featured-post').innerHTML = `
+    <span class="featured-badge">⭐ Featured</span>
+    <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:12px;">
+      <span class="post-category ${featured.catClass}">${featured.catLabel}</span>
+    </div>
+    <div class="featured-title">${featured.title}</div>
+    <div class="featured-desc">${featured.desc}</div>
+    <div class="post-meta">
+      <div class="meta-author">
+        <div class="author-avatar">${featured.authorInitial}</div>
+        <span class="author-name">${featured.author}</span>
+      </div>
+      <span class="meta-dot">·</span>
+      <span class="meta-date">${featured.date}</span>
+      <span class="meta-dot">·</span>
+      <span class="meta-read">⏱️ ${featured.readTime}</span>
+      <span class="meta-dot">·</span>
+      <span class="meta-read">👁️ ${featured.views.toLocaleString()}</span>
+    </div>
+  `
+
+  // Rest of posts
+  document.getElementById('posts-grid').innerHTML = rest.map(p => `
+    <div class="post-card">
+      <div class="post-card-top">
+        <span class="post-category ${p.catClass}">${p.catLabel}</span>
+        <span style="font-size:11px;color:rgba(255,255,255,0.25);">${p.readTime}</span>
+      </div>
+      <div class="post-title">${p.title}</div>
+      <div class="post-desc">${p.desc}</div>
+      <div class="post-footer">
+        <div class="meta-author">
+          <div class="author-avatar">${p.authorInitial}</div>
+          <span class="author-name">${p.date}</span>
+        </div>
+        <div class="read-more">Read → </div>
+      </div>
+    </div>
+  `).join('')
+}
+
+function setFilter(filter, btn) {
+  currentFilter = filter
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'))
+  btn.classList.add('active')
+  const filtered = filter === 'all' ? posts : posts.filter(p => p.category === filter)
+  renderPosts(filtered)
+}
+
+function subscribe() {
+  const input = document.querySelector('.newsletter-input')
+  if (!input.value) return
+  alert('✅ Subscribed! You will receive weekly data stories in your inbox.')
+  input.value = ''
+}
+
+renderPosts(posts)
+</script>
+</body>
+</html>

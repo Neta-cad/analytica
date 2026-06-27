@@ -4,913 +4,453 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Mentorship — Analytica</title>
-<link rel="stylesheet" href="../css/main.css">
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
-* { box-sizing: border-box; }
-body { background: #0A1628; min-height: 100vh; margin: 0; }
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body { background: #0A1628; color: #fff; font-family: 'Inter', sans-serif; min-height: 100vh; }
+a { text-decoration: none; color: inherit; }
 
-.topnav {
-  position: fixed;
-  top: 0; left: 0; right: 0;
-  height: 60px;
-  background: rgba(10,22,40,0.95);
-  backdrop-filter: blur(20px);
-  border-bottom: 1px solid rgba(255,255,255,0.06);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0 20px;
-  z-index: 40;
-}
-.topnav-logo {
-  font-family: 'Playfair Display', serif;
-  font-size: 20px;
-  font-weight: 900;
-  color: #fff;
-  text-decoration: none;
-}
-.topnav-logo span { color: #F5A623; }
-.topnav-right { display: flex; gap: 10px; }
-.btn-sm {
-  padding: 7px 16px;
-  border-radius: 6px;
-  font-size: 13px;
-  font-weight: 600;
-  font-family: 'DM Sans', sans-serif;
-  cursor: pointer;
-  text-decoration: none;
-  transition: all 0.2s;
-  border: none;
-}
-.btn-gold { background: #F5A623; color: #0A1628; }
-.btn-gold:hover { background: #FFD07A; }
-.btn-outline {
-  background: transparent;
-  border: 1px solid rgba(255,255,255,0.2) !important;
-  color: #fff;
-}
+/* NAV */
+.topnav { position: fixed; top: 0; left: 0; right: 0; height: 58px; background: rgba(10,22,40,0.98); backdrop-filter: blur(12px); border-bottom: 1px solid rgba(255,255,255,0.07); display: flex; align-items: center; padding: 0 20px; gap: 12px; z-index: 100; }
+.nav-logo { font-size: 18px; font-weight: 800; color: #fff; letter-spacing: -0.5px; }
+.nav-logo span { color: #F5A623; }
+.nav-right { margin-left: auto; display: flex; gap: 8px; }
+.btn { padding: 7px 16px; border-radius: 7px; font-size: 13px; font-weight: 600; font-family: 'Inter', sans-serif; cursor: pointer; border: none; transition: all 0.15s; display: inline-block; }
+.btn-ghost { background: transparent; border: 1px solid rgba(255,255,255,0.15) !important; color: rgba(255,255,255,0.7); }
+.btn-ghost:hover { color: #fff; border-color: rgba(255,255,255,0.3) !important; }
+.btn-primary { background: #F5A623; color: #0A1628; font-weight: 700; }
+.btn-primary:hover { background: #f0b84a; }
 
-.page {
-  margin-top: 60px;
-  padding: 28px 20px;
-  max-width: 1000px;
-  margin-left: auto;
-  margin-right: auto;
-}
+/* PAGE */
+.page { margin-top: 58px; }
 
-/* ── HERO ── */
-.mentor-hero {
-  background: linear-gradient(135deg, rgba(155,89,182,0.1), rgba(17,34,64,0.8));
-  border: 1px solid rgba(155,89,182,0.2);
-  border-radius: 20px;
-  padding: 36px 24px;
-  margin-bottom: 28px;
-  text-align: center;
-}
-.hero-label {
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: 3px;
-  text-transform: uppercase;
-  color: #9b59b6;
-  margin-bottom: 12px;
-}
-.hero-title {
-  font-family: 'Playfair Display', serif;
-  font-size: clamp(24px, 5vw, 36px);
-  font-weight: 900;
-  margin-bottom: 10px;
-}
-.hero-title span { color: #F5A623; }
-.hero-sub {
-  font-size: 14px;
-  color: rgba(255,255,255,0.5);
-  margin-bottom: 24px;
-  max-width: 480px;
-  margin-left: auto;
-  margin-right: auto;
-}
-.hero-stats {
-  display: flex;
-  justify-content: center;
-  gap: 32px;
-  flex-wrap: wrap;
-}
-.hstat-num {
-  font-family: 'Playfair Display', serif;
-  font-size: 26px;
-  font-weight: 700;
-  color: #F5A623;
-}
-.hstat-label {
-  font-size: 11px;
-  color: rgba(255,255,255,0.4);
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
+/* HERO */
+.hero { padding: 48px 20px 36px; text-align: center; background: radial-gradient(ellipse at 50% 0%, rgba(245,166,35,0.07) 0%, transparent 70%); border-bottom: 1px solid rgba(255,255,255,0.06); }
+.hero-badge { display: inline-flex; align-items: center; gap: 7px; background: rgba(245,166,35,0.1); border: 1px solid rgba(245,166,35,0.2); padding: 5px 14px; border-radius: 20px; font-size: 12px; font-weight: 600; color: #F5A623; margin-bottom: 16px; }
+.hero h1 { font-size: clamp(24px, 4.5vw, 44px); font-weight: 900; letter-spacing: -1px; line-height: 1.2; margin-bottom: 12px; }
+.hero h1 span { color: #F5A623; }
+.hero p { font-size: 14px; color: rgba(255,255,255,0.5); max-width: 500px; margin: 0 auto 24px; line-height: 1.7; }
+.hero-btns { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-bottom: 32px; }
+.btn-hero { padding: 11px 26px; border-radius: 8px; font-size: 14px; font-weight: 700; font-family: 'Inter', sans-serif; cursor: pointer; border: none; transition: all 0.15s; }
+.btn-hero-gold { background: #F5A623; color: #0A1628; }
+.btn-hero-gold:hover { background: #f0b84a; }
+.btn-hero-outline { background: transparent; border: 1px solid rgba(255,255,255,0.2) !important; color: #fff; }
+.btn-hero-outline:hover { border-color: rgba(255,255,255,0.4) !important; }
 
-/* ── FILTERS ── */
-.filter-row {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  margin-bottom: 24px;
-}
-.search-box {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  background: rgba(255,255,255,0.05);
-  border: 1px solid rgba(255,255,255,0.1);
-  border-radius: 10px;
-  padding: 10px 16px;
-}
-.search-box input {
-  flex: 1;
-  background: transparent;
-  border: none;
-  color: #fff;
-  font-size: 14px;
-  font-family: 'DM Sans', sans-serif;
-  outline: none;
-}
-.search-box input::placeholder { color: rgba(255,255,255,0.3); }
-.filter-tabs {
-  display: flex;
-  gap: 8px;
-  overflow-x: auto;
-  padding-bottom: 4px;
-}
-.filter-tabs::-webkit-scrollbar { display: none; }
-.tab {
-  padding: 7px 16px;
-  border-radius: 100px;
-  font-size: 13px;
-  font-weight: 500;
-  white-space: nowrap;
-  cursor: pointer;
-  border: 1px solid rgba(255,255,255,0.1);
-  color: rgba(255,255,255,0.5);
-  background: transparent;
-  font-family: 'DM Sans', sans-serif;
-  transition: all 0.2s;
-}
-.tab.active, .tab:hover {
-  background: rgba(155,89,182,0.12);
-  border-color: rgba(155,89,182,0.3);
-  color: #9b59b6;
-}
+/* STATS */
+.hero-stats { display: flex; justify-content: center; border: 1px solid rgba(255,255,255,0.07); border-radius: 12px; overflow: hidden; max-width: 560px; margin: 0 auto; background: rgba(255,255,255,0.02); }
+.hstat { flex: 1; padding: 14px 10px; text-align: center; border-right: 1px solid rgba(255,255,255,0.07); }
+.hstat:last-child { border-right: none; }
+.hstat-num { font-size: 20px; font-weight: 800; color: #F5A623; }
+.hstat-label { font-size: 10px; color: rgba(255,255,255,0.3); text-transform: uppercase; letter-spacing: 0.5px; margin-top: 2px; }
 
-/* ── MENTOR CARDS ── */
-.mentors-grid {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 16px;
-  margin-bottom: 40px;
-}
-.mentor-card {
-  background: rgba(255,255,255,0.03);
-  border: 1px solid rgba(255,255,255,0.07);
-  border-radius: 16px;
-  padding: 22px;
-  transition: all 0.3s;
-}
-.mentor-card:hover {
-  border-color: rgba(155,89,182,0.25);
-  transform: translateY(-3px);
-}
-.mentor-top {
-  display: flex;
-  gap: 16px;
-  align-items: flex-start;
-  margin-bottom: 14px;
-}
-.mentor-avatar {
-  width: 56px; height: 56px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 22px;
-  font-weight: 700;
-  color: #fff;
-  flex-shrink: 0;
-  position: relative;
-}
-.online-dot {
-  position: absolute;
-  bottom: 2px; right: 2px;
-  width: 12px; height: 12px;
-  background: #27AE60;
-  border-radius: 50%;
-  border: 2px solid #0A1628;
-}
+/* MAIN */
+.main { max-width: 1080px; margin: 0 auto; padding: 28px 20px; }
+
+/* TABS */
+.tabs { display: flex; gap: 4px; margin-bottom: 24px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.07); border-radius: 10px; padding: 4px; width: fit-content; }
+.tab { padding: 8px 20px; border-radius: 7px; font-size: 13px; font-weight: 600; cursor: pointer; border: none; background: transparent; color: rgba(255,255,255,0.4); font-family: 'Inter', sans-serif; transition: all 0.15s; }
+.tab.active { background: #F5A623; color: #0A1628; }
+
+/* FILTERS */
+.filters { display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; align-items: center; }
+.filter-pill { padding: 6px 14px; border-radius: 20px; font-size: 12px; font-weight: 500; cursor: pointer; border: 1px solid rgba(255,255,255,0.1); background: transparent; color: rgba(255,255,255,0.4); transition: all 0.15s; font-family: 'Inter', sans-serif; }
+.filter-pill:hover, .filter-pill.active { background: rgba(245,166,35,0.08); border-color: rgba(245,166,35,0.3); color: #F5A623; }
+.search-box { margin-left: auto; padding: 7px 14px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; color: #fff; font-size: 13px; font-family: 'Inter', sans-serif; outline: none; width: 200px; }
+.search-box:focus { border-color: rgba(245,166,35,0.4); }
+.search-box::placeholder { color: rgba(255,255,255,0.25); }
+
+/* SECTION HEADER */
+.sec-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+.sec-title { font-size: 15px; font-weight: 700; }
+.sec-count { font-size: 12px; color: rgba(255,255,255,0.3); }
+
+/* MENTORS GRID */
+.mentors-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 14px; margin-bottom: 40px; }
+
+.mentor-card { background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.07); border-radius: 12px; padding: 20px; transition: all 0.2s; cursor: pointer; }
+.mentor-card:hover { border-color: rgba(245,166,35,0.2); background: rgba(245,166,35,0.02); transform: translateY(-2px); }
+.mentor-card.featured { border-color: rgba(245,166,35,0.25); background: rgba(245,166,35,0.03); }
+
+.mentor-top { display: flex; gap: 14px; align-items: flex-start; margin-bottom: 14px; }
+.mentor-avatar { width: 52px; height: 52px; border-radius: 12px; background: linear-gradient(135deg, #F5A623, #e8920f); display: flex; align-items: center; justify-content: center; font-size: 18px; font-weight: 800; color: #0A1628; flex-shrink: 0; position: relative; }
+.mentor-available { position: absolute; bottom: -2px; right: -2px; width: 12px; height: 12px; background: #27AE60; border-radius: 50%; border: 2px solid #0A1628; }
+.mentor-busy { background: #E74C3C; }
 .mentor-info { flex: 1; }
-.mentor-name {
-  font-size: 16px;
-  font-weight: 600;
-  margin-bottom: 3px;
-}
-.mentor-title {
-  font-size: 13px;
-  color: rgba(255,255,255,0.45);
-  margin-bottom: 6px;
-}
-.mentor-rating {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 13px;
-}
-.stars { color: #F5A623; }
-.rating-count { color: rgba(255,255,255,0.35); font-size: 12px; }
+.mentor-name { font-size: 15px; font-weight: 700; margin-bottom: 2px; }
+.mentor-title { font-size: 12px; color: rgba(255,255,255,0.45); margin-bottom: 6px; }
+.mentor-badges { display: flex; gap: 5px; flex-wrap: wrap; }
+.mbadge { font-size: 10px; font-weight: 600; padding: 2px 7px; border-radius: 4px; }
+.mbadge-pro { background: rgba(245,166,35,0.12); color: #F5A623; border: 1px solid rgba(245,166,35,0.2); }
+.mbadge-top { background: rgba(39,174,96,0.12); color: #27AE60; border: 1px solid rgba(39,174,96,0.2); }
+.mbadge-new { background: rgba(41,128,185,0.12); color: #2980B9; border: 1px solid rgba(41,128,185,0.2); }
 
-.mentor-verified {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  font-size: 11px;
-  color: #27AE60;
-  background: rgba(39,174,96,0.1);
-  border: 1px solid rgba(39,174,96,0.2);
-  padding: 3px 10px;
-  border-radius: 100px;
-  white-space: nowrap;
-}
+.mentor-bio { font-size: 12px; color: rgba(255,255,255,0.4); line-height: 1.6; margin-bottom: 12px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
 
-.mentor-bio {
-  font-size: 13px;
-  color: rgba(255,255,255,0.45);
-  line-height: 1.65;
-  margin-bottom: 14px;
-}
+.mentor-skills { display: flex; gap: 5px; flex-wrap: wrap; margin-bottom: 14px; }
+.skill-tag { font-size: 11px; padding: 2px 8px; border-radius: 4px; background: rgba(255,255,255,0.04); color: rgba(255,255,255,0.35); border: 1px solid rgba(255,255,255,0.07); }
 
-.mentor-skills {
-  display: flex;
-  gap: 6px;
-  flex-wrap: wrap;
-  margin-bottom: 14px;
-}
-.skill-tag {
-  padding: 3px 10px;
-  border-radius: 100px;
-  font-size: 11px;
-  font-weight: 500;
-  background: rgba(255,255,255,0.05);
-  border: 1px solid rgba(255,255,255,0.08);
-  color: rgba(255,255,255,0.5);
-}
+.mentor-stats { display: flex; gap: 14px; margin-bottom: 14px; }
+.mstat { text-align: center; }
+.mstat-num { font-size: 15px; font-weight: 800; color: #fff; }
+.mstat-label { font-size: 10px; color: rgba(255,255,255,0.3); text-transform: uppercase; letter-spacing: 0.5px; }
 
-.mentor-meta {
-  display: flex;
-  gap: 16px;
-  flex-wrap: wrap;
-  margin-bottom: 16px;
-}
-.meta-item {
-  font-size: 12px;
-  color: rgba(255,255,255,0.35);
-  display: flex;
-  align-items: center;
-  gap: 4px;
-}
+.mentor-footer { display: flex; align-items: center; justify-content: space-between; padding-top: 12px; border-top: 1px solid rgba(255,255,255,0.06); }
+.mentor-rate { font-size: 13px; font-weight: 700; }
+.mentor-rate span { font-size: 11px; font-weight: 400; color: rgba(255,255,255,0.35); }
+.mentor-rating { font-size: 12px; color: #F5A623; }
+.btn-book { padding: 7px 16px; background: #F5A623; color: #0A1628; border: none; border-radius: 7px; font-size: 12px; font-weight: 700; cursor: pointer; font-family: 'Inter', sans-serif; transition: all 0.15s; }
+.btn-book:hover { background: #f0b84a; }
+.btn-book-free { background: rgba(39,174,96,0.1); color: #27AE60; border: 1px solid rgba(39,174,96,0.2) !important; }
+.btn-book-free:hover { background: rgba(39,174,96,0.2); }
 
-.mentor-footer {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  flex-wrap: wrap;
-}
-.mentor-price {
-  font-family: 'Playfair Display', serif;
-  font-size: 22px;
-  font-weight: 700;
-  color: #F5A623;
-}
-.mentor-price-label {
-  font-size: 11px;
-  color: rgba(255,255,255,0.35);
-}
-.btn-book {
-  padding: 10px 22px;
-  background: #9b59b6;
-  border: none;
-  border-radius: 8px;
-  color: #fff;
-  font-size: 14px;
-  font-weight: 700;
-  font-family: 'DM Sans', sans-serif;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-.btn-book:hover { background: #8e44ad; }
-.btn-profile {
-  padding: 10px 16px;
-  background: rgba(255,255,255,0.05);
-  border: 1px solid rgba(255,255,255,0.1);
-  border-radius: 8px;
-  color: rgba(255,255,255,0.6);
-  font-size: 13px;
-  font-family: 'DM Sans', sans-serif;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-.btn-profile:hover { border-color: #9b59b6; color: #9b59b6; }
+/* BECOME MENTOR */
+.become-mentor { background: linear-gradient(135deg, rgba(245,166,35,0.08), rgba(245,166,35,0.02)); border: 1px solid rgba(245,166,35,0.15); border-radius: 12px; padding: 32px; display: grid; grid-template-columns: 1fr; gap: 24px; margin-bottom: 40px; }
+@media (min-width: 700px) { .become-mentor { grid-template-columns: 1fr 1fr; } }
+.become-left h2 { font-size: 20px; font-weight: 800; letter-spacing: -0.5px; margin-bottom: 10px; }
+.become-left p { font-size: 13px; color: rgba(255,255,255,0.5); line-height: 1.7; margin-bottom: 16px; }
+.become-perks { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+.become-perks li { font-size: 13px; color: rgba(255,255,255,0.6); display: flex; gap: 8px; align-items: center; }
+.become-perks li::before { content: '✓'; color: #27AE60; font-weight: 700; font-size: 12px; }
+.become-right { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.perk-card { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.07); border-radius: 10px; padding: 16px; text-align: center; }
+.perk-icon { font-size: 24px; margin-bottom: 8px; }
+.perk-num { font-size: 18px; font-weight: 800; color: #F5A623; margin-bottom: 2px; }
+.perk-label { font-size: 11px; color: rgba(255,255,255,0.3); }
 
-/* ── BECOME A MENTOR CTA ── */
-.become-mentor {
-  background: linear-gradient(135deg, rgba(155,89,182,0.1), rgba(17,34,64,0.8));
-  border: 1px solid rgba(155,89,182,0.2);
-  border-radius: 20px;
-  padding: 36px 24px;
-  text-align: center;
-  margin-bottom: 32px;
-}
-.become-title {
-  font-family: 'Playfair Display', serif;
-  font-size: 24px;
-  font-weight: 700;
-  margin-bottom: 10px;
-}
-.become-desc {
-  font-size: 14px;
-  color: rgba(255,255,255,0.5);
-  margin-bottom: 20px;
-  line-height: 1.7;
-}
-.become-perks {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 10px;
-  margin-bottom: 24px;
-  max-width: 400px;
-  margin-left: auto;
-  margin-right: auto;
-}
-.perk {
-  background: rgba(255,255,255,0.03);
-  border: 1px solid rgba(255,255,255,0.06);
-  border-radius: 10px;
-  padding: 12px;
-  font-size: 13px;
-  color: rgba(255,255,255,0.6);
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-.btn-apply {
-  padding: 13px 32px;
-  background: #9b59b6;
-  border: none;
-  border-radius: 8px;
-  color: #fff;
-  font-size: 15px;
-  font-weight: 700;
-  font-family: 'DM Sans', sans-serif;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-.btn-apply:hover { background: #8e44ad; transform: translateY(-1px); }
+/* HOW IT WORKS */
+.how-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 40px; }
+@media (min-width: 700px) { .how-grid { grid-template-columns: repeat(4, 1fr); } }
+.how-card { background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.07); border-radius: 12px; padding: 18px; }
+.how-num { width: 28px; height: 28px; border-radius: 7px; background: rgba(245,166,35,0.1); border: 1px solid rgba(245,166,35,0.2); display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 800; color: #F5A623; margin-bottom: 10px; }
+.how-title { font-size: 13px; font-weight: 700; margin-bottom: 5px; }
+.how-desc { font-size: 12px; color: rgba(255,255,255,0.35); line-height: 1.6; }
 
-/* ── BOOKING MODAL ── */
-.modal-overlay {
-  display: none;
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.7);
-  z-index: 200;
-  align-items: flex-end;
-  justify-content: center;
-}
-.modal-overlay.show { display: flex; }
-.modal {
-  background: #0d1f3c;
-  border: 1px solid rgba(255,255,255,0.1);
-  border-radius: 20px 20px 0 0;
-  padding: 28px 24px;
-  width: 100%;
-  max-width: 500px;
-  max-height: 90vh;
-  overflow-y: auto;
-}
-.modal-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 20px;
-}
-.modal-title {
-  font-family: 'Playfair Display', serif;
-  font-size: 20px;
-  font-weight: 700;
-}
-.modal-close {
-  background: rgba(255,255,255,0.08);
-  border: none;
-  color: #fff;
-  width: 32px; height: 32px;
-  border-radius: 8px;
-  font-size: 16px;
-  cursor: pointer;
-}
-.modal label {
-  display: block;
-  font-size: 13px;
-  font-weight: 500;
-  color: rgba(255,255,255,0.6);
-  margin-bottom: 7px;
-  margin-top: 16px;
-}
-.modal select, .modal textarea, .modal input {
-  width: 100%;
-  padding: 12px 16px;
-  background: rgba(255,255,255,0.06);
-  border: 1px solid rgba(255,255,255,0.12);
-  border-radius: 8px;
-  color: #fff;
-  font-size: 14px;
-  font-family: 'DM Sans', sans-serif;
-  outline: none;
-}
-.modal select:focus, .modal textarea:focus { border-color: #9b59b6; }
-.modal select option { background: #112240; }
-.modal textarea { resize: vertical; min-height: 80px; }
-.modal textarea::placeholder { color: rgba(255,255,255,0.25); }
+/* BOOK MODAL */
+.modal-bg { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.75); backdrop-filter: blur(6px); z-index: 200; align-items: center; justify-content: center; padding: 20px; }
+.modal-bg.open { display: flex; }
+.modal { background: #0d1f3c; border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; padding: 28px; width: 100%; max-width: 480px; }
+.modal h2 { font-size: 18px; font-weight: 800; margin-bottom: 4px; }
+.modal-sub { font-size: 13px; color: rgba(255,255,255,0.35); margin-bottom: 20px; }
+.form-group { margin-bottom: 14px; }
+.form-label { font-size: 12px; font-weight: 600; color: rgba(255,255,255,0.5); margin-bottom: 6px; display: block; text-transform: uppercase; letter-spacing: 0.5px; }
+.form-input, .form-select, .form-textarea { width: 100%; padding: 10px 14px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; color: #fff; font-size: 13px; font-family: 'Inter', sans-serif; outline: none; transition: border 0.15s; }
+.form-input:focus, .form-select:focus, .form-textarea:focus { border-color: rgba(245,166,35,0.4); }
+.form-input::placeholder, .form-textarea::placeholder { color: rgba(255,255,255,0.2); }
+.form-select option { background: #0d1f3c; }
+.form-textarea { min-height: 80px; resize: vertical; }
+.modal-actions { display: flex; gap: 10px; margin-top: 20px; }
+.btn-confirm { flex: 1; padding: 11px; background: #F5A623; color: #0A1628; border: none; border-radius: 8px; font-size: 14px; font-weight: 700; cursor: pointer; font-family: 'Inter', sans-serif; }
+.btn-confirm:hover { background: #f0b84a; }
+.btn-cancel { padding: 11px 18px; background: transparent; border: 1px solid rgba(255,255,255,0.12); border-radius: 8px; color: rgba(255,255,255,0.4); font-size: 14px; cursor: pointer; font-family: 'Inter', sans-serif; }
 
-.session-price {
-  background: rgba(155,89,182,0.1);
-  border: 1px solid rgba(155,89,182,0.2);
-  border-radius: 10px;
-  padding: 14px 16px;
-  margin-top: 16px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-.session-price-label { font-size: 13px; color: rgba(255,255,255,0.5); }
-.session-price-val { font-size: 20px; font-weight: 700; color: #F5A623; }
-
-.modal-submit {
-  width: 100%;
-  padding: 14px;
-  background: #9b59b6;
-  border: none;
-  border-radius: 8px;
-  color: #fff;
-  font-size: 15px;
-  font-weight: 700;
-  font-family: 'DM Sans', sans-serif;
-  cursor: pointer;
-  margin-top: 20px;
-  transition: all 0.2s;
-}
-.modal-submit:hover { background: #8e44ad; }
-.modal-submit:disabled { opacity: 0.6; cursor: not-allowed; }
-
-.alert {
-  padding: 12px 16px;
-  border-radius: 8px;
-  font-size: 13px;
-  margin-bottom: 14px;
-  display: none;
-}
-.alert.success { background: rgba(39,174,96,0.15); border: 1px solid rgba(39,174,96,0.3); color: #2ecc71; display: block; }
-.alert.error { background: rgba(231,76,60,0.15); border: 1px solid rgba(231,76,60,0.3); color: #ff6b6b; display: block; }
-
-@media (min-width: 600px) {
-  .mentors-grid { grid-template-columns: repeat(2, 1fr); }
-  .filter-row { flex-direction: row; align-items: center; }
-  .search-box { flex: 1; }
-}
+/* TOAST */
+.toast { position: fixed; bottom: 20px; right: 20px; padding: 11px 18px; border-radius: 8px; font-size: 13px; font-weight: 500; color: #fff; z-index: 999; animation: slideUp 0.25s ease; box-shadow: 0 6px 24px rgba(0,0,0,0.4); }
+.toast-success { background: #27AE60; }
+.toast-info { background: #2980B9; }
+@keyframes slideUp { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:translateY(0)} }
 </style>
 </head>
 <body>
 
-<div class="topnav">
-  <a href="../index.html" class="topnav-logo">Analytica<span>.</span></a>
-  <div class="topnav-right">
-    <a href="../dashboard/index.html" class="btn-sm btn-outline">Dashboard</a>
-    <a href="../auth/signup.html" class="btn-sm btn-gold">Join Free</a>
+<!-- NAV -->
+<nav class="topnav">
+  <a href="../index.html" class="nav-logo">Analytica<span>.</span></a>
+  <div class="nav-right">
+    <a href="../auth/login.html" class="btn btn-ghost">Log In</a>
+    <a href="../auth/signup.html" class="btn btn-primary">Join Free</a>
   </div>
-</div>
-
-<!-- Booking Modal -->
-<div class="modal-overlay" id="modal-overlay">
-  <div class="modal">
-    <div class="modal-header">
-      <div class="modal-title">Book a Session</div>
-      <button class="modal-close" onclick="closeModal()">✕</button>
-    </div>
-    <div class="alert" id="modal-alert"></div>
-    <p style="font-size:14px;font-weight:600;color:rgba(255,255,255,0.8);" id="modal-mentor-name"></p>
-
-    <label>Session Type</label>
-    <select id="session-type">
-      <option value="career">💼 Career Guidance</option>
-      <option value="technical">⚙️ Technical Help</option>
-      <option value="portfolio">📄 Portfolio Review</option>
-      <option value="interview">🎯 Interview Prep</option>
-      <option value="general">💬 General Mentorship</option>
-    </select>
-
-    <label>Preferred Date</label>
-    <input type="date" id="session-date">
-
-    <label>Preferred Time</label>
-    <select id="session-time">
-      <option>9:00 AM WAT</option>
-      <option>10:00 AM WAT</option>
-      <option>11:00 AM WAT</option>
-      <option>12:00 PM WAT</option>
-      <option>2:00 PM WAT</option>
-      <option>3:00 PM WAT</option>
-      <option>4:00 PM WAT</option>
-      <option>5:00 PM WAT</option>
-    </select>
-
-    <label>What do you want to discuss?</label>
-    <textarea id="session-notes" placeholder="Describe what you need help with..."></textarea>
-
-    <div class="session-price">
-      <div class="session-price-label">Session Price (60 min)</div>
-      <div class="session-price-val" id="modal-price">₦0</div>
-    </div>
-
-    <button class="modal-submit" id="modal-submit" onclick="bookSession()">
-      💳 Confirm Booking →
-    </button>
-  </div>
-</div>
+</nav>
 
 <div class="page">
 
-  <!-- Hero -->
-  <div class="mentor-hero">
-    <div class="hero-label">1-on-1 Mentorship</div>
-    <h1 class="hero-title">Learn from <span>Real Analysts</span></h1>
-    <p class="hero-sub">Book 1-on-1 sessions with verified data professionals across Africa. Get career guidance, technical help and portfolio reviews.</p>
+  <!-- HERO -->
+  <div class="hero">
+    <div class="hero-badge">🎓 1-on-1 & Group Sessions</div>
+    <h1>Learn Faster With a<br><span>Real Mentor</span></h1>
+    <p>Connect with senior engineers, designers and founders worldwide. Get guidance that accelerates your growth by years.</p>
+    <div class="hero-btns">
+      <button class="btn-hero btn-hero-gold" onclick="scrollToMentors()">Find a Mentor →</button>
+      <button class="btn-hero btn-hero-outline" onclick="scrollToBecome()">Become a Mentor</button>
+    </div>
     <div class="hero-stats">
-      <div>
-        <div class="hstat-num">890+</div>
-        <div class="hstat-label">Mentors</div>
-      </div>
-      <div>
-        <div class="hstat-num">12K+</div>
-        <div class="hstat-label">Sessions Done</div>
-      </div>
-      <div>
-        <div class="hstat-num">4.8★</div>
-        <div class="hstat-label">Avg Rating</div>
-      </div>
+      <div class="hstat"><div class="hstat-num">840</div><div class="hstat-label">Mentors</div></div>
+      <div class="hstat"><div class="hstat-num">6,200</div><div class="hstat-label">Sessions</div></div>
+      <div class="hstat"><div class="hstat-num">4.9★</div><div class="hstat-label">Avg Rating</div></div>
+      <div class="hstat"><div class="hstat-num">68</div><div class="hstat-label">Countries</div></div>
     </div>
   </div>
 
-  <!-- Filters -->
-  <div class="filter-row">
-    <div class="search-box">
-      <span>🔍</span>
-      <input type="text" id="search-input" placeholder="Search mentors by name or skill..." oninput="filterMentors()">
+  <div class="main">
+
+    <!-- HOW IT WORKS -->
+    <div class="sec-header" style="margin-bottom:16px;">
+      <div>
+        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:2px;color:#F5A623;margin-bottom:4px;">How It Works</div>
+        <div class="sec-title" style="font-size:18px;font-weight:800;">Simple 4-Step Process</div>
+      </div>
     </div>
-  </div>
-  <div class="filter-tabs" style="margin-bottom:24px;">
-    <button class="tab active" onclick="setFilter('all', this)">All</button>
-    <button class="tab" onclick="setFilter('sql', this)">SQL</button>
-    <button class="tab" onclick="setFilter('python', this)">Python</button>
-    <button class="tab" onclick="setFilter('powerbi', this)">Power BI</button>
-    <button class="tab" onclick="setFilter('excel', this)">Excel</button>
-    <button class="tab" onclick="setFilter('career', this)">Career</button>
-    <button class="tab" onclick="setFilter('ml', this)">Machine Learning</button>
-  </div>
-
-  <!-- Mentors Grid -->
-  <div class="mentors-grid" id="mentors-grid"></div>
-
-  <!-- Become a Mentor -->
-  <div class="become-mentor">
-    <div class="become-title">🎓 Become a Mentor</div>
-    <p class="become-desc">Share your expertise, earn money and help the next generation of African data analysts grow.</p>
-    <div class="become-perks">
-      <div class="perk">💰 Set your own rates</div>
-      <div class="perk">⏰ Flexible schedule</div>
-      <div class="perk">🌍 Reach Africa-wide</div>
-      <div class="perk">🏆 Build your brand</div>
+    <div class="how-grid">
+      <div class="how-card">
+        <div class="how-num">01</div>
+        <div class="how-title">Browse Mentors</div>
+        <div class="how-desc">Filter by skill, role, price or availability. Read reviews from past mentees.</div>
+      </div>
+      <div class="how-card">
+        <div class="how-num">02</div>
+        <div class="how-title">Book a Session</div>
+        <div class="how-desc">Pick a time that works for you. 30 min, 60 min or recurring weekly sessions.</div>
+      </div>
+      <div class="how-card">
+        <div class="how-num">03</div>
+        <div class="how-title">Meet & Learn</div>
+        <div class="how-desc">Video call directly on Analytica. Get personalized advice, code reviews and feedback.</div>
+      </div>
+      <div class="how-card">
+        <div class="how-num">04</div>
+        <div class="how-title">Grow & Apply</div>
+        <div class="how-desc">Apply what you learned. Track your progress. Book follow-up sessions as needed.</div>
+      </div>
     </div>
-    <button class="btn-apply" onclick="window.location.href='../auth/signup.html'">
-      Apply to Become a Mentor →
-    </button>
-  </div>
 
+    <!-- MENTOR FILTERS -->
+    <div id="mentors-section">
+      <div class="sec-header">
+        <div>
+          <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:2px;color:#F5A623;margin-bottom:4px;">Mentors</div>
+          <div class="sec-title" style="font-size:18px;font-weight:800;">Find Your Mentor</div>
+        </div>
+      </div>
+
+      <div class="tabs" style="margin-bottom:16px;">
+        <button class="tab active" onclick="setTab('all', this)">All Mentors</button>
+        <button class="tab" onclick="setTab('available', this)">Available Now</button>
+        <button class="tab" onclick="setTab('free', this)">Free Sessions</button>
+        <button class="tab" onclick="setTab('top', this)">Top Rated</button>
+      </div>
+
+      <div class="filters">
+        <button class="filter-pill active" onclick="setFilter('all', this)">All</button>
+        <button class="filter-pill" onclick="setFilter('frontend', this)">Frontend</button>
+        <button class="filter-pill" onclick="setFilter('backend', this)">Backend</button>
+        <button class="filter-pill" onclick="setFilter('ai', this)">AI / ML</button>
+        <button class="filter-pill" onclick="setFilter('mobile', this)">Mobile</button>
+        <button class="filter-pill" onclick="setFilter('design', this)">Design</button>
+        <button class="filter-pill" onclick="setFilter('career', this)">Career</button>
+        <input class="search-box" type="text" placeholder="🔍 Search mentors..." oninput="searchMentors(this.value)">
+      </div>
+
+      <div class="sec-header">
+        <span class="sec-count" id="mentor-count">Showing all mentors</span>
+      </div>
+
+      <div class="mentors-grid" id="mentors-grid"></div>
+    </div>
+
+    <!-- BECOME A MENTOR -->
+    <div id="become-section">
+      <div class="sec-header" style="margin-bottom:16px;">
+        <div>
+          <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:2px;color:#F5A623;margin-bottom:4px;">For Experts</div>
+          <div class="sec-title" style="font-size:18px;font-weight:800;">Become a Mentor</div>
+        </div>
+      </div>
+      <div class="become-mentor">
+        <div class="become-left">
+          <h2>Share Your Knowledge.<br>Earn While You Teach.</h2>
+          <p>You have skills that others are willing to pay to learn. Set your own schedule, rate and topics. Help someone grow their career while building yours.</p>
+          <ul class="become-perks">
+            <li>Set your own hourly rate</li>
+            <li>Flexible schedule — mentor when you want</li>
+            <li>Build your personal brand</li>
+            <li>Grow your network globally</li>
+            <li>Analytica handles payments & scheduling</li>
+          </ul>
+          <br>
+          <button class="btn-hero btn-hero-gold" onclick="showToast('🎉 Mentor application opening soon!', 'success')" style="margin-top:4px;">Apply to Become a Mentor →</button>
+        </div>
+        <div class="become-right">
+          <div class="perk-card"><div class="perk-icon">💰</div><div class="perk-num">$80</div><div class="perk-label">Avg hourly rate</div></div>
+          <div class="perk-card"><div class="perk-icon">👥</div><div class="perk-num">6,200</div><div class="perk-label">Sessions done</div></div>
+          <div class="perk-card"><div class="perk-icon">⭐</div><div class="perk-num">4.9</div><div class="perk-label">Avg rating</div></div>
+          <div class="perk-card"><div class="perk-icon">🌍</div><div class="perk-num">68</div><div class="perk-label">Countries</div></div>
+        </div>
+      </div>
+    </div>
+
+  </div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<!-- BOOK MODAL -->
+<div class="modal-bg" id="modal-bg" onclick="closeModalOutside(event)">
+  <div class="modal">
+    <h2 id="modal-title">Book a Session</h2>
+    <p class="modal-sub" id="modal-sub">Choose your session type and time</p>
+    <div class="form-group">
+      <label class="form-label">Session Type</label>
+      <select class="form-select">
+        <option>30 min — Quick advice / code review</option>
+        <option>60 min — Deep dive / project review</option>
+        <option>Weekly recurring — Ongoing mentorship</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Preferred Time</label>
+      <select class="form-select">
+        <option>This week — Morning (9am–12pm UTC)</option>
+        <option>This week — Afternoon (1pm–5pm UTC)</option>
+        <option>This week — Evening (6pm–9pm UTC)</option>
+        <option>Next week — I'll be flexible</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label class="form-label">What do you want to focus on?</label>
+      <textarea class="form-textarea" placeholder="e.g. I want help reviewing my React project and understanding state management..."></textarea>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-confirm" onclick="confirmBooking()">Confirm Booking →</button>
+      <button class="btn-cancel" onclick="closeModal()">Cancel</button>
+    </div>
+  </div>
+</div>
+
 <script src="../js/supabase.js"></script>
 <script>
-let currentUser = null
-let selectedMentor = null
 
-async function getUser() {
-  const { data: { session } } = await db.auth.getSession()
-  if (session) currentUser = session.user
-}
+const MENTORS = [
+  { id:1, init:'SK', name:'Sarah K.', title:'Senior Frontend Engineer @ Google', category:'frontend', available:true, free:false, rating:5.0, sessions:142, mentees:38, rate:'$60/hr', bio:'8 years building large-scale React apps at Google. Specialize in performance, accessibility and system design. Love helping junior devs level up fast.', skills:['React','TypeScript','CSS','System Design'], badges:['top','pro'], featured:true },
+  { id:2, init:'AM', name:'Ade M.', title:'ML Engineer @ OpenAI', category:'ai', available:true, free:true, rating:4.9, sessions:96, mentees:24, rate:'Free', bio:'Research engineer working on LLMs. Previously at DeepMind. Passionate about making AI accessible to developers everywhere.', skills:['Python','PyTorch','LLMs','NLP'], badges:['pro'], featured:false },
+  { id:3, init:'JR', name:'James R.', title:'Staff Backend Engineer @ Stripe', category:'backend', available:false, free:false, rating:4.8, sessions:218, mentees:61, rate:'$80/hr', bio:'12 years in backend engineering. Built payment systems handling billions in volume. Expert in distributed systems, APIs and PostgreSQL.', skills:['Node.js','Go','PostgreSQL','AWS'], badges:['top','pro'], featured:false },
+  { id:4, init:'FO', name:'Fatima O.', title:'Product Designer @ Figma', category:'design', available:true, free:false, rating:5.0, sessions:74, mentees:19, rate:'$50/hr', bio:'Lead designer at Figma working on core product. Former design mentor at Google. Help designers break into top companies.', skills:['Figma','Design Systems','User Research','Prototyping'], badges:['top'], featured:false },
+  { id:5, init:'DC', name:'David C.', title:'iOS Lead @ Airbnb', category:'mobile', available:true, free:false, rating:4.7, sessions:58, mentees:15, rate:'$70/hr', bio:'Led the iOS team at Airbnb for 4 years. Expert in Swift, SwiftUI and building apps with millions of users. Career coach for mobile devs.', skills:['Swift','SwiftUI','iOS','Flutter'], badges:['pro'], featured:false },
+  { id:6, init:'PS', name:'Priya S.', title:'Engineering Manager @ Meta', category:'career', available:true, free:true, rating:4.9, sessions:184, mentees:52, rate:'Free', bio:'EM at Meta managing a team of 12. Expert at tech interviews, salary negotiation and navigating big tech. Love helping people get their dream job.', skills:['Career','Interviews','Leadership','Negotiation'], badges:['top','pro'], featured:true },
+  { id:7, init:'KL', name:'Kevin L.', title:'DevOps Architect @ AWS', category:'backend', available:false, free:false, rating:4.8, sessions:112, mentees:31, rate:'$90/hr', bio:'Cloud architect with 10 years experience. Built infra for 50M+ user platforms. Expert in Kubernetes, Terraform and CI/CD pipelines.', skills:['AWS','Kubernetes','Terraform','Docker'], badges:['pro'], featured:false },
+  { id:8, init:'NA', name:'Ngozi A.', title:'Full Stack Dev & Founder', category:'frontend', available:true, free:false, rating:4.9, sessions:67, mentees:18, rate:'$45/hr', bio:'Self-taught dev who went from zero to building a funded startup. Specialize in helping beginners get their first job and build real projects.', skills:['React','Node.js','Supabase','Startup'], badges:['new'], featured:false },
+];
 
-const mentors = [
-  {
-    id: 1,
-    name: 'Chukwuemeka Obi',
-    title: 'Senior Data Analyst @ Flutterwave',
-    avatar: 'CO',
-    avatarBg: 'linear-gradient(135deg, #F5A623, #e8920f)',
-    online: true,
-    verified: true,
-    rating: 4.9,
-    reviews: 127,
-    bio: '6 years in fintech data analysis. Specializes in SQL optimization, Python automation and building dashboards for C-suite executives.',
-    skills: ['SQL', 'Python', 'Power BI', 'Excel', 'Tableau'],
-    specialty: ['sql', 'python', 'powerbi'],
-    sessions: 340,
-    experience: '6 years',
-    location: 'Lagos, Nigeria',
-    price: 15000,
-    available: true
-  },
-  {
-    id: 2,
-    name: 'Fatima Abdullahi',
-    title: 'Data Scientist @ MTN Nigeria',
-    avatar: 'FA',
-    avatarBg: 'linear-gradient(135deg, #9b59b6, #8e44ad)',
-    online: true,
-    verified: true,
-    rating: 4.8,
-    reviews: 89,
-    bio: 'Machine learning engineer with expertise in telecoms data. Helps analysts transition into data science roles.',
-    skills: ['Python', 'Machine Learning', 'SQL', 'TensorFlow'],
-    specialty: ['python', 'ml'],
-    sessions: 210,
-    experience: '5 years',
-    location: 'Abuja, Nigeria',
-    price: 20000,
-    available: true
-  },
-  {
-    id: 3,
-    name: 'Segun Babatunde',
-    title: 'BI Developer @ Sterling Bank',
-    avatar: 'SB',
-    avatarBg: 'linear-gradient(135deg, #3498db, #2980b9)',
-    online: false,
-    verified: true,
-    rating: 4.7,
-    reviews: 64,
-    bio: 'Power BI specialist with deep DAX knowledge. Helped 50+ analysts pass Microsoft Power BI certification.',
-    skills: ['Power BI', 'DAX', 'SQL', 'Excel'],
-    specialty: ['powerbi', 'sql', 'excel'],
-    sessions: 178,
-    experience: '4 years',
-    location: 'Lagos, Nigeria',
-    price: 12000,
-    available: true
-  },
-  {
-    id: 4,
-    name: 'Amaka Nwosu',
-    title: 'Data Analyst @ eHealth Africa',
-    avatar: 'AN',
-    avatarBg: 'linear-gradient(135deg, #27AE60, #219a52)',
-    online: true,
-    verified: true,
-    rating: 4.9,
-    reviews: 43,
-    bio: 'Health data specialist. Excel and SQL expert who helps beginners land their first data analyst job.',
-    skills: ['Excel', 'SQL', 'R', 'Power BI'],
-    specialty: ['excel', 'sql', 'career'],
-    sessions: 95,
-    experience: '3 years',
-    location: 'Abuja, Nigeria',
-    price: 8000,
-    available: false
-  },
-  {
-    id: 5,
-    name: 'Ibrahim Musa',
-    title: 'Analytics Manager @ Kuda Bank',
-    avatar: 'IM',
-    avatarBg: 'linear-gradient(135deg, #e74c3c, #c0392b)',
-    online: false,
-    verified: true,
-    rating: 4.6,
-    reviews: 38,
-    bio: 'Leads a team of 8 analysts. Career mentor who has helped 30+ analysts get promoted or switch into senior roles.',
-    skills: ['SQL', 'Python', 'Career Coaching', 'Leadership'],
-    specialty: ['sql', 'python', 'career'],
-    sessions: 112,
-    experience: '7 years',
-    location: 'Lagos, Nigeria',
-    price: 25000,
-    available: true
-  },
-  {
-    id: 6,
-    name: 'Ngozi Eze',
-    title: 'Freelance Data Consultant',
-    avatar: 'NE',
-    avatarBg: 'linear-gradient(135deg, #1abc9c, #16a085)',
-    online: true,
-    verified: false,
-    rating: 4.5,
-    reviews: 22,
-    bio: 'Freelance analyst helping small businesses use data. Great for Excel beginners and anyone starting from scratch.',
-    skills: ['Excel', 'Google Sheets', 'Power BI', 'Data Cleaning'],
-    specialty: ['excel', 'career'],
-    sessions: 67,
-    experience: '2 years',
-    location: 'Port Harcourt, Nigeria',
-    price: 5000,
-    available: true
-  }
-]
+let currentFilter = 'all';
+let currentTab = 'all';
+let currentSearch = '';
+let selectedMentor = null;
 
-let currentFilter = 'all'
+function renderMentors() {
+  let list = MENTORS.filter(m => {
+    const matchFilter = currentFilter === 'all' || m.category === currentFilter;
+    const matchTab = currentTab === 'all' ||
+      (currentTab === 'available' && m.available) ||
+      (currentTab === 'free' && m.free) ||
+      (currentTab === 'top' && m.badges.includes('top'));
+    const matchSearch = !currentSearch || m.name.toLowerCase().includes(currentSearch) || m.skills.some(s => s.toLowerCase().includes(currentSearch)) || m.title.toLowerCase().includes(currentSearch);
+    return matchFilter && matchTab && matchSearch;
+  });
 
-function renderMentors(data) {
-  const grid = document.getElementById('mentors-grid')
-  if (data.length === 0) {
-    grid.innerHTML = '<div style="text-align:center;padding:40px;color:rgba(255,255,255,0.3);grid-column:1/-1;">No mentors found.</div>'
-    return
+  document.getElementById('mentor-count').textContent = `${list.length} mentor${list.length !== 1 ? 's' : ''} found`;
+
+  const grid = document.getElementById('mentors-grid');
+  if (!list.length) {
+    grid.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:48px 20px;color:rgba(255,255,255,0.3);">
+      <div style="font-size:36px;margin-bottom:12px;">🔍</div>
+      <p style="font-size:14px;">No mentors found. Try a different filter.</p>
+    </div>`;
+    return;
   }
 
-  grid.innerHTML = data.map(m => `
-    <div class="mentor-card">
+  grid.innerHTML = list.map(m => `
+    <div class="mentor-card ${m.featured ? 'featured' : ''}">
       <div class="mentor-top">
-        <div class="mentor-avatar" style="background:${m.avatarBg};">
-          ${m.avatar}
-          ${m.online ? '<div class="online-dot"></div>' : ''}
+        <div class="mentor-avatar">
+          ${m.init}
+          <div class="mentor-available ${m.available ? '' : 'mentor-busy'}"></div>
         </div>
         <div class="mentor-info">
           <div class="mentor-name">${m.name}</div>
           <div class="mentor-title">${m.title}</div>
-          <div class="mentor-rating">
-            <span class="stars">★★★★${m.rating >= 4.8 ? '★' : '☆'}</span>
-            <span>${m.rating}</span>
-            <span class="rating-count">(${m.reviews} reviews)</span>
+          <div class="mentor-badges">
+            ${m.badges.includes('top') ? '<span class="mbadge mbadge-top">⭐ Top Mentor</span>' : ''}
+            ${m.badges.includes('pro') ? '<span class="mbadge mbadge-pro">Pro</span>' : ''}
+            ${m.badges.includes('new') ? '<span class="mbadge mbadge-new">New</span>' : ''}
           </div>
         </div>
-        ${m.verified ? '<div class="mentor-verified">✓ Verified</div>' : ''}
       </div>
-
       <div class="mentor-bio">${m.bio}</div>
-
-      <div class="mentor-skills">
-        ${m.skills.map(s => `<span class="skill-tag">${s}</span>`).join('')}
+      <div class="mentor-skills">${m.skills.map(s => `<span class="skill-tag">${s}</span>`).join('')}</div>
+      <div class="mentor-stats">
+        <div class="mstat"><div class="mstat-num">${m.sessions}</div><div class="mstat-label">Sessions</div></div>
+        <div class="mstat"><div class="mstat-num">${m.mentees}</div><div class="mstat-label">Mentees</div></div>
+        <div class="mstat"><div class="mstat-num">${m.rating}</div><div class="mstat-label">Rating</div></div>
       </div>
-
-      <div class="mentor-meta">
-        <span class="meta-item">📍 ${m.location}</span>
-        <span class="meta-item">💼 ${m.experience} exp</span>
-        <span class="meta-item">🎓 ${m.sessions} sessions</span>
-        <span class="meta-item" style="color:${m.available ? '#27AE60' : '#e74c3c'}">
-          ${m.available ? '✓ Available' : '✗ Fully Booked'}
-        </span>
-      </div>
-
       <div class="mentor-footer">
         <div>
-          <div class="mentor-price">₦${m.price.toLocaleString()}</div>
-          <div class="mentor-price-label">per session (60 min)</div>
+          <div class="mentor-rate">${m.rate} ${m.rate !== 'Free' ? '<span>per session</span>' : '<span>introductory</span>'}</div>
+          <div class="mentor-rating">${'★'.repeat(Math.floor(m.rating))} ${m.rating}</div>
         </div>
-        <div style="display:flex;gap:8px;">
-          <button class="btn-profile">View Profile</button>
-          <button class="btn-book" onclick="openBooking(${m.id})"
-            ${!m.available ? 'disabled style="opacity:0.5;cursor:not-allowed;"' : ''}>
-            Book Session
-          </button>
-        </div>
+        <button class="btn-book ${m.rate === 'Free' ? 'btn-book-free' : ''}" onclick="openBooking(${m.id}, '${m.name}', event)">
+          ${m.available ? 'Book Session' : 'Join Waitlist'}
+        </button>
       </div>
-    </div>
-  `).join('')
+    </div>`).join('');
+}
+
+function setTab(tab, btn) {
+  currentTab = tab;
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  renderMentors();
 }
 
 function setFilter(filter, btn) {
-  currentFilter = filter
-  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'))
-  btn.classList.add('active')
-  filterMentors()
+  currentFilter = filter;
+  document.querySelectorAll('.filter-pill').forEach(p => p.classList.remove('active'));
+  btn.classList.add('active');
+  renderMentors();
 }
 
-function filterMentors() {
-  const search = document.getElementById('search-input').value.toLowerCase()
-  let filtered = mentors
-
-  if (currentFilter !== 'all') {
-    filtered = filtered.filter(m => m.specialty.includes(currentFilter))
-  }
-
-  if (search) {
-    filtered = filtered.filter(m =>
-      m.name.toLowerCase().includes(search) ||
-      m.skills.some(s => s.toLowerCase().includes(search)) ||
-      m.bio.toLowerCase().includes(search)
-    )
-  }
-
-  renderMentors(filtered)
+function searchMentors(val) {
+  currentSearch = val.toLowerCase();
+  renderMentors();
 }
 
-function openBooking(id) {
-  if (!currentUser) {
-    window.location.href = '../auth/login.html'
-    return
-  }
-  selectedMentor = mentors.find(m => m.id === id)
-  document.getElementById('modal-mentor-name').textContent = `with ${selectedMentor.name}`
-  document.getElementById('modal-price').textContent = `₦${selectedMentor.price.toLocaleString()}`
-  document.getElementById('modal-overlay').classList.add('show')
+function openBooking(id, name, e) {
+  e.stopPropagation();
+  selectedMentor = MENTORS.find(m => m.id === id);
+  document.getElementById('modal-title').textContent = `Book with ${name}`;
+  document.getElementById('modal-sub').textContent = selectedMentor.available ? 'Choose your session type and preferred time' : 'Join the waitlist — we\'ll notify you when they\'re available';
+  document.getElementById('modal-bg').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
 
-  // Set min date to today
-  const today = new Date().toISOString().split('T')[0]
-  document.getElementById('session-date').min = today
+function confirmBooking() {
+  closeModal();
+  showToast(`🎉 Session requested! ${selectedMentor?.name} will confirm shortly.`, 'success');
 }
 
 function closeModal() {
-  document.getElementById('modal-overlay').classList.remove('show')
-  document.getElementById('modal-alert').className = 'alert'
+  document.getElementById('modal-bg').classList.remove('open');
+  document.body.style.overflow = '';
 }
 
-async function bookSession() {
-  const date = document.getElementById('session-date').value
-  const alertBox = document.getElementById('modal-alert')
-  const btn = document.getElementById('modal-submit')
-
-  if (!date) {
-    alertBox.textContent = 'Please select a date for your session.'
-    alertBox.className = 'alert error'
-    return
-  }
-
-  btn.disabled = true
-  btn.textContent = 'Processing...'
-
-  await new Promise(r => setTimeout(r, 1500))
-
-  alertBox.textContent = `✅ Session booked with ${selectedMentor.name}! Check your email for confirmation and meeting link.`
-  alertBox.className = 'alert success'
-  btn.textContent = 'Booked ✓'
-
-  setTimeout(() => {
-    closeModal()
-    btn.disabled = false
-    btn.textContent = '💳 Confirm Booking →'
-  }, 2500)
+function closeModalOutside(e) {
+  if (e.target === document.getElementById('modal-bg')) closeModal();
 }
 
-function openBooking(id) {
-  selectedMentor = mentors.find(m => m.id === id)
-  document.getElementById('modal-mentor-name').textContent = `with ${selectedMentor.name}`
-  document.getElementById('modal-price').textContent = `₦${selectedMentor.price.toLocaleString()}`
-  document.getElementById('modal-overlay').classList.add('show')
-  const today = new Date().toISOString().split('T')[0]
-  document.getElementById('session-date').min = today
+function scrollToMentors() {
+  document.getElementById('mentors-section').scrollIntoView({ behavior: 'smooth' });
 }
 
-function closeModal() {
-  document.getElementById('modal-overlay').classList.remove('show')
-  document.getElementById('modal-alert').className = 'alert'
+function scrollToBecome() {
+  document.getElementById('become-section').scrollIntoView({ behavior: 'smooth' });
 }
 
-async function bookSession() {
-  const date = document.getElementById('session-date').value
-  const alertBox = document.getElementById('modal-alert')
-  const btn = document.getElementById('modal-submit')
-
-  if (!date) {
-    alertBox.textContent = 'Please select a date for your session.'
-    alertBox.className = 'alert error'
-    return
-  }
-
-  btn.disabled = true
-  btn.textContent = 'Processing...'
-
-  await new Promise(r => setTimeout(r, 1500))
-
-  alertBox.textContent = `✅ Session booked with ${selectedMentor.name}! Check your email for confirmation.`
-  alertBox.className = 'alert success'
-  btn.textContent = 'Booked ✓'
-
-  setTimeout(() => {
-    closeModal()
-    btn.disabled = false
-    btn.textContent = '💳 Confirm Booking →'
-  }, 2500)
+function showToast(msg, type = 'success') {
+  const t = document.createElement('div');
+  t.className = `toast toast-${type}`;
+  t.textContent = msg;
+  document.body.appendChild(t);
+  setTimeout(() => t.remove(), 3000);
 }
 
-async function init() {
-  await getUser()
-  renderMentors(mentors)
-}
-init()
+renderMentors();
 </script>
 </body>
 </html>

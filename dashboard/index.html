@@ -4,595 +4,558 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Dashboard — Analytica</title>
-<link rel="stylesheet" href="../css/main.css">
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body { background: #0A1628; color: #fff; font-family: 'Inter', sans-serif; min-height: 100vh; }
+a { text-decoration: none; color: inherit; }
+
+/* ── TOPNAV ── */
+.topnav {
+  position: fixed; top: 0; left: 0; right: 0; height: 58px;
+  background: rgba(10,22,40,0.98); backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(255,255,255,0.07);
+  display: flex; align-items: center; padding: 0 20px; gap: 12px; z-index: 100;
+}
+.nav-logo { font-size: 18px; font-weight: 800; color: #fff; letter-spacing: -0.5px; flex-shrink: 0; }
+.nav-logo span { color: #F5A623; }
+.nav-search { flex: 1; max-width: 320px; margin: 0 16px; position: relative; }
+.nav-search input { width: 100%; padding: 7px 14px 7px 34px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; color: #fff; font-size: 13px; font-family: 'Inter', sans-serif; outline: none; }
+.nav-search input:focus { border-color: rgba(245,166,35,0.4); }
+.nav-search input::placeholder { color: rgba(255,255,255,0.25); }
+.nav-search-icon { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); font-size: 13px; opacity: 0.4; }
+.nav-right { margin-left: auto; display: flex; gap: 8px; align-items: center; }
+.nav-icon-btn { width: 34px; height: 34px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 15px; cursor: pointer; transition: all 0.15s; position: relative; }
+.nav-icon-btn:hover { background: rgba(255,255,255,0.08); }
+.notif-dot { position: absolute; top: 4px; right: 4px; width: 7px; height: 7px; background: #E74C3C; border-radius: 50%; border: 1.5px solid #0A1628; }
+.nav-avatar { width: 34px; height: 34px; border-radius: 8px; background: linear-gradient(135deg, #F5A623, #e8920f); display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 800; color: #0A1628; cursor: pointer; }
 
 /* ── LAYOUT ── */
-body { background: #0A1628; min-height: 100vh; }
-
-.dashboard-layout {
-  display: flex;
-  min-height: 100vh;
-}
+.layout { display: flex; margin-top: 58px; min-height: calc(100vh - 58px); }
 
 /* ── SIDEBAR ── */
 .sidebar {
-  width: 240px;
-  background: #0d1f3c;
+  width: 220px; flex-shrink: 0;
+  background: rgba(255,255,255,0.01);
   border-right: 1px solid rgba(255,255,255,0.06);
-  padding: 24px 0;
-  position: fixed;
-  top: 0; left: 0; bottom: 0;
-  display: flex;
-  flex-direction: column;
-  z-index: 50;
-  transform: translateX(-100%);
-  transition: transform 0.3s ease;
+  padding: 20px 12px;
+  position: fixed; top: 58px; left: 0; bottom: 0;
+  overflow-y: auto; display: none; flex-direction: column; gap: 4px;
 }
-
-.sidebar.open { transform: translateX(0); }
-
-.sidebar-logo {
-  font-family: 'Playfair Display', serif;
-  font-size: 20px;
-  font-weight: 900;
-  color: #fff;
-  padding: 0 24px 24px;
-  border-bottom: 1px solid rgba(255,255,255,0.06);
-  margin-bottom: 16px;
-  display: block;
-  text-decoration: none;
+@media (min-width: 860px) { .sidebar { display: flex; } }
+.sidebar-section-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; color: rgba(255,255,255,0.2); padding: 10px 10px 6px; margin-top: 8px; }
+.sidebar-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 9px 10px; border-radius: 8px; cursor: pointer;
+  transition: all 0.15s; color: rgba(255,255,255,0.5);
+  font-size: 13px; font-weight: 500; border: none; background: transparent;
+  font-family: 'Inter', sans-serif; width: 100%; text-align: left;
 }
-.sidebar-logo span { color: #F5A623; }
+.sidebar-item:hover { background: rgba(255,255,255,0.05); color: #fff; }
+.sidebar-item.active { background: rgba(245,166,35,0.1); color: #F5A623; font-weight: 600; }
+.sidebar-item .s-icon { font-size: 16px; width: 20px; text-align: center; flex-shrink: 0; }
+.sidebar-badge { margin-left: auto; background: #E74C3C; color: #fff; font-size: 10px; font-weight: 700; padding: 1px 6px; border-radius: 10px; }
+.sidebar-badge-gold { background: rgba(245,166,35,0.2); color: #F5A623; }
+.sidebar-divider { height: 1px; background: rgba(255,255,255,0.06); margin: 8px 0; }
 
-.nav-section-title {
-  font-size: 10px;
-  font-weight: 600;
-  letter-spacing: 2px;
-  text-transform: uppercase;
-  color: rgba(255,255,255,0.25);
-  padding: 0 24px;
-  margin: 16px 0 8px;
-}
+/* ── MAIN ── */
+.main { flex: 1; padding: 24px 20px; margin-left: 0; max-width: 100%; }
+@media (min-width: 860px) { .main { margin-left: 220px; } }
 
-.nav-item {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 11px 24px;
-  color: rgba(255,255,255,0.55);
-  font-size: 14px;
-  font-weight: 500;
-  text-decoration: none;
-  transition: all 0.2s;
-  border-left: 3px solid transparent;
+/* ── WELCOME BANNER ── */
+.welcome-banner {
+  background: linear-gradient(135deg, rgba(245,166,35,0.1), rgba(245,166,35,0.02));
+  border: 1px solid rgba(245,166,35,0.15); border-radius: 12px;
+  padding: 20px 24px; margin-bottom: 20px;
+  display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap;
 }
-.nav-item:hover {
-  color: #fff;
-  background: rgba(255,255,255,0.04);
-}
-.nav-item.active {
-  color: #F5A623;
-  background: rgba(245,166,35,0.08);
-  border-left-color: #F5A623;
-}
-.nav-icon { font-size: 16px; width: 20px; text-align: center; }
-
-.sidebar-bottom {
-  margin-top: auto;
-  padding: 16px 0;
-  border-top: 1px solid rgba(255,255,255,0.06);
-}
-
-/* ── TOP NAV ── */
-.topnav {
-  position: fixed;
-  top: 0; left: 0; right: 0;
-  height: 60px;
-  background: rgba(10,22,40,0.95);
-  backdrop-filter: blur(20px);
-  border-bottom: 1px solid rgba(255,255,255,0.06);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0 20px;
-  z-index: 40;
-}
-
-.topnav-left { display: flex; align-items: center; gap: 14px; }
-
-.hamburger {
-  background: transparent;
-  border: none;
-  color: #fff;
-  font-size: 22px;
-  cursor: pointer;
-  padding: 4px;
-}
-
-.topnav-logo {
-  font-family: 'Playfair Display', serif;
-  font-size: 18px;
-  font-weight: 900;
-  color: #fff;
-  text-decoration: none;
-}
-.topnav-logo span { color: #F5A623; }
-
-.topnav-right { display: flex; align-items: center; gap: 12px; }
-
-.notif-btn {
-  background: rgba(255,255,255,0.06);
-  border: 1px solid rgba(255,255,255,0.1);
-  color: #fff;
-  width: 36px; height: 36px;
-  border-radius: 8px;
-  font-size: 16px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.avatar {
-  width: 36px; height: 36px;
-  background: linear-gradient(135deg, #F5A623, #e8920f);
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 14px;
-  font-weight: 700;
-  color: #0A1628;
-  cursor: pointer;
-}
-
-/* ── MAIN CONTENT ── */
-.main {
-  flex: 1;
-  margin-top: 60px;
-  padding: 24px;
-  min-height: calc(100vh - 60px);
-}
-
-/* ── GREETING ── */
-.greeting-section {
-  margin-bottom: 28px;
-}
-
-.greeting {
-  font-family: 'Playfair Display', serif;
-  font-size: clamp(22px, 5vw, 30px);
-  font-weight: 700;
-  margin-bottom: 6px;
-}
-.greeting span { color: #F5A623; }
-
-.greeting-sub {
-  font-size: 14px;
-  color: rgba(255,255,255,0.45);
-}
+.welcome-left h2 { font-size: 18px; font-weight: 800; letter-spacing: -0.5px; margin-bottom: 4px; }
+.welcome-left p { font-size: 13px; color: rgba(255,255,255,0.45); }
+.welcome-streak { display: flex; align-items: center; gap: 8px; background: rgba(245,166,35,0.08); border: 1px solid rgba(245,166,35,0.15); border-radius: 8px; padding: 8px 14px; }
+.streak-num { font-size: 22px; font-weight: 900; color: #F5A623; }
+.streak-label { font-size: 11px; color: rgba(255,255,255,0.4); }
 
 /* ── STATS ROW ── */
-.stats-row {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 14px;
-  margin-bottom: 28px;
-}
+.stats-row { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 20px; }
+@media (min-width: 600px) { .stats-row { grid-template-columns: repeat(4, 1fr); } }
+.stat-card { background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.07); border-radius: 12px; padding: 16px; }
+.stat-card-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+.stat-card-icon { font-size: 18px; }
+.stat-card-change { font-size: 11px; font-weight: 600; padding: 2px 7px; border-radius: 4px; }
+.change-up { background: rgba(39,174,96,0.12); color: #27AE60; }
+.change-down { background: rgba(231,76,60,0.12); color: #E74C3C; }
+.stat-card-num { font-size: 24px; font-weight: 900; letter-spacing: -1px; color: #fff; margin-bottom: 2px; }
+.stat-card-label { font-size: 11px; color: rgba(255,255,255,0.35); text-transform: uppercase; letter-spacing: 0.5px; }
 
-.stat-card {
-  background: rgba(255,255,255,0.04);
-  border: 1px solid rgba(255,255,255,0.07);
-  border-radius: 14px;
-  padding: 18px;
-  transition: all 0.3s;
-}
-.stat-card:hover { border-color: rgba(245,166,35,0.2); }
+/* ── GRID LAYOUT ── */
+.dash-grid { display: grid; grid-template-columns: 1fr; gap: 16px; }
+@media (min-width: 1000px) { .dash-grid { grid-template-columns: 1fr 320px; } }
 
-.stat-card-icon { font-size: 22px; margin-bottom: 10px; }
-.stat-card-num {
-  font-family: 'Playfair Display', serif;
-  font-size: 24px;
-  font-weight: 700;
-  color: #F5A623;
-  line-height: 1;
-  margin-bottom: 4px;
-}
-.stat-card-label {
-  font-size: 11px;
-  color: rgba(255,255,255,0.4);
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
+/* ── SECTION BOX ── */
+.box { background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.07); border-radius: 12px; padding: 18px; margin-bottom: 16px; }
+.box-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+.box-title { font-size: 14px; font-weight: 700; }
+.box-link { font-size: 12px; color: #F5A623; font-weight: 600; cursor: pointer; }
+.box-link:hover { text-decoration: underline; }
+
+/* ── PROGRESS ── */
+.progress-wrap { margin-bottom: 14px; }
+.progress-top { display: flex; justify-content: space-between; margin-bottom: 6px; }
+.progress-label { font-size: 12px; color: rgba(255,255,255,0.5); font-weight: 500; }
+.progress-val { font-size: 12px; color: #F5A623; font-weight: 700; }
+.progress-bar { height: 6px; background: rgba(255,255,255,0.07); border-radius: 3px; overflow: hidden; }
+.progress-fill { height: 100%; border-radius: 3px; background: linear-gradient(90deg, #F5A623, #f0b84a); transition: width 0.6s ease; }
+.progress-fill-green { background: linear-gradient(90deg, #27AE60, #2ecc71); }
+.progress-fill-blue { background: linear-gradient(90deg, #2980B9, #3498DB); }
+
+/* ── JOB ITEMS ── */
+.job-item { display: flex; align-items: center; gap: 12px; padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,0.05); cursor: pointer; transition: all 0.15s; }
+.job-item:last-child { border-bottom: none; padding-bottom: 0; }
+.job-item:hover .job-title { color: #F5A623; }
+.job-logo { width: 36px; height: 36px; border-radius: 8px; background: rgba(255,255,255,0.06); display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0; }
+.job-info { flex: 1; }
+.job-title { font-size: 13px; font-weight: 600; margin-bottom: 2px; transition: color 0.15s; }
+.job-meta { font-size: 11px; color: rgba(255,255,255,0.35); }
+.job-salary { font-size: 12px; font-weight: 700; color: #27AE60; white-space: nowrap; }
+
+/* ── ACTIVITY FEED ── */
+.activity-item { display: flex; gap: 12px; padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
+.activity-item:last-child { border-bottom: none; }
+.activity-icon { width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 14px; flex-shrink: 0; }
+.ai-gold { background: rgba(245,166,35,0.1); }
+.ai-green { background: rgba(39,174,96,0.1); }
+.ai-blue { background: rgba(41,128,185,0.1); }
+.ai-purple { background: rgba(142,68,173,0.1); }
+.activity-text { flex: 1; }
+.activity-text p { font-size: 12px; color: rgba(255,255,255,0.55); line-height: 1.5; }
+.activity-text p strong { color: #fff; }
+.activity-time { font-size: 11px; color: rgba(255,255,255,0.25); margin-top: 2px; }
+
+/* ── CHALLENGE ITEMS ── */
+.challenge-item { display: flex; align-items: center; gap: 12px; padding: 11px 0; border-bottom: 1px solid rgba(255,255,255,0.05); cursor: pointer; }
+.challenge-item:last-child { border-bottom: none; }
+.ch-icon { width: 36px; height: 36px; border-radius: 8px; background: rgba(255,255,255,0.04); display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; }
+.ch-info { flex: 1; }
+.ch-title { font-size: 13px; font-weight: 600; margin-bottom: 2px; }
+.ch-meta { font-size: 11px; color: rgba(255,255,255,0.35); }
+.ch-badge { font-size: 10px; font-weight: 700; padding: 3px 8px; border-radius: 4px; white-space: nowrap; }
+.badge-easy { background: rgba(39,174,96,0.12); color: #27AE60; }
+.badge-medium { background: rgba(245,166,35,0.12); color: #F5A623; }
+.badge-hard { background: rgba(231,76,60,0.12); color: #E74C3C; }
+
+/* ── COLLAB ITEMS ── */
+.collab-item { display: flex; align-items: center; gap: 12px; padding: 11px 0; border-bottom: 1px solid rgba(255,255,255,0.05); cursor: pointer; }
+.collab-item:last-child { border-bottom: none; }
+.collab-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.dot-live { background: #27AE60; animation: blink 1.5s infinite; }
+.dot-open { background: #F5A623; }
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
+.collab-info { flex: 1; }
+.collab-title { font-size: 13px; font-weight: 600; margin-bottom: 2px; }
+.collab-meta { font-size: 11px; color: rgba(255,255,255,0.35); }
+.collab-slots { font-size: 11px; color: rgba(255,255,255,0.3); white-space: nowrap; }
 
 /* ── QUICK ACTIONS ── */
-.section-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 16px;
-}
-.section-h {
-  font-size: 15px;
-  font-weight: 600;
-  color: rgba(255,255,255,0.8);
-}
-.section-link {
-  font-size: 12px;
-  color: #F5A623;
-  text-decoration: none;
-}
+.quick-actions { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 16px; }
+.qa-btn { display: flex; align-items: center; gap: 10px; padding: 12px; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.07); border-radius: 10px; cursor: pointer; transition: all 0.15s; font-size: 13px; font-weight: 600; color: rgba(255,255,255,0.7); font-family: 'Inter', sans-serif; text-align: left; }
+.qa-btn:hover { background: rgba(245,166,35,0.06); border-color: rgba(245,166,35,0.2); color: #fff; }
+.qa-icon { font-size: 20px; }
 
-.quick-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 12px;
-  margin-bottom: 28px;
-}
+/* ── NOTIFICATION ITEMS ── */
+.notif-item { display: flex; gap: 10px; padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.05); cursor: pointer; }
+.notif-item:last-child { border-bottom: none; }
+.notif-item.unread { background: rgba(245,166,35,0.03); margin: 0 -18px; padding: 10px 18px; }
+.notif-avatar { width: 30px; height: 30px; border-radius: 50%; background: linear-gradient(135deg, #F5A623, #e8920f); display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 800; color: #0A1628; flex-shrink: 0; }
+.notif-text { font-size: 12px; color: rgba(255,255,255,0.5); line-height: 1.5; }
+.notif-text strong { color: #fff; }
+.notif-time { font-size: 10px; color: rgba(255,255,255,0.25); margin-top: 2px; }
+.unread-dot { width: 6px; height: 6px; background: #F5A623; border-radius: 50%; margin-top: 6px; flex-shrink: 0; }
 
-.quick-card {
-  background: rgba(255,255,255,0.03);
-  border: 1px solid rgba(255,255,255,0.07);
-  border-radius: 14px;
-  padding: 18px 16px;
-  text-decoration: none;
-  transition: all 0.3s;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 8px;
-}
-.quick-card:hover {
-  border-color: rgba(245,166,35,0.25);
-  background: rgba(255,255,255,0.05);
-  transform: translateY(-2px);
-}
-.quick-icon { font-size: 24px; }
-.quick-title { font-size: 13px; font-weight: 600; color: #fff; }
-.quick-desc { font-size: 11px; color: rgba(255,255,255,0.4); line-height: 1.4; }
+/* ── PROFILE CARD ── */
+.profile-card { background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.07); border-radius: 12px; padding: 20px; margin-bottom: 16px; text-align: center; }
+.profile-avatar-lg { width: 64px; height: 64px; border-radius: 14px; background: linear-gradient(135deg, #F5A623, #e8920f); display: flex; align-items: center; justify-content: center; font-size: 24px; font-weight: 900; color: #0A1628; margin: 0 auto 12px; }
+.profile-name { font-size: 16px; font-weight: 800; margin-bottom: 2px; }
+.profile-role { font-size: 12px; color: rgba(255,255,255,0.4); margin-bottom: 12px; }
+.profile-stats { display: flex; gap: 0; border: 1px solid rgba(255,255,255,0.07); border-radius: 8px; overflow: hidden; }
+.pstat { flex: 1; padding: 10px 6px; text-align: center; border-right: 1px solid rgba(255,255,255,0.07); }
+.pstat:last-child { border-right: none; }
+.pstat-num { font-size: 15px; font-weight: 800; color: #F5A623; }
+.pstat-label { font-size: 10px; color: rgba(255,255,255,0.3); text-transform: uppercase; }
+.profile-complete { margin-top: 12px; }
+.profile-complete-top { display: flex; justify-content: space-between; font-size: 11px; margin-bottom: 5px; }
+.profile-complete-top span:first-child { color: rgba(255,255,255,0.4); }
+.profile-complete-top span:last-child { color: #F5A623; font-weight: 700; }
 
-/* ── RECENT ACTIVITY ── */
-.activity-list { display: flex; flex-direction: column; gap: 10px; margin-bottom: 28px; }
+/* ── TOAST ── */
+.toast { position: fixed; bottom: 20px; right: 20px; padding: 11px 18px; border-radius: 8px; font-size: 13px; font-weight: 500; color: #fff; z-index: 999; animation: slideUp 0.25s ease; box-shadow: 0 6px 24px rgba(0,0,0,0.4); }
+.toast-success { background: #27AE60; }
+.toast-info { background: #2980B9; }
+@keyframes slideUp { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:translateY(0)} }
 
-.activity-item {
-  background: rgba(255,255,255,0.03);
-  border: 1px solid rgba(255,255,255,0.06);
-  border-radius: 12px;
-  padding: 14px 16px;
-  display: flex;
-  align-items: center;
-  gap: 14px;
-}
-
-.activity-icon {
-  width: 38px; height: 38px;
-  border-radius: 10px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 16px;
-  flex-shrink: 0;
-}
-.activity-icon.blue { background: rgba(52,152,219,0.15); }
-.activity-icon.green { background: rgba(39,174,96,0.15); }
-.activity-icon.gold { background: rgba(245,166,35,0.15); }
-.activity-icon.purple { background: rgba(155,89,182,0.15); }
-
-.activity-info { flex: 1; min-width: 0; }
-.activity-title { font-size: 13px; font-weight: 500; color: rgba(255,255,255,0.8); margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.activity-time { font-size: 11px; color: rgba(255,255,255,0.3); }
-
-/* ── PRO BANNER ── */
-.pro-banner {
-  background: linear-gradient(135deg, rgba(245,166,35,0.12), rgba(245,166,35,0.04));
-  border: 1px solid rgba(245,166,35,0.3);
-  border-radius: 16px;
-  padding: 20px;
-  margin-bottom: 28px;
-  display: flex;
-  align-items: center;
-  gap: 16px;
-}
-.pro-banner-icon { font-size: 32px; flex-shrink: 0; }
-.pro-banner-title { font-size: 14px; font-weight: 600; margin-bottom: 4px; }
-.pro-banner-desc { font-size: 12px; color: rgba(255,255,255,0.5); margin-bottom: 12px; line-height: 1.5; }
-.btn-pro {
-  padding: 9px 18px;
-  background: #F5A623;
-  border: none;
-  border-radius: 7px;
-  color: #0A1628;
-  font-size: 13px;
-  font-weight: 700;
-  cursor: pointer;
-  font-family: 'DM Sans', sans-serif;
-}
-
-/* ── OVERLAY ── */
-.overlay {
-  display: none;
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.5);
-  z-index: 45;
-}
-.overlay.show { display: block; }
-
-/* ── DESKTOP ── */
-@media (min-width: 900px) {
-  .sidebar { transform: translateX(0); }
-  .hamburger { display: none; }
-  .topnav { left: 240px; }
-  .main { margin-left: 240px; padding: 32px 40px; }
-  .stats-row { grid-template-columns: repeat(4, 1fr); }
-  .quick-grid { grid-template-columns: repeat(4, 1fr); }
-  .topnav-logo { display: none; }
-}
+/* MOBILE BOTTOM NAV */
+.bottom-nav { display: flex; position: fixed; bottom: 0; left: 0; right: 0; background: rgba(10,22,40,0.98); border-top: 1px solid rgba(255,255,255,0.07); padding: 8px 0 12px; z-index: 100; }
+@media (min-width: 860px) { .bottom-nav { display: none; } }
+.bottom-nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px; cursor: pointer; padding: 4px; }
+.bottom-nav-item .bn-icon { font-size: 18px; }
+.bottom-nav-item .bn-label { font-size: 10px; color: rgba(255,255,255,0.35); }
+.bottom-nav-item.active .bn-label { color: #F5A623; }
 </style>
 </head>
 <body>
 
-<!-- OVERLAY for mobile sidebar -->
-<div class="overlay" id="overlay"></div>
-
-<!-- SIDEBAR -->
-<div class="sidebar" id="sidebar">
-  <a href="../index.html" class="sidebar-logo">Analytica<span>.</span></a>
-
-  <div class="nav-section-title">Main</div>
-  <a href="index.html" class="nav-item active">
-    <span class="nav-icon">🏠</span> Dashboard
-  </a>
-  <a href="../community/index.html" class="nav-item">
-    <span class="nav-icon">🗣️</span> Community
-  </a>
-  <a href="../datasets/index.html" class="nav-item">
-    <span class="nav-icon">📊</span> Datasets
-  </a>
-  <a href="../jobs/index.html" class="nav-item">
-    <span class="nav-icon">💼</span> Jobs
-  </a>
-  <a href="../learn/index.html" class="nav-item">
-    <span class="nav-icon">📚</span> Learn
-  </a>
-
-  <div class="nav-section-title">Tools</div>
-  <a href="../tools/sql.html" class="nav-item">
-    <span class="nav-icon">📝</span> SQL Playground
-  </a>
-  <a href="../tools/charts.html" class="nav-item">
-    <span class="nav-icon">📈</span> Chart Builder
-  </a>
-  <a href="../tools/formulas.html" class="nav-item">
-    <span class="nav-icon">🧮</span> Formula Library
-  </a>
-  
-  <a href="../tools/ai.html" class="nav-item">
-  <span class="nav-icon">🤖</span> AI Assistant
-</a>
-
-
- <div class="nav-section-title">More</div>
-<a href="../profile/index.html" class="nav-item">
-  <span class="nav-icon">👤</span> My Profile
-</a>
-<a href="../challenges/index.html" class="nav-item">
-  <span class="nav-icon">🏆</span> Challenges
-</a>
-<a href="../mentorship/index.html" class="nav-item">
-  <span class="nav-icon">🎓</span> Mentorship
-</a>
-<a href="../notifications/index.html" class="nav-item">
-  <span class="nav-icon">🔔</span> Notifications
-</a>
-<a href="../cv/index.html" class="nav-item">
-  <span class="nav-icon">📄</span> CV Builder
-</a>
-<a href="../errors/index.html" class="nav-item">
-  <span class="nav-icon">🔔</span> Error Encyclopedia
-</a>
-<a href="../blog/index.html" class="nav-item">
-  <span class="nav-icon">📰</span> Blog & News
-</a>
-<a href="../admin/index.html" class="nav-item">
-  <span class="nav-icon">🛡️</span> Admin
-</a>
-<div class="sidebar-bottom">
-      <a href="../settings/index.html" class="nav-item">
-        <span class="nav-icon">⚙️</span> Settings
-      </a>
-      <a href="#" class="nav-item" id="logout-btn">
-        <span class="nav-icon">🚪</span> Log Out
-      </a>
-   </div>
-</div>
-
-
-<!-- TOP NAV -->
-<div class="topnav">
-  <div class="topnav-left">
-    <button class="hamburger" id="hamburger">☰</button>
-    <a href="../index.html" class="topnav-logo">Analytica<span>.</span></a>
+<!-- TOPNAV -->
+<nav class="topnav">
+  <a href="../index.html" class="nav-logo">Analytica<span>.</span></a>
+  <div class="nav-search">
+    <span class="nav-search-icon">🔍</span>
+    <input type="text" placeholder="Search jobs, people, rooms...">
   </div>
- <div class="topnav-right">
-  <button onclick="window.location.href='../notifications/index.html'"
-    style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);
-    color:#fff;width:36px;height:36px;border-radius:8px;font-size:16px;
-    cursor:pointer;display:flex;align-items:center;justify-content:center;
-    position:relative;">
-    🔔
-    <span style="position:absolute;top:-4px;right:-4px;width:16px;height:16px;
-    background:#e74c3c;border-radius:50%;font-size:9px;font-weight:700;
-    display:flex;align-items:center;justify-content:center;color:#fff;">3</span>
-  </button>
-<div class="avatar" id="avatar" onclick="window.location.href='../profile/index.html'"
-      style="cursor:pointer;">A</div>
+  <div class="nav-right">
+    <div class="nav-icon-btn" onclick="showToast('No new messages', 'info')">💬</div>
+    <div class="nav-icon-btn" onclick="showToast('3 new notifications', 'info')">
+      🔔
+      <div class="notif-dot"></div>
+    </div>
+    <div class="nav-avatar" title="Your Profile">YO</div>
   </div>
-</div>
+</nav>
 
-<!-- MAIN CONTENT -->
-<div class="dashboard-layout">
+<div class="layout">
+
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div class="sidebar-section-label">Main</div>
+    <button class="sidebar-item active"><span class="s-icon">🏠</span> Dashboard</button>
+    <a href="../profile/index.html"><button class="sidebar-item"><span class="s-icon">👤</span> My Profile</button></a>
+    <a href="../notifications/index.html"><button class="sidebar-item"><span class="s-icon">🔔</span> Notifications <span class="sidebar-badge">3</span></button></a>
+
+    <div class="sidebar-section-label">Explore</div>
+    <a href="../collab/index.html"><button class="sidebar-item"><span class="s-icon">🤝</span> Collab Rooms</button></a>
+    <a href="../jobs/index.html"><button class="sidebar-item"><span class="s-icon">💼</span> Jobs</button></a>
+    <a href="../challenges/index.html"><button class="sidebar-item"><span class="s-icon">🏆</span> Challenges <span class="sidebar-badge sidebar-badge-gold">New</span></button></a>
+    <a href="../community/index.html"><button class="sidebar-item"><span class="s-icon">🗣️</span> Community</button></a>
+    <a href="../mentorship/index.html"><button class="sidebar-item"><span class="s-icon">🎓</span> Mentorship</button></a>
+    <a href="../learn/index.html"><button class="sidebar-item"><span class="s-icon">📚</span> Learn</button></a>
+
+    <div class="sidebar-section-label">Tools</div>
+    <a href="../tools/ai.html"><button class="sidebar-item"><span class="s-icon">🤖</span> AI Assistant</button></a>
+    <a href="../tools/sql.html"><button class="sidebar-item"><span class="s-icon">🗄️</span> SQL Playground</button></a>
+    <a href="../cv/index.html"><button class="sidebar-item"><span class="s-icon">📄</span> CV Builder</button></a>
+
+    <div class="sidebar-divider"></div>
+    <a href="../settings/index.html"><button class="sidebar-item"><span class="s-icon">⚙️</span> Settings</button></a>
+    <a href="../auth/login.html"><button class="sidebar-item"><span class="s-icon">🚪</span> Log Out</button></a>
+  </div>
+
+  <!-- MAIN CONTENT -->
   <div class="main">
 
-    <!-- Greeting -->
-    <div class="greeting-section">
-      <div class="greeting">Welcome back, <span id="user-name">Analyst</span> 👋</div>
-      <div class="greeting-sub" id="greeting-sub">Here's what's happening on Analytica today.</div>
+    <!-- WELCOME -->
+    <div class="welcome-banner">
+      <div class="welcome-left">
+        <h2>👋 Welcome back, Alex!</h2>
+        <p>You have 3 new job matches and 1 collab room invite waiting.</p>
+      </div>
+      <div class="welcome-streak">
+        <div>
+          <div class="streak-num">🔥 7</div>
+          <div class="streak-label">Day Streak</div>
+        </div>
+      </div>
     </div>
 
-    <!-- Stats -->
+    <!-- STATS -->
     <div class="stats-row">
       <div class="stat-card">
-        <div class="stat-card-icon">🗣️</div>
-        <div class="stat-card-num">0</div>
-        <div class="stat-card-label">Forum Posts</div>
+        <div class="stat-card-top">
+          <div class="stat-card-icon">💼</div>
+          <div class="stat-card-change change-up">+3 new</div>
+        </div>
+        <div class="stat-card-num">12</div>
+        <div class="stat-card-label">Job Matches</div>
       </div>
       <div class="stat-card">
-        <div class="stat-card-icon">📥</div>
-        <div class="stat-card-num">0</div>
-        <div class="stat-card-label">Downloads</div>
+        <div class="stat-card-top">
+          <div class="stat-card-icon">🏆</div>
+          <div class="stat-card-change change-up">+1</div>
+        </div>
+        <div class="stat-card-num">4</div>
+        <div class="stat-card-label">Badges Earned</div>
       </div>
       <div class="stat-card">
-        <div class="stat-card-icon">🏆</div>
-        <div class="stat-card-num">0</div>
-        <div class="stat-card-label">Challenges</div>
+        <div class="stat-card-top">
+          <div class="stat-card-icon">🤝</div>
+          <div class="stat-card-change change-up">Active</div>
+        </div>
+        <div class="stat-card-num">2</div>
+        <div class="stat-card-label">Collab Rooms</div>
       </div>
       <div class="stat-card">
-        <div class="stat-card-icon">⭐</div>
-        <div class="stat-card-num">Free</div>
-        <div class="stat-card-label">Your Plan</div>
+        <div class="stat-card-top">
+          <div class="stat-card-icon">👁️</div>
+          <div class="stat-card-change change-up">+24%</div>
+        </div>
+        <div class="stat-card-num">348</div>
+        <div class="stat-card-label">Profile Views</div>
       </div>
     </div>
 
-    <!-- Pro Banner -->
-    <div class="pro-banner">
-      <div class="pro-banner-icon">⚡</div>
+    <!-- QUICK ACTIONS -->
+    <div class="quick-actions">
+      <a href="../collab/index.html"><button class="qa-btn"><span class="qa-icon">🤝</span> Join a Collab Room</button></a>
+      <a href="../challenges/index.html"><button class="qa-btn"><span class="qa-icon">🏆</span> Take a Challenge</button></a>
+      <a href="../jobs/index.html"><button class="qa-btn"><span class="qa-icon">💼</span> Browse Jobs</button></a>
+      <a href="../community/index.html"><button class="qa-btn"><span class="qa-icon">🗣️</span> Post in Community</button></a>
+    </div>
+
+    <div class="dash-grid">
+
+      <!-- LEFT COLUMN -->
       <div>
-        <div class="pro-banner-title">Upgrade to Pro</div>
-        <div class="pro-banner-desc">Unlock AI Assistant, SQL Playground, CV Builder and unlimited dataset downloads for just ₦2,500/month.</div>
-        <button class="btn-pro">Upgrade Now →</button>
-      </div>
-    </div>
 
-    <!-- Quick Actions -->
-    <div class="section-header">
-      <div class="section-h">Quick Actions</div>
-    </div>
-    <div class="quick-grid">
-      <a href="../community/index.html" class="quick-card">
-        <div class="quick-icon">🗣️</div>
-        <div class="quick-title">Ask a Question</div>
-        <div class="quick-desc">Post in the community forum</div>
-      </a>
-      <a href="../datasets/index.html" class="quick-card">
-        <div class="quick-icon">📊</div>
-        <div class="quick-title">Browse Datasets</div>
-        <div class="quick-desc">1,200+ free African datasets</div>
-      </a>
-      <a href="../jobs/index.html" class="quick-card">
-        <div class="quick-icon">💼</div>
-        <div class="quick-title">Find a Job</div>
-        <div class="quick-desc">340+ data jobs in Africa</div>
-      </a>
-      <a href="../tools/sql.html" class="quick-card">
-        <div class="quick-icon">📝</div>
-        <div class="quick-title">SQL Playground</div>
-        <div class="quick-desc">Write and run SQL queries</div>
-      </a>
-    </div>
+        <!-- MY PROGRESS -->
+        <div class="box">
+          <div class="box-header">
+            <div class="box-title">📈 My Progress</div>
+            <span class="box-link" onclick="showToast('Full stats coming soon!','info')">View All</span>
+          </div>
+          <div class="progress-wrap">
+            <div class="progress-top"><span class="progress-label">Profile Completion</span><span class="progress-val">72%</span></div>
+            <div class="progress-bar"><div class="progress-fill" style="width:72%"></div></div>
+          </div>
+          <div class="progress-wrap">
+            <div class="progress-top"><span class="progress-label">Challenges Completed</span><span class="progress-val">4 / 10</span></div>
+            <div class="progress-bar"><div class="progress-fill progress-fill-green" style="width:40%"></div></div>
+          </div>
+          <div class="progress-wrap">
+            <div class="progress-top"><span class="progress-label">Learning Roadmap</span><span class="progress-val">60%</span></div>
+            <div class="progress-bar"><div class="progress-fill progress-fill-blue" style="width:60%"></div></div>
+          </div>
+        </div>
 
-    <!-- Recent Activity -->
-    <div class="section-header">
-      <div class="section-h">Recent Activity</div>
-      <a href="#" class="section-link">View all</a>
-    </div>
-    <div class="activity-list">
-      <div class="activity-item">
-        <div class="activity-icon blue">🗣️</div>
-        <div class="activity-info">
-          <div class="activity-title">Welcome to Analytica! Your account is ready.</div>
-          <div class="activity-time">Just now</div>
+        <!-- RECOMMENDED JOBS -->
+        <div class="box">
+          <div class="box-header">
+            <div class="box-title">💼 Recommended Jobs</div>
+            <a href="../jobs/index.html"><span class="box-link">See All →</span></a>
+          </div>
+          <div class="job-item">
+            <div class="job-logo">💳</div>
+            <div class="job-info">
+              <div class="job-title">Senior Frontend Engineer</div>
+              <div class="job-meta">Stripe · Remote · Full-time</div>
+            </div>
+            <div class="job-salary">$140K</div>
+          </div>
+          <div class="job-item">
+            <div class="job-logo">📝</div>
+            <div class="job-info">
+              <div class="job-title">Backend Engineer — Python</div>
+              <div class="job-meta">Notion · Hybrid · Full-time</div>
+            </div>
+            <div class="job-salary">$130K</div>
+          </div>
+          <div class="job-item">
+            <div class="job-logo">💚</div>
+            <div class="job-info">
+              <div class="job-title">Full Stack Developer</div>
+              <div class="job-meta">Paystack · Remote · Full-time</div>
+            </div>
+            <div class="job-salary">$80K</div>
+          </div>
+          <div class="job-item">
+            <div class="job-logo">🤖</div>
+            <div class="job-info">
+              <div class="job-title">ML Engineer</div>
+              <div class="job-meta">OpenAI · On-site · Full-time</div>
+            </div>
+            <div class="job-salary">$200K</div>
+          </div>
         </div>
-      </div>
-      <div class="activity-item">
-        <div class="activity-icon green">📊</div>
-        <div class="activity-info">
-          <div class="activity-title">1,200+ datasets available for you to explore</div>
-          <div class="activity-time">Today</div>
-        </div>
-      </div>
-      <div class="activity-item">
-        <div class="activity-icon gold">🏆</div>
-        <div class="activity-info">
-          <div class="activity-title">New challenge live: Nigeria GDP Analysis 2024</div>
-          <div class="activity-time">Today</div>
-        </div>
-      </div>
-    </div>
 
+        <!-- ACTIVE COLLAB ROOMS -->
+        <div class="box">
+          <div class="box-header">
+            <div class="box-title">🤝 My Collab Rooms</div>
+            <a href="../collab/index.html"><span class="box-link">Browse Rooms →</span></a>
+          </div>
+          <div class="collab-item">
+            <div class="collab-dot dot-live"></div>
+            <div class="collab-info">
+              <div class="collab-title">Real-Time Chat App with WebSockets</div>
+              <div class="collab-meta">3 teammates · Web Dev</div>
+            </div>
+            <div class="collab-slots">🟢 Live</div>
+          </div>
+          <div class="collab-item">
+            <div class="collab-dot dot-open"></div>
+            <div class="collab-info">
+              <div class="collab-title">Open Source Dashboard Library</div>
+              <div class="collab-meta">4 teammates · Frontend</div>
+            </div>
+            <div class="collab-slots">2 slots left</div>
+          </div>
+          <div style="margin-top:14px;">
+            <a href="../collab/index.html"><button style="width:100%;padding:9px;background:transparent;border:1px solid rgba(255,255,255,0.1);border-radius:8px;color:rgba(255,255,255,0.4);font-size:13px;font-weight:600;cursor:pointer;font-family:Inter,sans-serif;transition:all 0.15s;" onmouseover="this.style.borderColor='rgba(245,166,35,0.3)';this.style.color='#F5A623'" onmouseout="this.style.borderColor='rgba(255,255,255,0.1)';this.style.color='rgba(255,255,255,0.4)'">+ Join Another Room</button></a>
+          </div>
+        </div>
+
+        <!-- CHALLENGES -->
+        <div class="box">
+          <div class="box-header">
+            <div class="box-title">🏆 Recommended Challenges</div>
+            <a href="../challenges/index.html"><span class="box-link">See All →</span></a>
+          </div>
+          <div class="challenge-item">
+            <div class="ch-icon">🌐</div>
+            <div class="ch-info">
+              <div class="ch-title">Build a Responsive Portfolio</div>
+              <div class="ch-meta">HTML · CSS · 2–4 hrs</div>
+            </div>
+            <span class="ch-badge badge-easy">Easy</span>
+          </div>
+          <div class="challenge-item">
+            <div class="ch-icon">🤖</div>
+            <div class="ch-info">
+              <div class="ch-title">Chatbot with OpenAI API</div>
+              <div class="ch-meta">Python · 4–6 hrs</div>
+            </div>
+            <span class="ch-badge badge-medium">Medium</span>
+          </div>
+          <div class="challenge-item">
+            <div class="ch-icon">⚙️</div>
+            <div class="ch-info">
+              <div class="ch-title">Design a REST API</div>
+              <div class="ch-meta">Node.js · 5–8 hrs</div>
+            </div>
+            <span class="ch-badge badge-medium">Medium</span>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- RIGHT COLUMN -->
+      <div>
+
+        <!-- PROFILE CARD -->
+        <div class="profile-card">
+          <div class="profile-avatar-lg">AX</div>
+          <div class="profile-name">Alex Johnson</div>
+          <div class="profile-role">Full Stack Developer · Nigeria 🇳🇬</div>
+          <div class="profile-stats">
+            <div class="pstat"><div class="pstat-num">348</div><div class="pstat-label">Views</div></div>
+            <div class="pstat"><div class="pstat-num">4</div><div class="pstat-label">Badges</div></div>
+            <div class="pstat"><div class="pstat-num">12</div><div class="pstat-label">Posts</div></div>
+          </div>
+          <div class="profile-complete">
+            <div class="profile-complete-top"><span>Profile Completion</span><span>72%</span></div>
+            <div class="progress-bar"><div class="progress-fill" style="width:72%"></div></div>
+          </div>
+          <a href="../profile/index.html"><button style="width:100%;margin-top:12px;padding:9px;background:rgba(245,166,35,0.1);border:1px solid rgba(245,166,35,0.2);border-radius:8px;color:#F5A623;font-size:13px;font-weight:700;cursor:pointer;font-family:Inter,sans-serif;">View Full Profile →</button></a>
+        </div>
+
+        <!-- NOTIFICATIONS -->
+        <div class="box">
+          <div class="box-header">
+            <div class="box-title">🔔 Notifications</div>
+            <span class="box-link" onclick="markAllRead()">Mark all read</span>
+          </div>
+          <div id="notif-list"></div>
+        </div>
+
+        <!-- ACTIVITY -->
+        <div class="box">
+          <div class="box-header">
+            <div class="box-title">⚡ Recent Activity</div>
+          </div>
+          <div class="activity-item">
+            <div class="activity-icon ai-gold">🏆</div>
+            <div class="activity-text">
+              <p>You earned the <strong>Portfolio Pro</strong> badge</p>
+              <div class="activity-time">2 hours ago</div>
+            </div>
+          </div>
+          <div class="activity-item">
+            <div class="activity-icon ai-blue">💼</div>
+            <div class="activity-text">
+              <p>Applied to <strong>Senior Frontend Engineer</strong> at Stripe</p>
+              <div class="activity-time">5 hours ago</div>
+            </div>
+          </div>
+          <div class="activity-item">
+            <div class="activity-icon ai-green">🤝</div>
+            <div class="activity-text">
+              <p>Joined <strong>Real-Time Chat App</strong> collab room</p>
+              <div class="activity-time">1 day ago</div>
+            </div>
+          </div>
+          <div class="activity-item">
+            <div class="activity-icon ai-purple">🗣️</div>
+            <div class="activity-text">
+              <p>Your post got <strong>14 replies</strong> in Community</p>
+              <div class="activity-time">2 days ago</div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
   </div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<!-- MOBILE BOTTOM NAV -->
+<div class="bottom-nav">
+  <div class="bottom-nav-item active"><div class="bn-icon">🏠</div><div class="bn-label">Home</div></div>
+  <a href="../jobs/index.html"><div class="bottom-nav-item"><div class="bn-icon">💼</div><div class="bn-label">Jobs</div></div></a>
+  <a href="../collab/index.html"><div class="bottom-nav-item"><div class="bn-icon">🤝</div><div class="bn-label">Collab</div></div></a>
+  <a href="../community/index.html"><div class="bottom-nav-item"><div class="bn-icon">🗣️</div><div class="bn-label">Community</div></div></a>
+  <a href="../profile/index.html"><div class="bottom-nav-item"><div class="bn-icon">👤</div><div class="bn-label">Profile</div></div></a>
+</div>
+
 <script src="../js/supabase.js"></script>
 <script>
-// ── CHECK AUTH ──
-async function checkAuth() {
-  const { data: { session } } = await db.auth.getSession()
 
-  if (!session) {
-    window.location.href = '../auth/login.html'
-    return
-  }
+const NOTIFS = [
+  { id:1, init:'SK', text:'<strong>Sarah K.</strong> invited you to join her Collab Room', time:'5 min ago', unread:true },
+  { id:2, init:'💼', text:'New job match: <strong>ML Engineer at OpenAI</strong> — 94% match', time:'1 hr ago', unread:true },
+  { id:3, init:'KM', text:'<strong>Kofi M.</strong> replied to your Community post', time:'3 hrs ago', unread:true },
+  { id:4, init:'🏆', text:'You earned the <strong>Data Visualizer</strong> badge!', time:'1 day ago', unread:false },
+  { id:5, init:'AM', text:'<strong>Ade M.</strong> confirmed your mentorship session for tomorrow', time:'2 days ago', unread:false },
+];
 
-  const user = session.user
-  const meta = user.user_metadata
-
-  // Set name
-  const firstName = meta.first_name || user.email.split('@')[0]
-  document.getElementById('user-name').textContent = firstName
-  const initial = firstName[0].toUpperCase()
-document.getElementById('avatar').textContent = initial
-document.getElementById('avatar').title = `${firstName} — View Profile`
-
-  // Set greeting by time
-  const hour = new Date().getHours()
-  let greeting = 'Good morning'
-  if (hour >= 12 && hour < 17) greeting = 'Good afternoon'
-  else if (hour >= 17) greeting = 'Good evening'
-
-  document.getElementById('greeting-sub').textContent =
-    `${greeting}! Here's what's happening on Analytica today.`
+function renderNotifs() {
+  document.getElementById('notif-list').innerHTML = NOTIFS.map(n => `
+    <div class="notif-item ${n.unread ? 'unread' : ''}" onclick="readNotif(${n.id})">
+      <div class="notif-avatar" style="background:${n.init.length > 2 ? 'rgba(255,255,255,0.06)' : ''}">${n.init}</div>
+      <div style="flex:1">
+        <div class="notif-text">${n.text}</div>
+        <div class="notif-time">${n.time}</div>
+      </div>
+      ${n.unread ? '<div class="unread-dot"></div>' : ''}
+    </div>`).join('');
 }
 
-// ── HAMBURGER ──
-const hamburger = document.getElementById('hamburger')
-const sidebar = document.getElementById('sidebar')
-const overlay = document.getElementById('overlay')
+function readNotif(id) {
+  const n = NOTIFS.find(n => n.id === id);
+  if (n) { n.unread = false; renderNotifs(); }
+}
 
-hamburger.addEventListener('click', () => {
-  sidebar.classList.toggle('open')
-  overlay.classList.toggle('show')
-})
+function markAllRead() {
+  NOTIFS.forEach(n => n.unread = false);
+  renderNotifs();
+  showToast('All notifications marked as read', 'info');
+}
 
-overlay.addEventListener('click', () => {
-  sidebar.classList.remove('open')
-  overlay.classList.remove('show')
-})
+function showToast(msg, type = 'success') {
+  const t = document.createElement('div');
+  t.className = `toast toast-${type}`;
+  t.textContent = msg;
+  document.body.appendChild(t);
+  setTimeout(() => t.remove(), 3000);
+}
 
-// ── LOGOUT ──
-document.getElementById('logout-btn').addEventListener('click', async (e) => {
-  e.preventDefault()
-  await db.auth.signOut()
-  window.location.href = '../auth/login.html'
-})
-
-// Run
-checkAuth()
+renderNotifs();
 </script>
-
 </body>
 </html>

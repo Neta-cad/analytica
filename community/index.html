@@ -3,670 +3,470 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Community Forum — Analytica</title>
-<link rel="stylesheet" href="../css/main.css">
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<title>Community — Analytica</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
-body { background: #0A1628; min-height: 100vh; }
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body { background: #0A1628; color: #fff; font-family: 'Inter', sans-serif; min-height: 100vh; }
+a { text-decoration: none; color: inherit; }
 
-/* ── TOP NAV ── */
-.topnav {
-  position: fixed;
-  top: 0; left: 0; right: 0;
-  height: 60px;
-  background: rgba(10,22,40,0.95);
-  backdrop-filter: blur(20px);
-  border-bottom: 1px solid rgba(255,255,255,0.06);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0 20px;
-  z-index: 40;
-}
-.topnav-logo {
-  font-family: 'Playfair Display', serif;
-  font-size: 20px;
-  font-weight: 900;
-  color: #fff;
-  text-decoration: none;
-}
-.topnav-logo span { color: #F5A623; }
-.topnav-right { display: flex; gap: 10px; align-items: center; }
-.btn-sm {
-  padding: 7px 16px;
-  border-radius: 6px;
-  font-size: 13px;
-  font-weight: 600;
-  font-family: 'DM Sans', sans-serif;
-  cursor: pointer;
-  text-decoration: none;
-  transition: all 0.2s;
-}
-.btn-gold { background: #F5A623; color: #0A1628; border: none; }
-.btn-gold:hover { background: #FFD07A; }
-.btn-outline { background: transparent; border: 1px solid rgba(255,255,255,0.2); color: #fff; }
-.btn-outline:hover { border-color: #F5A623; color: #F5A623; }
+/* NAV */
+.topnav { position: fixed; top: 0; left: 0; right: 0; height: 58px; background: rgba(10,22,40,0.98); backdrop-filter: blur(12px); border-bottom: 1px solid rgba(255,255,255,0.07); display: flex; align-items: center; padding: 0 20px; gap: 12px; z-index: 100; }
+.nav-logo { font-size: 18px; font-weight: 800; color: #fff; letter-spacing: -0.5px; }
+.nav-logo span { color: #F5A623; }
+.nav-right { margin-left: auto; display: flex; gap: 8px; }
+.btn { padding: 7px 16px; border-radius: 7px; font-size: 13px; font-weight: 600; font-family: 'Inter', sans-serif; cursor: pointer; border: none; transition: all 0.15s; display: inline-block; }
+.btn-ghost { background: transparent; border: 1px solid rgba(255,255,255,0.15) !important; color: rgba(255,255,255,0.7); }
+.btn-ghost:hover { color: #fff; border-color: rgba(255,255,255,0.3) !important; }
+.btn-primary { background: #F5A623; color: #0A1628; font-weight: 700; }
+.btn-primary:hover { background: #f0b84a; }
 
-/* ── PAGE LAYOUT ── */
-.page { margin-top: 60px; padding: 28px 20px; max-width: 900px; margin-left: auto; margin-right: auto; }
+/* LAYOUT */
+.page { margin-top: 58px; max-width: 1080px; margin-left: auto; margin-right: auto; padding: 24px 20px; display: grid; grid-template-columns: 1fr; gap: 20px; }
+@media (min-width: 860px) { .page { grid-template-columns: 220px 1fr 200px; margin-top: 58px; } }
 
-/* ── PAGE HEADER ── */
-.page-header { margin-bottom: 24px; }
-.page-title {
-  font-family: 'Playfair Display', serif;
-  font-size: clamp(24px, 5vw, 36px);
-  font-weight: 700;
-  margin-bottom: 6px;
-}
-.page-title span { color: #F5A623; }
-.page-sub { font-size: 14px; color: rgba(255,255,255,0.45); }
+/* LEFT SIDEBAR */
+.left-sidebar { display: none; }
+@media (min-width: 860px) { .left-sidebar { display: block; } }
 
-/* ── FORUM STATS ── */
-.forum-stats {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 12px;
-  margin-bottom: 24px;
-}
-.fstat {
-  background: rgba(255,255,255,0.03);
-  border: 1px solid rgba(255,255,255,0.07);
-  border-radius: 12px;
-  padding: 14px;
-  text-align: center;
-}
-.fstat-num {
-  font-family: 'Playfair Display', serif;
-  font-size: 22px;
-  font-weight: 700;
-  color: #F5A623;
-}
-.fstat-label { font-size: 11px; color: rgba(255,255,255,0.4); margin-top: 2px; text-transform: uppercase; letter-spacing: 0.5px; }
+.sidebar-box { background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.07); border-radius: 12px; padding: 16px; margin-bottom: 12px; }
+.sidebar-title { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; color: rgba(255,255,255,0.3); margin-bottom: 12px; }
+.category-list { list-style: none; display: flex; flex-direction: column; gap: 2px; }
+.category-item { display: flex; align-items: center; justify-content: space-between; padding: 7px 10px; border-radius: 7px; cursor: pointer; transition: all 0.15s; }
+.category-item:hover, .category-item.active { background: rgba(245,166,35,0.08); }
+.category-item.active .cat-name { color: #F5A623; }
+.cat-name { font-size: 13px; color: rgba(255,255,255,0.55); font-weight: 500; display: flex; align-items: center; gap: 8px; }
+.cat-count { font-size: 11px; color: rgba(255,255,255,0.2); background: rgba(255,255,255,0.05); padding: 2px 7px; border-radius: 10px; }
 
-/* ── SEARCH & FILTER ── */
-.forum-controls {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  margin-bottom: 20px;
-}
-.search-box {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  background: rgba(255,255,255,0.05);
-  border: 1px solid rgba(255,255,255,0.1);
-  border-radius: 10px;
-  padding: 10px 16px;
-}
-.search-box input {
-  flex: 1;
-  background: transparent;
-  border: none;
-  color: #fff;
-  font-size: 14px;
-  font-family: 'DM Sans', sans-serif;
-  outline: none;
-}
-.search-box input::placeholder { color: rgba(255,255,255,0.3); }
-.search-icon { font-size: 16px; color: rgba(255,255,255,0.3); }
+.online-list { display: flex; flex-direction: column; gap: 10px; }
+.online-user { display: flex; align-items: center; gap: 10px; }
+.o-avatar { width: 30px; height: 30px; border-radius: 50%; background: linear-gradient(135deg, #F5A623, #e8920f); display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 800; color: #0A1628; flex-shrink: 0; position: relative; }
+.o-dot { position: absolute; bottom: 0; right: 0; width: 8px; height: 8px; background: #27AE60; border-radius: 50%; border: 1.5px solid #0A1628; }
+.o-name { font-size: 12px; font-weight: 600; }
+.o-role { font-size: 11px; color: rgba(255,255,255,0.35); }
 
-.filter-tabs {
-  display: flex;
-  gap: 8px;
-  overflow-x: auto;
-  padding-bottom: 4px;
-}
-.filter-tabs::-webkit-scrollbar { display: none; }
-.tab {
-  padding: 7px 16px;
-  border-radius: 100px;
-  font-size: 13px;
-  font-weight: 500;
-  white-space: nowrap;
-  cursor: pointer;
-  border: 1px solid rgba(255,255,255,0.1);
-  color: rgba(255,255,255,0.5);
-  background: transparent;
-  font-family: 'DM Sans', sans-serif;
-  transition: all 0.2s;
-}
-.tab.active, .tab:hover {
-  background: rgba(245,166,35,0.12);
-  border-color: rgba(245,166,35,0.3);
-  color: #F5A623;
-}
+/* MAIN FEED */
+.feed { }
 
-/* ── ASK BUTTON ── */
-.ask-btn-wrap { margin-bottom: 20px; }
-.ask-btn {
-  width: 100%;
-  padding: 14px;
-  background: #F5A623;
-  border: none;
-  border-radius: 10px;
-  color: #0A1628;
-  font-size: 15px;
-  font-weight: 700;
-  font-family: 'DM Sans', sans-serif;
-  cursor: pointer;
-  transition: all 0.2s;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-}
-.ask-btn:hover { background: #FFD07A; }
+/* TOP BAR */
+.feed-topbar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; gap: 10px; flex-wrap: wrap; }
+.feed-topbar h1 { font-size: 20px; font-weight: 800; letter-spacing: -0.5px; }
+.btn-post { padding: 8px 18px; background: #F5A623; color: #0A1628; border: none; border-radius: 7px; font-size: 13px; font-weight: 700; cursor: pointer; font-family: 'Inter', sans-serif; transition: all 0.15s; }
+.btn-post:hover { background: #f0b84a; }
 
-/* ── POST MODAL ── */
-.modal-overlay {
-  display: none;
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.7);
-  z-index: 200;
-  align-items: flex-end;
-  justify-content: center;
-}
-.modal-overlay.show { display: flex; }
-.modal {
-  background: #0d1f3c;
-  border: 1px solid rgba(255,255,255,0.1);
-  border-radius: 20px 20px 0 0;
-  padding: 28px 24px;
-  width: 100%;
-  max-width: 600px;
-  max-height: 90vh;
-  overflow-y: auto;
-}
-.modal-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 20px;
-}
-.modal-title {
-  font-family: 'Playfair Display', serif;
-  font-size: 20px;
-  font-weight: 700;
-}
-.modal-close {
-  background: rgba(255,255,255,0.08);
-  border: none;
-  color: #fff;
-  width: 32px; height: 32px;
-  border-radius: 8px;
-  font-size: 16px;
-  cursor: pointer;
-}
-.modal label {
-  display: block;
-  font-size: 13px;
-  font-weight: 500;
-  color: rgba(255,255,255,0.7);
-  margin-bottom: 7px;
-  margin-top: 16px;
-}
-.modal input, .modal textarea, .modal select {
-  width: 100%;
-  padding: 12px 16px;
-  background: rgba(255,255,255,0.06);
-  border: 1px solid rgba(255,255,255,0.12);
-  border-radius: 8px;
-  color: #fff;
-  font-size: 14px;
-  font-family: 'DM Sans', sans-serif;
-  outline: none;
-  transition: border-color 0.2s;
-}
-.modal input:focus, .modal textarea:focus, .modal select:focus { border-color: #F5A623; }
-.modal textarea { resize: vertical; min-height: 120px; }
-.modal input::placeholder, .modal textarea::placeholder { color: rgba(255,255,255,0.25); }
-.modal select option { background: #112240; }
-.modal-submit {
-  width: 100%;
-  padding: 14px;
-  background: #F5A623;
-  border: none;
-  border-radius: 8px;
-  color: #0A1628;
-  font-size: 15px;
-  font-weight: 700;
-  font-family: 'DM Sans', sans-serif;
-  cursor: pointer;
-  margin-top: 20px;
-  transition: all 0.2s;
-}
-.modal-submit:hover { background: #FFD07A; }
-.modal-submit:disabled { opacity: 0.6; cursor: not-allowed; }
+/* STATS ROW */
+.stats-row { display: flex; gap: 10px; margin-bottom: 16px; flex-wrap: wrap; }
+.stat-chip { background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.07); border-radius: 8px; padding: 10px 16px; text-align: center; flex: 1; min-width: 80px; }
+.stat-chip-num { font-size: 18px; font-weight: 800; color: #F5A623; letter-spacing: -0.5px; }
+.stat-chip-label { font-size: 10px; color: rgba(255,255,255,0.3); text-transform: uppercase; letter-spacing: 0.5px; margin-top: 2px; }
 
-/* ── POSTS LIST ── */
-.posts-list { display: flex; flex-direction: column; gap: 12px; }
+/* SEARCH + FILTER BAR */
+.filter-bar { display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; }
+.search-input { flex: 1; min-width: 160px; padding: 8px 14px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; color: #fff; font-size: 13px; font-family: 'Inter', sans-serif; outline: none; }
+.search-input:focus { border-color: rgba(245,166,35,0.4); }
+.search-input::placeholder { color: rgba(255,255,255,0.25); }
+.filter-pill { padding: 7px 14px; border-radius: 20px; font-size: 12px; font-weight: 500; cursor: pointer; border: 1px solid rgba(255,255,255,0.1); background: transparent; color: rgba(255,255,255,0.4); transition: all 0.15s; font-family: 'Inter', sans-serif; white-space: nowrap; }
+.filter-pill:hover, .filter-pill.active { background: rgba(245,166,35,0.08); border-color: rgba(245,166,35,0.3); color: #F5A623; }
 
-.post-card {
-  background: rgba(255,255,255,0.03);
-  border: 1px solid rgba(255,255,255,0.07);
-  border-radius: 14px;
-  padding: 18px;
-  cursor: pointer;
-  transition: all 0.3s;
-  text-decoration: none;
-  display: block;
-}
-.post-card:hover {
-  border-color: rgba(245,166,35,0.25);
-  background: rgba(255,255,255,0.05);
-  transform: translateY(-2px);
-}
+/* POST CARD */
+.post-card { background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.07); border-radius: 12px; padding: 18px; margin-bottom: 10px; transition: all 0.15s; cursor: pointer; }
+.post-card:hover { border-color: rgba(245,166,35,0.15); background: rgba(245,166,35,0.02); }
+.post-card.pinned { border-color: rgba(245,166,35,0.2); background: rgba(245,166,35,0.02); }
 
-.post-top {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 12px;
-  margin-bottom: 10px;
-}
+.post-top { display: flex; align-items: flex-start; gap: 12px; margin-bottom: 12px; }
+.post-avatar { width: 36px; height: 36px; border-radius: 50%; background: linear-gradient(135deg, #F5A623, #e8920f); display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 800; color: #0A1628; flex-shrink: 0; }
+.post-meta { flex: 1; }
+.post-author-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 2px; }
+.post-author { font-size: 13px; font-weight: 700; }
+.post-role { font-size: 11px; color: rgba(255,255,255,0.35); }
+.post-time { font-size: 11px; color: rgba(255,255,255,0.25); margin-left: auto; }
+.post-category { font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 4px; text-transform: uppercase; letter-spacing: 0.5px; }
+.cat-web { background: rgba(41,128,185,0.12); color: #2980B9; }
+.cat-ai { background: rgba(142,68,173,0.12); color: #9B59B6; }
+.cat-career { background: rgba(39,174,96,0.12); color: #27AE60; }
+.cat-python { background: rgba(245,166,35,0.12); color: #F5A623; }
+.cat-general { background: rgba(255,255,255,0.06); color: rgba(255,255,255,0.4); }
+.cat-mobile { background: rgba(231,76,60,0.12); color: #E74C3C; }
+.cat-devops { background: rgba(26,188,156,0.12); color: #1ABC9C; }
 
-.post-tag {
-  display: inline-block;
-  padding: 3px 10px;
-  border-radius: 100px;
-  font-size: 11px;
-  font-weight: 600;
-  border: 1px solid;
-  white-space: nowrap;
-}
-.tag-sql { background: rgba(52,152,219,0.1); color: #3498db; border-color: rgba(52,152,219,0.3); }
-.tag-excel { background: rgba(39,174,96,0.1); color: #27AE60; border-color: rgba(39,174,96,0.3); }
-.tag-python { background: rgba(155,89,182,0.1); color: #9b59b6; border-color: rgba(155,89,182,0.3); }
-.tag-powerbi { background: rgba(245,166,35,0.1); color: #F5A623; border-color: rgba(245,166,35,0.3); }
-.tag-general { background: rgba(255,255,255,0.06); color: rgba(255,255,255,0.5); border-color: rgba(255,255,255,0.1); }
-.tag-career { background: rgba(231,76,60,0.1); color: #e74c3c; border-color: rgba(231,76,60,0.3); }
+.pinned-label { font-size: 10px; font-weight: 700; color: #F5A623; background: rgba(245,166,35,0.1); padding: 2px 8px; border-radius: 4px; }
 
-.post-time { font-size: 11px; color: rgba(255,255,255,0.3); white-space: nowrap; }
+.post-title { font-size: 15px; font-weight: 700; margin-bottom: 6px; line-height: 1.4; }
+.post-preview { font-size: 13px; color: rgba(255,255,255,0.45); line-height: 1.6; margin-bottom: 12px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
 
-.post-title {
-  font-size: 15px;
-  font-weight: 600;
-  color: #fff;
-  margin-bottom: 8px;
-  line-height: 1.4;
-}
+.post-tags { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 12px; }
+.post-tag { font-size: 11px; padding: 2px 8px; border-radius: 4px; background: rgba(255,255,255,0.04); color: rgba(255,255,255,0.35); border: 1px solid rgba(255,255,255,0.07); }
 
-.post-preview {
-  font-size: 13px;
-  color: rgba(255,255,255,0.4);
-  line-height: 1.6;
-  margin-bottom: 14px;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-}
+.post-footer { display: flex; align-items: center; gap: 16px; }
+.post-action { display: flex; align-items: center; gap: 5px; font-size: 12px; color: rgba(255,255,255,0.3); cursor: pointer; transition: color 0.15s; background: none; border: none; font-family: 'Inter', sans-serif; }
+.post-action:hover { color: #F5A623; }
+.post-action.liked { color: #E74C3C; }
+.post-action.bookmarked { color: #F5A623; }
+.post-answers { margin-left: auto; font-size: 11px; color: rgba(255,255,255,0.25); }
+.post-answers.has-answer { color: #27AE60; }
 
-.post-bottom {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
+/* COMPOSE BOX */
+.compose-box { background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.07); border-radius: 12px; padding: 14px; margin-bottom: 16px; display: flex; align-items: center; gap: 12px; cursor: pointer; transition: all 0.15s; }
+.compose-box:hover { border-color: rgba(245,166,35,0.2); }
+.compose-avatar { width: 36px; height: 36px; border-radius: 50%; background: rgba(255,255,255,0.08); display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0; }
+.compose-placeholder { font-size: 13px; color: rgba(255,255,255,0.25); }
 
-.post-author {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-.author-avatar {
-  width: 26px; height: 26px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, #F5A623, #e8920f);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 11px;
-  font-weight: 700;
-  color: #0A1628;
-}
-.author-name { font-size: 12px; color: rgba(255,255,255,0.5); }
+/* POST MODAL */
+.modal-bg { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.75); backdrop-filter: blur(6px); z-index: 200; align-items: center; justify-content: center; padding: 20px; }
+.modal-bg.open { display: flex; }
+.modal { background: #0d1f3c; border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; padding: 28px; width: 100%; max-width: 560px; max-height: 90vh; overflow-y: auto; }
+.modal h2 { font-size: 18px; font-weight: 800; margin-bottom: 4px; }
+.modal-sub { font-size: 13px; color: rgba(255,255,255,0.35); margin-bottom: 20px; }
+.form-group { margin-bottom: 14px; }
+.form-label { font-size: 12px; font-weight: 600; color: rgba(255,255,255,0.5); margin-bottom: 6px; display: block; text-transform: uppercase; letter-spacing: 0.5px; }
+.form-input, .form-select, .form-textarea { width: 100%; padding: 10px 14px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; color: #fff; font-size: 13px; font-family: 'Inter', sans-serif; outline: none; transition: border 0.15s; }
+.form-input:focus, .form-select:focus, .form-textarea:focus { border-color: rgba(245,166,35,0.4); }
+.form-input::placeholder, .form-textarea::placeholder { color: rgba(255,255,255,0.2); }
+.form-select option { background: #0d1f3c; }
+.form-textarea { min-height: 100px; resize: vertical; line-height: 1.6; }
+.modal-actions { display: flex; gap: 10px; margin-top: 20px; }
+.btn-modal-post { flex: 1; padding: 11px; background: #F5A623; color: #0A1628; border: none; border-radius: 8px; font-size: 14px; font-weight: 700; cursor: pointer; font-family: 'Inter', sans-serif; }
+.btn-modal-post:hover { background: #f0b84a; }
+.btn-modal-cancel { padding: 11px 18px; background: transparent; border: 1px solid rgba(255,255,255,0.12); border-radius: 8px; color: rgba(255,255,255,0.4); font-size: 14px; cursor: pointer; font-family: 'Inter', sans-serif; }
 
-.post-meta {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-}
-.meta-item {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  font-size: 12px;
-  color: rgba(255,255,255,0.35);
-}
+/* RIGHT SIDEBAR */
+.right-sidebar { display: none; }
+@media (min-width: 860px) { .right-sidebar { display: block; } }
 
-/* ── EMPTY STATE ── */
-.empty-state {
-  text-align: center;
-  padding: 60px 24px;
-  color: rgba(255,255,255,0.3);
-}
-.empty-icon { font-size: 48px; margin-bottom: 16px; }
-.empty-title { font-size: 16px; font-weight: 600; margin-bottom: 8px; color: rgba(255,255,255,0.5); }
-.empty-desc { font-size: 13px; line-height: 1.6; }
+.trending-list { display: flex; flex-direction: column; gap: 2px; }
+.trending-item { padding: 8px 10px; border-radius: 7px; cursor: pointer; transition: all 0.15s; }
+.trending-item:hover { background: rgba(255,255,255,0.04); }
+.trending-num { font-size: 10px; color: rgba(255,255,255,0.2); font-weight: 700; margin-bottom: 2px; }
+.trending-tag { font-size: 12px; font-weight: 700; color: #F5A623; margin-bottom: 1px; }
+.trending-count { font-size: 11px; color: rgba(255,255,255,0.3); }
 
-/* ── LOADING ── */
-.loading {
-  text-align: center;
-  padding: 40px;
-  color: rgba(255,255,255,0.3);
-  font-size: 14px;
-}
+.rules-list { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+.rules-list li { font-size: 12px; color: rgba(255,255,255,0.45); display: flex; gap: 8px; line-height: 1.5; }
+.rules-list li::before { content: '→'; color: #F5A623; flex-shrink: 0; }
 
-/* ── ALERT ── */
-.alert {
-  padding: 12px 16px;
-  border-radius: 8px;
-  font-size: 13px;
-  margin-bottom: 16px;
-  display: none;
-}
-.alert.error { background: rgba(231,76,60,0.15); border: 1px solid rgba(231,76,60,0.3); color: #ff6b6b; display: block; }
-.alert.success { background: rgba(39,174,96,0.15); border: 1px solid rgba(39,174,96,0.3); color: #2ecc71; display: block; }
+/* TOAST */
+.toast { position: fixed; bottom: 20px; right: 20px; padding: 11px 18px; border-radius: 8px; font-size: 13px; font-weight: 500; color: #fff; z-index: 999; animation: slideUp 0.25s ease; box-shadow: 0 6px 24px rgba(0,0,0,0.4); }
+.toast-success { background: #27AE60; }
+.toast-info { background: #2980B9; }
+@keyframes slideUp { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:translateY(0)} }
 
-@media (min-width: 600px) {
-  .forum-controls { flex-direction: row; align-items: center; }
-  .search-box { flex: 1; }
-}
+.empty-feed { text-align: center; padding: 48px 20px; color: rgba(255,255,255,0.3); }
+.empty-feed div { font-size: 40px; margin-bottom: 12px; }
+.empty-feed p { font-size: 14px; }
 </style>
 </head>
 <body>
 
-<!-- TOP NAV -->
-<div class="topnav">
-  <a href="../index.html" class="topnav-logo">Analytica<span>.</span></a>
-  <div class="topnav-right">
-    <a href="../dashboard/index.html" class="btn-sm btn-outline">Dashboard</a>
-    <button class="btn-sm btn-gold" onclick="openModal()">+ Ask</button>
+<!-- NAV -->
+<nav class="topnav">
+  <a href="../index.html" class="nav-logo">Analytica<span>.</span></a>
+  <div class="nav-right">
+    <a href="../auth/login.html" class="btn btn-ghost">Log In</a>
+    <a href="../auth/signup.html" class="btn btn-primary">Join Free</a>
   </div>
+</nav>
+
+<div class="page">
+
+  <!-- LEFT SIDEBAR -->
+  <div class="left-sidebar">
+    <div class="sidebar-box">
+      <div class="sidebar-title">Categories</div>
+      <ul class="category-list" id="cat-list">
+        <li class="category-item active" onclick="filterCategory('all', this)"><span class="cat-name">🌐 All Posts</span><span class="cat-count">1.2K</span></li>
+        <li class="category-item" onclick="filterCategory('web', this)"><span class="cat-name">💻 Web Dev</span><span class="cat-count">340</span></li>
+        <li class="category-item" onclick="filterCategory('ai', this)"><span class="cat-name">🤖 AI / ML</span><span class="cat-count">218</span></li>
+        <li class="category-item" onclick="filterCategory('python', this)"><span class="cat-name">🐍 Python</span><span class="cat-count">196</span></li>
+        <li class="category-item" onclick="filterCategory('mobile', this)"><span class="cat-name">📱 Mobile</span><span class="cat-count">142</span></li>
+        <li class="category-item" onclick="filterCategory('career', this)"><span class="cat-name">💼 Career</span><span class="cat-count">284</span></li>
+        <li class="category-item" onclick="filterCategory('devops', this)"><span class="cat-name">⚙️ DevOps</span><span class="cat-count">98</span></li>
+        <li class="category-item" onclick="filterCategory('general', this)"><span class="cat-name">💬 General</span><span class="cat-count">164</span></li>
+      </ul>
+    </div>
+    <div class="sidebar-box">
+      <div class="sidebar-title">Online Now</div>
+      <div class="online-list" id="online-list"></div>
+    </div>
+  </div>
+
+  <!-- MAIN FEED -->
+  <div class="feed">
+    <div class="feed-topbar">
+      <h1>Community</h1>
+      <button class="btn-post" onclick="openModal()">+ New Post</button>
+    </div>
+
+    <div class="stats-row">
+      <div class="stat-chip"><div class="stat-chip-num">12.4K</div><div class="stat-chip-label">Members</div></div>
+      <div class="stat-chip"><div class="stat-chip-num">1,240</div><div class="stat-chip-label">Posts</div></div>
+      <div class="stat-chip"><div class="stat-chip-num">312</div><div class="stat-chip-label">Online</div></div>
+      <div class="stat-chip"><div class="stat-chip-num">4,800</div><div class="stat-chip-label">Replies</div></div>
+    </div>
+
+    <div class="compose-box" onclick="openModal()">
+      <div class="compose-avatar">✏️</div>
+      <div class="compose-placeholder">Share something with the community...</div>
+    </div>
+
+    <div class="filter-bar">
+      <input class="search-input" type="text" placeholder="🔍  Search posts..." oninput="searchPosts(this.value)" id="search-input">
+      <button class="filter-pill active" onclick="setSort('latest', this)">Latest</button>
+      <button class="filter-pill" onclick="setSort('top', this)">Top</button>
+      <button class="filter-pill" onclick="setSort('unanswered', this)">Unanswered</button>
+    </div>
+
+    <div id="feed-list"></div>
+  </div>
+
+  <!-- RIGHT SIDEBAR -->
+  <div class="right-sidebar">
+    <div class="sidebar-box">
+      <div class="sidebar-title">Trending Tags</div>
+      <div class="trending-list" id="trending-list"></div>
+    </div>
+    <div class="sidebar-box" style="margin-top:12px;">
+      <div class="sidebar-title">Community Rules</div>
+      <ul class="rules-list">
+        <li>Be respectful to everyone</li>
+        <li>No spam or self-promotion</li>
+        <li>Search before posting</li>
+        <li>Tag your posts correctly</li>
+        <li>Help others when you can</li>
+      </ul>
+    </div>
+  </div>
+
 </div>
 
 <!-- POST MODAL -->
-<div class="modal-overlay" id="modal-overlay">
+<div class="modal-bg" id="modal-bg" onclick="closeModalOutside(event)">
   <div class="modal">
-    <div class="modal-header">
-      <div class="modal-title">Ask the Community</div>
-      <button class="modal-close" onclick="closeModal()">✕</button>
+    <h2>New Post</h2>
+    <p class="modal-sub">Ask a question, share a resource or start a discussion</p>
+    <div class="form-group">
+      <label class="form-label">Title *</label>
+      <input class="form-input" type="text" id="post-title" placeholder="What's your question or topic?">
     </div>
-
-    <div class="alert" id="modal-alert"></div>
-
-    <label>Title — what is your question?</label>
-    <input type="text" id="post-title" placeholder="e.g. How do I remove duplicates in SQL?">
-
-    <label>Category</label>
-    <select id="post-tag">
-      <option value="general">General</option>
-      <option value="sql">SQL</option>
-      <option value="excel">Excel</option>
-      <option value="python">Python</option>
-      <option value="powerbi">Power BI</option>
-      <option value="career">Career</option>
-    </select>
-
-    <label>Details — describe your problem</label>
-    <textarea id="post-body" placeholder="Explain your problem in detail. Include any error messages or what you have tried..."></textarea>
-
-    <button class="modal-submit" id="modal-submit" onclick="submitPost()">
-      Post Question →
-    </button>
+    <div class="form-group">
+      <label class="form-label">Category</label>
+      <select class="form-select" id="post-category">
+        <option value="general">💬 General</option>
+        <option value="web">💻 Web Dev</option>
+        <option value="ai">🤖 AI / ML</option>
+        <option value="python">🐍 Python</option>
+        <option value="mobile">📱 Mobile</option>
+        <option value="career">💼 Career</option>
+        <option value="devops">⚙️ DevOps</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Details</label>
+      <textarea class="form-textarea" id="post-body" placeholder="Describe your question or share your thoughts in detail..."></textarea>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Tags (comma separated)</label>
+      <input class="form-input" type="text" id="post-tags" placeholder="e.g. React, API, beginner">
+    </div>
+    <div class="modal-actions">
+      <button class="btn-modal-post" onclick="submitPost()">Post to Community</button>
+      <button class="btn-modal-cancel" onclick="closeModal()">Cancel</button>
+    </div>
   </div>
 </div>
 
-<!-- MAIN PAGE -->
-<div class="page">
-
-  <div class="page-header">
-    <h1 class="page-title">Community <span>Forum</span></h1>
-    <p class="page-sub">Ask questions, share knowledge, grow together</p>
-  </div>
-
-  <!-- Stats -->
-  <div class="forum-stats">
-    <div class="fstat">
-      <div class="fstat-num" id="total-posts">0</div>
-      <div class="fstat-label">Posts</div>
-    </div>
-    <div class="fstat">
-      <div class="fstat-num" id="total-members">0</div>
-      <div class="fstat-label">Members</div>
-    </div>
-    <div class="fstat">
-      <div class="fstat-num">24/7</div>
-      <div class="fstat-label">Active</div>
-    </div>
-  </div>
-
-  <!-- Ask button -->
-  <div class="ask-btn-wrap">
-    <button class="ask-btn" onclick="openModal()">
-      ✏️ Ask a Question
-    </button>
-  </div>
-
-  <!-- Search & Filter -->
-  <div class="forum-controls">
-    <div class="search-box">
-      <span class="search-icon">🔍</span>
-      <input type="text" id="search-input" placeholder="Search questions..." oninput="filterPosts()">
-    </div>
-  </div>
-
-  <!-- Filter tabs -->
-  <div class="filter-tabs" style="margin-bottom:20px;">
-    <button class="tab active" onclick="setFilter('all', this)">All</button>
-    <button class="tab" onclick="setFilter('sql', this)">SQL</button>
-    <button class="tab" onclick="setFilter('excel', this)">Excel</button>
-    <button class="tab" onclick="setFilter('python', this)">Python</button>
-    <button class="tab" onclick="setFilter('powerbi', this)">Power BI</button>
-    <button class="tab" onclick="setFilter('career', this)">Career</button>
-    <button class="tab" onclick="setFilter('general', this)">General</button>
-  </div>
-
-  <!-- Posts -->
-  <div class="posts-list" id="posts-list">
-    <div class="loading">Loading posts...</div>
-  </div>
-
-</div>
-
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="../js/supabase.js"></script>
 <script>
-let allPosts = []
-let currentFilter = 'all'
-let currentUser = null
 
-// ── GET USER ──
-async function getUser() {
-  const { data: { session } } = await db.auth.getSession()
-  if (session) currentUser = session.user
+const POSTS = [
+  { id:1, author:'Adaeze O.', init:'AO', role:'Frontend Dev · Nigeria', time:'2m ago', category:'web', title:'How do I center a div vertically AND horizontally in 2026?', preview:'I know this is a classic question but I keep forgetting the cleanest way to do it. Flexbox? Grid? What do you all prefer these days?', tags:['CSS','Flexbox','Grid'], likes:42, replies:18, bookmarked:false, liked:false, pinned:true, answered:true },
+  { id:2, author:'Kofi M.', init:'KM', role:'Data Scientist · Ghana', time:'14m ago', category:'ai', title:'Best free resources to learn LLMs from scratch in 2026?', preview:'I have a solid Python background and want to get into large language models. Where should I start? Looking for courses, papers or GitHub repos.', tags:['LLMs','Python','AI'], likes:38, replies:12, bookmarked:false, liked:false, pinned:false, answered:false },
+  { id:3, author:'James L.', init:'JL', role:'Backend Dev · UK', time:'1h ago', category:'career', title:'Got my first $100K offer — here\'s what helped me get there', preview:'After 2 years of grinding, I finally landed a six-figure remote role. I want to share exactly what I did differently in the last 6 months.', tags:['Career','Salary','Remote'], likes:94, replies:31, bookmarked:false, liked:false, pinned:false, answered:true },
+  { id:4, author:'Priya S.', init:'PS', role:'Full Stack · India', time:'2h ago', category:'web', title:'Next.js 16 vs Remix — which should I pick for a new project?', preview:'Starting a new SaaS project and torn between Next.js and Remix. Anyone switched between the two recently? What were your pain points?', tags:['Next.js','Remix','React'], likes:27, replies:9, bookmarked:false, liked:false, pinned:false, answered:false },
+  { id:5, author:'Fatima M.', init:'FM', role:'Mobile Dev · Kenya', time:'3h ago', category:'mobile', title:'Flutter vs React Native in 2026 — honest comparison after building both', preview:'I have now shipped 3 apps in Flutter and 2 in React Native. Here is my completely honest take on performance, DX and which to choose.', tags:['Flutter','React Native','Mobile'], likes:61, replies:24, bookmarked:false, liked:false, pinned:false, answered:true },
+  { id:6, author:'David C.', init:'DC', role:'DevOps · Canada', time:'5h ago', category:'devops', title:'My Kubernetes setup for a 50K user SaaS — full breakdown', preview:'Sharing my entire K8s configuration that handles 50K daily active users on a $300/month infra budget. Includes auto-scaling, monitoring and CI/CD.', tags:['Kubernetes','DevOps','AWS'], likes:83, replies:19, bookmarked:false, liked:false, pinned:false, answered:true },
+  { id:7, author:'Omar B.', init:'OB', role:'Student · Morocco', time:'8h ago', category:'career', title:'Is it worth doing a CS degree in 2026 or just self-teach?', preview:'I have an offer from a university but I am also making progress self-teaching online. I want honest opinions from people who have been through both paths.', tags:['Career','Education','Advice'], likes:56, replies:44, bookmarked:false, liked:false, pinned:false, answered:false },
+  { id:8, author:'Sofia R.', init:'SR', role:'AI Engineer · Brazil', time:'12h ago', category:'python', title:'How I reduced my ML model inference time by 70% — tips inside', preview:'After weeks of profiling and optimizing, I got our production model from 800ms to 240ms per request. Here are the 5 techniques that made the biggest difference.', tags:['Python','ML','Performance'], likes:77, replies:15, bookmarked:false, liked:false, pinned:false, answered:true },
+];
+
+const TRENDING = [
+  { tag:'#React', count:'142 posts' },
+  { tag:'#Python', count:'118 posts' },
+  { tag:'#Career', count:'96 posts' },
+  { tag:'#AI', count:'88 posts' },
+  { tag:'#RemoteJobs', count:'74 posts' },
+  { tag:'#Flutter', count:'62 posts' },
+];
+
+const ONLINE = [
+  { init:'AO', name:'Adaeze O.', role:'Frontend Dev' },
+  { init:'KM', name:'Kofi M.', role:'Data Scientist' },
+  { init:'JL', name:'James L.', role:'Backend Dev' },
+  { init:'PS', name:'Priya S.', role:'Full Stack' },
+  { init:'DC', name:'David C.', role:'DevOps' },
+];
+
+let posts = [...POSTS];
+let currentCategory = 'all';
+let currentSearch = '';
+let currentSort = 'latest';
+
+function getCatClass(cat) {
+  return { web:'cat-web', ai:'cat-ai', career:'cat-career', python:'cat-python', mobile:'cat-mobile', devops:'cat-devops', general:'cat-general' }[cat] || 'cat-general';
+}
+function getCatLabel(cat) {
+  return { web:'Web Dev', ai:'AI / ML', career:'Career', python:'Python', mobile:'Mobile', devops:'DevOps', general:'General' }[cat] || 'General';
 }
 
-// ── LOAD POSTS ──
-async function loadPosts() {
-  const { data, error } = await db
-    .from('forum_posts')
-    .select('*')
-    .order('created_at', { ascending: false })
+function renderFeed() {
+  let list = posts.filter(p => {
+    const matchCat = currentCategory === 'all' || p.category === currentCategory;
+    const matchSearch = !currentSearch || p.title.toLowerCase().includes(currentSearch) || p.tags.some(t => t.toLowerCase().includes(currentSearch));
+    const matchSort = currentSort !== 'unanswered' || !p.answered;
+    return matchCat && matchSearch && matchSort;
+  });
 
-  if (error) {
-    document.getElementById('posts-list').innerHTML =
-      '<div class="empty-state"><div class="empty-icon">⚠️</div><div class="empty-title">Could not load posts</div><div class="empty-desc">Please refresh the page.</div></div>'
-    return
+  if (currentSort === 'top') list = [...list].sort((a,b) => b.likes - a.likes);
+
+  const feed = document.getElementById('feed-list');
+  if (!list.length) {
+    feed.innerHTML = `<div class="empty-feed"><div>💬</div><p>No posts found. Be the first to post!</p></div>`;
+    return;
   }
 
-  allPosts = data || []
-  document.getElementById('total-posts').textContent = allPosts.length
-  renderPosts(allPosts)
-}
-
-// ── RENDER POSTS ──
-function renderPosts(posts) {
-  const list = document.getElementById('posts-list')
-
-  if (posts.length === 0) {
-    list.innerHTML = `
-      <div class="empty-state">
-        <div class="empty-icon">🗣️</div>
-        <div class="empty-title">No posts yet</div>
-        <div class="empty-desc">Be the first to ask a question! The community is waiting to help.</div>
-      </div>`
-    return
-  }
-
-  list.innerHTML = posts.map(post => `
-    <a href="post.html?id=${post.id}" class="post-card">
+  feed.innerHTML = list.map(p => `
+    <div class="post-card ${p.pinned ? 'pinned' : ''}" onclick="openPost(${p.id})">
       <div class="post-top">
-        <span class="post-tag tag-${post.tag}">${post.tag.toUpperCase()}</span>
-        <span class="post-time">${timeAgo(post.created_at)}</span>
-      </div>
-      <div class="post-title">${escapeHtml(post.title)}</div>
-      <div class="post-preview">${escapeHtml(post.body)}</div>
-      <div class="post-bottom">
-        <div class="post-author">
-          <div class="author-avatar">${(post.author_name || 'A')[0].toUpperCase()}</div>
-          <span class="author-name">${escapeHtml(post.author_name || 'Anonymous')}</span>
-        </div>
+        <div class="post-avatar">${p.init}</div>
         <div class="post-meta">
-          <span class="meta-item">👍 ${post.upvotes || 0}</span>
-          <span class="meta-item">💬 ${post.replies || 0}</span>
+          <div class="post-author-row">
+            <span class="post-author">${p.author}</span>
+            <span class="post-role">${p.role}</span>
+            ${p.pinned ? '<span class="pinned-label">📌 Pinned</span>' : ''}
+            <span class="post-time">${p.time}</span>
+          </div>
+          <span class="post-category ${getCatClass(p.category)}">${getCatLabel(p.category)}</span>
         </div>
       </div>
-</a>
-  `).join('')
-
-  document.getElementById('total-posts').textContent = allPosts.length
+      <div class="post-title">${p.title}</div>
+      <div class="post-preview">${p.preview}</div>
+      <div class="post-tags">${p.tags.map(t => `<span class="post-tag">#${t}</span>`).join('')}</div>
+      <div class="post-footer">
+        <button class="post-action ${p.liked ? 'liked' : ''}" onclick="toggleLike(${p.id}, event)">
+          ${p.liked ? '❤️' : '🤍'} ${p.likes}
+        </button>
+        <button class="post-action" onclick="openPost(${p.id})">💬 ${p.replies} replies</button>
+        <button class="post-action ${p.bookmarked ? 'bookmarked' : ''}" onclick="toggleBookmark(${p.id}, event)">
+          ${p.bookmarked ? '🔖' : '🏷️'} Save
+        </button>
+        <span class="post-answers ${p.answered ? 'has-answer' : ''}">
+          ${p.answered ? '✓ Answered' : '○ Needs answer'}
+        </span>
+      </div>
+    </div>`).join('');
 }
 
-// ── FILTER ──
-function setFilter(filter, btn) {
-  currentFilter = filter
-  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'))
-  btn.classList.add('active')
-  filterPosts()
+function renderSidebars() {
+  document.getElementById('trending-list').innerHTML = TRENDING.map((t,i) => `
+    <div class="trending-item" onclick="searchPosts('${t.tag.slice(1)}')">
+      <div class="trending-num">#${i+1}</div>
+      <div class="trending-tag">${t.tag}</div>
+      <div class="trending-count">${t.count}</div>
+    </div>`).join('');
+
+  document.getElementById('online-list').innerHTML = ONLINE.map(u => `
+    <div class="online-user">
+      <div class="o-avatar">${u.init}<div class="o-dot"></div></div>
+      <div><div class="o-name">${u.name}</div><div class="o-role">${u.role}</div></div>
+    </div>`).join('');
 }
 
-function filterPosts() {
-  const search = document.getElementById('search-input').value.toLowerCase()
-  let filtered = allPosts
-
-  if (currentFilter !== 'all') {
-    filtered = filtered.filter(p => p.tag === currentFilter)
-  }
-
-  if (search) {
-    filtered = filtered.filter(p =>
-      p.title.toLowerCase().includes(search) ||
-      p.body.toLowerCase().includes(search)
-    )
-  }
-
-  renderPosts(filtered)
+function filterCategory(cat, el) {
+  currentCategory = cat;
+  document.querySelectorAll('.category-item').forEach(i => i.classList.remove('active'));
+  el.classList.add('active');
+  renderFeed();
 }
 
-// ── MODAL ──
+function setSort(sort, btn) {
+  currentSort = sort;
+  document.querySelectorAll('.filter-pill').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderFeed();
+}
+
+function searchPosts(val) {
+  currentSearch = val.toLowerCase().replace('#','');
+  document.getElementById('search-input').value = val;
+  renderFeed();
+}
+
+function toggleLike(id, e) {
+  e.stopPropagation();
+  const p = posts.find(p => p.id === id);
+  if (!p) return;
+  p.liked = !p.liked;
+  p.likes += p.liked ? 1 : -1;
+  renderFeed();
+}
+
+function toggleBookmark(id, e) {
+  e.stopPropagation();
+  const p = posts.find(p => p.id === id);
+  if (!p) return;
+  p.bookmarked = !p.bookmarked;
+  showToast(p.bookmarked ? '🔖 Post saved!' : 'Bookmark removed', p.bookmarked ? 'success' : 'info');
+  renderFeed();
+}
+
+function openPost(id) {
+  showToast('💬 Full post view coming soon!', 'info');
+}
+
 function openModal() {
-  if (!currentUser) {
-    window.location.href = '../auth/login.html'
-    return
-  }
-  document.getElementById('modal-overlay').classList.add('show')
+  document.getElementById('modal-bg').classList.add('open');
+  document.body.style.overflow = 'hidden';
 }
-
 function closeModal() {
-  document.getElementById('modal-overlay').classList.remove('show')
-  document.getElementById('modal-alert').className = 'alert'
-  document.getElementById('post-title').value = ''
-  document.getElementById('post-body').value = ''
+  document.getElementById('modal-bg').classList.remove('open');
+  document.body.style.overflow = '';
+}
+function closeModalOutside(e) {
+  if (e.target === document.getElementById('modal-bg')) closeModal();
 }
 
-// ── SUBMIT POST ──
-async function submitPost() {
-  const title = document.getElementById('post-title').value.trim()
-  const body  = document.getElementById('post-body').value.trim()
-  const tag   = document.getElementById('post-tag').value
-  const alertBox = document.getElementById('modal-alert')
-  const btn = document.getElementById('modal-submit')
+function submitPost() {
+  const title = document.getElementById('post-title').value.trim();
+  const body = document.getElementById('post-body').value.trim();
+  const cat = document.getElementById('post-category').value;
+  const tags = document.getElementById('post-tags').value.split(',').map(t => t.trim()).filter(Boolean);
+  if (!title) { showToast('Please add a title', 'info'); return; }
 
-  if (!title) {
-    alertBox.textContent = 'Please enter a title for your question.'
-    alertBox.className = 'alert error'
-    return
-  }
-
-  if (!body) {
-    alertBox.textContent = 'Please describe your problem in detail.'
-    alertBox.className = 'alert error'
-    return
-  }
-
-  btn.disabled = true
-  btn.textContent = 'Posting...'
-
-  const meta = currentUser.user_metadata
-  const authorName = meta.full_name || meta.first_name || currentUser.email.split('@')[0]
-
-  const { error } = await db.from('forum_posts').insert({
-    title,
-    body,
-    tag,
-    author_id: currentUser.id,
-    author_name: authorName,
-    upvotes: 0,
-    replies: 0
-  })
-
-  if (error) {
-    alertBox.textContent = 'Failed to post. Please try again.'
-    alertBox.className = 'alert error'
-    btn.disabled = false
-    btn.textContent = 'Post Question →'
-    return
-  }
-
-  alertBox.textContent = 'Question posted successfully!'
-  alertBox.className = 'alert success'
-  btn.textContent = 'Posted ✓'
-
-  setTimeout(() => {
-    closeModal()
-    loadPosts()
-    btn.disabled = false
-    btn.textContent = 'Post Question →'
-  }, 1500)
+  const newPost = {
+    id: Date.now(), author:'You', init:'YO', role:'Community Member',
+    time:'Just now', category: cat, title, preview: body || 'No description added.',
+    tags: tags.length ? tags : ['General'],
+    likes:0, replies:0, bookmarked:false, liked:false, pinned:false, answered:false
+  };
+  posts.unshift(newPost);
+  closeModal();
+  document.getElementById('post-title').value = '';
+  document.getElementById('post-body').value = '';
+  document.getElementById('post-tags').value = '';
+  renderFeed();
+  showToast('🎉 Post published!', 'success');
 }
 
-// ── HELPERS ──
-function timeAgo(dateStr) {
-  const diff = Math.floor((Date.now() - new Date(dateStr)) / 1000)
-  if (diff < 60) return 'just now'
-  if (diff < 3600) return `${Math.floor(diff/60)}m ago`
-  if (diff < 86400) return `${Math.floor(diff/3600)}h ago`
-  return `${Math.floor(diff/86400)}d ago`
+function showToast(msg, type = 'success') {
+  const t = document.createElement('div');
+  t.className = `toast toast-${type}`;
+  t.textContent = msg;
+  document.body.appendChild(t);
+  setTimeout(() => t.remove(), 3000);
 }
 
-function escapeHtml(str) {
-  return String(str)
-    .replace(/&/g,'&amp;')
-    .replace(/</g,'&lt;')
-    .replace(/>/g,'&gt;')
-    .replace(/"/g,'&quot;')
-}
-
-// ── INIT ──
-async function init() {
-  await getUser()
-  loadPosts()
-}
-init()
+renderFeed();
+renderSidebars();
 </script>
 </body>
 </html>

@@ -3,224 +3,193 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Analytica — Where Tech People Build the Future</title>
-<link rel="stylesheet" href="css/main.css">
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<title>Analytica — Where Tech People Connect & Build</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
-
-/* ── RESET ── */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-body { background: #0A1628; color: #fff; font-family: 'DM Sans', sans-serif; overflow-x: hidden; }
+body { background: #0A1628; color: #fff; font-family: 'Inter', sans-serif; overflow-x: hidden; }
 a { text-decoration: none; color: inherit; }
+img { display: block; max-width: 100%; }
 
 /* ── NAV ── */
 nav {
   position: fixed; top: 0; left: 0; right: 0; z-index: 100;
-  display: flex; align-items: center; justify-content: space-between;
-  padding: 16px 32px;
-  background: rgba(10,22,40,0.97);
-  backdrop-filter: blur(20px);
-  border-bottom: 1px solid rgba(245,166,35,0.12);
+  background: rgba(10,22,40,0.98); backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(255,255,255,0.07);
+  height: 58px; display: flex; align-items: center;
+  padding: 0 20px; gap: 16px;
 }
-.logo { font-family: 'Playfair Display', serif; font-size: 22px; font-weight: 900; color: #fff; }
-.logo span { color: #F5A623; }
-.nav-links { display: flex; gap: 32px; list-style: none; }
-.nav-links a { color: rgba(255,255,255,0.65); font-size: 14px; font-weight: 500; transition: color 0.2s; }
-.nav-links a:hover { color: #F5A623; }
-.nav-actions { display: flex; gap: 10px; align-items: center; }
-.btn { padding: 9px 20px; border-radius: 8px; font-size: 14px; font-weight: 600; font-family: 'DM Sans', sans-serif; cursor: pointer; border: none; transition: all 0.2s; }
-.btn-ghost { background: transparent; border: 1px solid rgba(255,255,255,0.2); color: #fff; }
-.btn-ghost:hover { border-color: #F5A623; color: #F5A623; }
-.btn-gold { background: #F5A623; color: #0A1628; }
-.btn-gold:hover { background: #ffc14d; transform: translateY(-1px); }
-.menu-btn { display: none; background: transparent; border: 1px solid rgba(255,255,255,0.2); color: #fff; padding: 7px 13px; border-radius: 6px; font-size: 18px; cursor: pointer; }
+.nav-logo { font-size: 18px; font-weight: 800; color: #fff; letter-spacing: -0.5px; }
+.nav-logo span { color: #F5A623; }
+.nav-links { display: none; gap: 4px; list-style: none; margin-left: 8px; }
+.nav-links a { color: rgba(255,255,255,0.6); font-size: 13px; font-weight: 500; padding: 6px 10px; border-radius: 6px; transition: all 0.15s; }
+.nav-links a:hover { color: #fff; background: rgba(255,255,255,0.06); }
+.nav-actions { margin-left: auto; display: flex; gap: 8px; align-items: center; }
+.btn { padding: 7px 16px; border-radius: 7px; font-size: 13px; font-weight: 600; font-family: 'Inter', sans-serif; cursor: pointer; border: none; transition: all 0.15s; display: inline-block; text-align: center; }
+.btn-ghost { background: transparent; border: 1px solid rgba(255,255,255,0.15) !important; color: rgba(255,255,255,0.7); }
+.btn-ghost:hover { border-color: rgba(255,255,255,0.3) !important; color: #fff; }
+.btn-primary { background: #F5A623; color: #0A1628; font-weight: 700; }
+.btn-primary:hover { background: #f0b84a; }
+.menu-btn { background: transparent; border: 1px solid rgba(255,255,255,0.15); color: #fff; padding: 6px 10px; border-radius: 6px; font-size: 16px; cursor: pointer; display: block; }
 
 /* Mobile Menu */
-.mobile-menu { display: none; flex-direction: column; position: fixed; top: 61px; left: 0; right: 0; background: #0d1f3c; border-bottom: 1px solid rgba(245,166,35,0.1); padding: 20px 24px; gap: 14px; z-index: 99; }
-.mobile-menu.open { display: flex; }
-.mobile-menu a { color: rgba(255,255,255,0.8); font-size: 15px; font-weight: 500; padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
+.mobile-nav { display: none; position: fixed; top: 58px; left: 0; right: 0; background: #0d1f3c; border-bottom: 1px solid rgba(255,255,255,0.07); z-index: 99; padding: 12px 20px; flex-direction: column; gap: 2px; }
+.mobile-nav.open { display: flex; }
+.mobile-nav a { color: rgba(255,255,255,0.7); font-size: 14px; font-weight: 500; padding: 10px 8px; border-bottom: 1px solid rgba(255,255,255,0.04); display: flex; align-items: center; gap: 10px; }
+.mobile-nav a:last-child { border: none; }
+.mobile-nav a:hover { color: #F5A623; }
 
-@media (max-width: 768px) {
-  .nav-links, .nav-actions { display: none; }
-  .menu-btn { display: block; }
+@media (min-width: 900px) {
+  nav { padding: 0 40px; }
+  .nav-links { display: flex; }
+  .menu-btn { display: none; }
 }
 
 /* ── HERO ── */
 .hero {
-  min-height: 100vh;
-  display: flex; flex-direction: column; align-items: center; justify-content: center;
-  padding: 120px 24px 80px;
+  padding: 90px 20px 60px;
   text-align: center;
-  position: relative; overflow: hidden;
+  background: radial-gradient(ellipse at 50% 0%, rgba(245,166,35,0.08) 0%, transparent 70%);
+  border-bottom: 1px solid rgba(255,255,255,0.06);
 }
-.hero::before {
-  content: '';
-  position: absolute; inset: 0;
-  background-image: linear-gradient(rgba(245,166,35,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(245,166,35,0.03) 1px, transparent 1px);
-  background-size: 60px 60px;
-}
-.orb { position: absolute; border-radius: 50%; filter: blur(80px); pointer-events: none; }
-.orb-1 { width: 500px; height: 500px; background: rgba(245,166,35,0.07); top: -100px; right: -150px; }
-.orb-2 { width: 400px; height: 400px; background: rgba(26,58,107,0.4); bottom: 0; left: -100px; }
-.orb-3 { width: 300px; height: 300px; background: rgba(245,166,35,0.05); bottom: 100px; right: 100px; }
-
 .hero-badge {
-  display: inline-flex; align-items: center; gap: 8px;
-  background: rgba(245,166,35,0.1); border: 1px solid rgba(245,166,35,0.25);
-  padding: 7px 16px; border-radius: 50px; font-size: 13px; font-weight: 500;
-  color: #F5A623; margin-bottom: 28px; position: relative;
+  display: inline-flex; align-items: center; gap: 7px;
+  background: rgba(245,166,35,0.1); border: 1px solid rgba(245,166,35,0.2);
+  padding: 5px 14px; border-radius: 20px;
+  font-size: 12px; font-weight: 600; color: #F5A623; margin-bottom: 20px;
 }
-.badge-dot { width: 6px; height: 6px; background: #F5A623; border-radius: 50%; animation: pulse 2s infinite; }
-@keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.5;transform:scale(1.4)} }
+.live-dot { width: 6px; height: 6px; background: #27AE60; border-radius: 50%; animation: blink 1.5s infinite; }
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
+.hero h1 { font-size: clamp(28px, 5.5vw, 56px); font-weight: 900; letter-spacing: -1px; line-height: 1.15; margin-bottom: 16px; }
+.hero h1 span { color: #F5A623; }
+.hero p { font-size: 15px; color: rgba(255,255,255,0.55); line-height: 1.7; max-width: 520px; margin: 0 auto 28px; }
+.hero-btns { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-bottom: 40px; }
+.btn-hero { padding: 12px 28px; border-radius: 8px; font-size: 15px; font-weight: 700; font-family: 'Inter', sans-serif; cursor: pointer; border: none; transition: all 0.15s; }
+.btn-hero-gold { background: #F5A623; color: #0A1628; }
+.btn-hero-gold:hover { background: #f0b84a; transform: translateY(-1px); }
+.btn-hero-outline { background: transparent; border: 1px solid rgba(255,255,255,0.2) !important; color: #fff; }
+.btn-hero-outline:hover { border-color: rgba(255,255,255,0.4) !important; }
 
-.hero h1 {
-  font-family: 'Playfair Display', serif;
-  font-size: clamp(38px, 7vw, 80px);
-  font-weight: 900; line-height: 1.1;
-  margin-bottom: 24px; position: relative;
-}
-.hero h1 em { font-style: italic; color: #F5A623; }
+/* HERO STATS */
+.hero-stats { display: flex; justify-content: center; gap: 0; flex-wrap: wrap; border: 1px solid rgba(255,255,255,0.07); border-radius: 12px; overflow: hidden; max-width: 600px; margin: 0 auto; background: rgba(255,255,255,0.02); }
+.hstat { flex: 1; min-width: 120px; padding: 16px 10px; text-align: center; border-right: 1px solid rgba(255,255,255,0.07); }
+.hstat:last-child { border-right: none; }
+.hstat-num { font-size: 22px; font-weight: 800; color: #F5A623; letter-spacing: -0.5px; }
+.hstat-label { font-size: 11px; color: rgba(255,255,255,0.35); margin-top: 2px; text-transform: uppercase; letter-spacing: 0.5px; }
 
-.hero-sub {
-  font-size: clamp(16px, 2.5vw, 20px);
-  color: rgba(255,255,255,0.6);
-  max-width: 620px; line-height: 1.7; margin-bottom: 40px; position: relative;
-}
+/* ── MARQUEE ── */
+.marquee-wrap { padding: 12px 0; background: rgba(255,255,255,0.02); border-bottom: 1px solid rgba(255,255,255,0.06); overflow: hidden; }
+.marquee-track { display: flex; gap: 40px; animation: marquee 25s linear infinite; white-space: nowrap; }
+.marquee-item { font-size: 12px; color: rgba(255,255,255,0.35); font-weight: 500; letter-spacing: 1px; text-transform: uppercase; display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+.marquee-dot { width: 4px; height: 4px; background: #F5A623; border-radius: 50%; }
+@keyframes marquee { from{transform:translateX(0)} to{transform:translateX(-50%)} }
 
-.hero-actions { display: flex; gap: 14px; flex-wrap: wrap; justify-content: center; position: relative; margin-bottom: 60px; }
-.btn-hero-primary {
-  padding: 15px 32px; background: #F5A623; color: #0A1628;
-  border-radius: 10px; font-size: 16px; font-weight: 700;
-  border: none; cursor: pointer; transition: all 0.2s; font-family: 'DM Sans', sans-serif;
-}
-.btn-hero-primary:hover { background: #ffc14d; transform: translateY(-2px); box-shadow: 0 12px 40px rgba(245,166,35,0.3); }
-.btn-hero-secondary {
-  padding: 15px 32px; background: transparent;
-  border: 1px solid rgba(255,255,255,0.2); color: #fff;
-  border-radius: 10px; font-size: 16px; font-weight: 600;
-  cursor: pointer; transition: all 0.2s; font-family: 'DM Sans', sans-serif;
-}
-.btn-hero-secondary:hover { border-color: #F5A623; color: #F5A623; }
+/* ── SECTIONS ── */
+.section { padding: 48px 20px; border-bottom: 1px solid rgba(255,255,255,0.06); }
+.section-inner { max-width: 1080px; margin: 0 auto; }
+.section-top { display: flex; align-items: flex-end; justify-content: space-between; margin-bottom: 24px; gap: 12px; flex-wrap: wrap; }
+.section-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; color: #F5A623; margin-bottom: 4px; }
+.section-title { font-size: clamp(18px, 2.5vw, 26px); font-weight: 800; letter-spacing: -0.5px; }
+.section-link { font-size: 13px; color: #F5A623; font-weight: 600; white-space: nowrap; }
+.section-link:hover { text-decoration: underline; }
 
-/* Stats bar */
-.stats-bar {
-  display: flex; gap: 40px; flex-wrap: wrap; justify-content: center;
-  position: relative;
-}
-.stat { text-align: center; }
-.stat-num { font-family: 'Playfair Display', serif; font-size: 32px; font-weight: 900; color: #F5A623; }
-.stat-label { font-size: 12px; color: rgba(255,255,255,0.4); text-transform: uppercase; letter-spacing: 1px; margin-top: 2px; }
+/* ── FEATURES GRID ── */
+.features-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+.feature-card { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.07); border-radius: 12px; padding: 20px; transition: all 0.2s; }
+.feature-card:hover { border-color: rgba(245,166,35,0.2); background: rgba(245,166,35,0.03); }
+.feature-icon { font-size: 24px; margin-bottom: 12px; }
+.feature-new { display: inline-block; background: rgba(245,166,35,0.12); color: #F5A623; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 4px; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; }
+.feature-title { font-size: 14px; font-weight: 700; margin-bottom: 6px; }
+.feature-desc { font-size: 12px; color: rgba(255,255,255,0.45); line-height: 1.6; }
 
-/* Scrolling ticker */
-.ticker-wrap { overflow: hidden; padding: 18px 0; border-top: 1px solid rgba(255,255,255,0.05); border-bottom: 1px solid rgba(255,255,255,0.05); margin-top: 60px; background: rgba(255,255,255,0.02); }
-.ticker { display: flex; gap: 60px; animation: ticker 30s linear infinite; white-space: nowrap; }
-.ticker-item { font-size: 13px; color: rgba(255,255,255,0.4); font-weight: 500; }
-.ticker-item span { color: #F5A623; }
-@keyframes ticker { from { transform: translateX(0); } to { transform: translateX(-50%); } }
-
-/* ── SECTION SHARED ── */
-section { padding: 100px 24px; }
-.section-label { font-size: 12px; font-weight: 600; letter-spacing: 3px; text-transform: uppercase; color: #F5A623; margin-bottom: 14px; }
-.section-title { font-family: 'Playfair Display', serif; font-size: clamp(28px, 4vw, 48px); font-weight: 900; line-height: 1.2; margin-bottom: 18px; }
-.section-title em { font-style: italic; color: #F5A623; }
-.section-sub { color: rgba(255,255,255,0.55); font-size: 17px; line-height: 1.7; max-width: 560px; }
-.container { max-width: 1100px; margin: 0 auto; }
-
-/* ── FEATURES ── */
-.features-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; margin-top: 60px; }
-.feature-card {
-  background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.07);
-  border-radius: 16px; padding: 32px;
-  transition: all 0.3s; cursor: default;
-}
-.feature-card:hover { background: rgba(245,166,35,0.05); border-color: rgba(245,166,35,0.2); transform: translateY(-4px); }
-.feature-icon { font-size: 32px; margin-bottom: 18px; }
-.feature-tag { display: inline-block; background: rgba(245,166,35,0.12); color: #F5A623; font-size: 10px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; padding: 3px 10px; border-radius: 4px; margin-bottom: 12px; }
-.feature-card h3 { font-size: 18px; font-weight: 700; margin-bottom: 10px; }
-.feature-card p { font-size: 14px; color: rgba(255,255,255,0.5); line-height: 1.7; }
+@media (min-width: 600px) { .features-grid { grid-template-columns: repeat(3, 1fr); } }
+@media (min-width: 900px) { .features-grid { grid-template-columns: repeat(6, 1fr); } .section { padding: 56px 40px; } }
 
 /* ── HOW IT WORKS ── */
-.how-bg { background: rgba(255,255,255,0.01); border-top: 1px solid rgba(255,255,255,0.04); border-bottom: 1px solid rgba(255,255,255,0.04); }
-.steps { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 32px; margin-top: 60px; }
-.step { text-align: center; }
-.step-num { width: 52px; height: 52px; background: rgba(245,166,35,0.1); border: 1px solid rgba(245,166,35,0.25); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-family: 'Playfair Display', serif; font-size: 20px; font-weight: 900; color: #F5A623; margin: 0 auto 20px; }
-.step h3 { font-size: 17px; font-weight: 700; margin-bottom: 10px; }
-.step p { font-size: 14px; color: rgba(255,255,255,0.5); line-height: 1.6; }
+.steps-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+.step-card { background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.07); border-radius: 12px; padding: 20px; display: flex; gap: 14px; align-items: flex-start; }
+.step-num { width: 32px; height: 32px; border-radius: 8px; background: rgba(245,166,35,0.1); border: 1px solid rgba(245,166,35,0.2); display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 800; color: #F5A623; flex-shrink: 0; }
+.step-title { font-size: 14px; font-weight: 700; margin-bottom: 4px; }
+.step-desc { font-size: 12px; color: rgba(255,255,255,0.4); line-height: 1.6; }
+@media (min-width: 700px) { .steps-grid { grid-template-columns: repeat(4, 1fr); } }
+
+/* ── STATS BAND ── */
+.stats-band { background: rgba(245,166,35,0.05); border-top: 1px solid rgba(245,166,35,0.1); border-bottom: 1px solid rgba(245,166,35,0.1); padding: 32px 20px; }
+.stats-band-inner { max-width: 1080px; margin: 0 auto; display: grid; grid-template-columns: repeat(2, 1fr); gap: 24px; }
+.band-stat { text-align: center; }
+.band-num { font-size: 32px; font-weight: 900; color: #F5A623; letter-spacing: -1px; }
+.band-label { font-size: 12px; color: rgba(255,255,255,0.4); margin-top: 4px; }
+@media (min-width: 600px) { .stats-band-inner { grid-template-columns: repeat(4, 1fr); } }
 
 /* ── PRICING ── */
-.pricing-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; margin-top: 60px; }
-.plan-card { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.07); border-radius: 20px; padding: 36px; }
-.plan-card.featured { background: linear-gradient(135deg, rgba(245,166,35,0.1), rgba(245,166,35,0.03)); border-color: rgba(245,166,35,0.4); position: relative; }
-.featured-badge { position: absolute; top: -12px; left: 50%; transform: translateX(-50%); background: #F5A623; color: #0A1628; font-size: 11px; font-weight: 700; padding: 4px 16px; border-radius: 20px; white-space: nowrap; }
-.plan-name { font-size: 14px; font-weight: 600; color: rgba(255,255,255,0.5); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 1px; }
-.plan-price { font-family: 'Playfair Display', serif; font-size: 42px; font-weight: 900; color: #fff; margin-bottom: 4px; }
-.plan-price span { font-size: 18px; color: rgba(255,255,255,0.4); }
-.plan-desc { font-size: 13px; color: rgba(255,255,255,0.4); margin-bottom: 28px; }
-.plan-features { list-style: none; margin-bottom: 32px; display: flex; flex-direction: column; gap: 12px; }
-.plan-features li { font-size: 14px; color: rgba(255,255,255,0.7); display: flex; gap: 10px; align-items: flex-start; }
-.plan-features li::before { content: '✓'; color: #F5A623; font-weight: 700; flex-shrink: 0; }
+.pricing-grid { display: grid; grid-template-columns: 1fr; gap: 12px; }
+.plan { background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.07); border-radius: 12px; padding: 24px; }
+.plan.featured { border-color: rgba(245,166,35,0.35); background: rgba(245,166,35,0.04); position: relative; }
+.plan-badge { position: absolute; top: -10px; left: 20px; background: #F5A623; color: #0A1628; font-size: 10px; font-weight: 800; padding: 3px 12px; border-radius: 20px; text-transform: uppercase; letter-spacing: 0.5px; }
+.plan-name { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; color: rgba(255,255,255,0.4); margin-bottom: 10px; }
+.plan-price { font-size: 36px; font-weight: 900; letter-spacing: -1px; margin-bottom: 2px; }
+.plan-price sup { font-size: 16px; font-weight: 700; vertical-align: top; margin-top: 8px; display: inline-block; }
+.plan-period { font-size: 12px; color: rgba(255,255,255,0.35); margin-bottom: 20px; }
+.plan-features { list-style: none; margin-bottom: 20px; display: flex; flex-direction: column; gap: 10px; }
+.plan-features li { font-size: 13px; color: rgba(255,255,255,0.6); display: flex; gap: 8px; align-items: flex-start; line-height: 1.4; }
+.plan-features li::before { content: '✓'; color: #27AE60; font-weight: 700; font-size: 12px; flex-shrink: 0; margin-top: 1px; }
 .plan-features li.no::before { content: '×'; color: rgba(255,255,255,0.2); }
 .plan-features li.no { color: rgba(255,255,255,0.25); }
-.btn-plan { width: 100%; padding: 13px; border-radius: 10px; font-size: 15px; font-weight: 700; font-family: 'DM Sans', sans-serif; cursor: pointer; border: none; transition: all 0.2s; }
-.btn-plan-outline { background: transparent; border: 1px solid rgba(255,255,255,0.2) !important; color: #fff; }
-.btn-plan-outline:hover { border-color: #F5A623 !important; color: #F5A623; }
-.btn-plan-gold { background: #F5A623; color: #0A1628; }
-.btn-plan-gold:hover { background: #ffc14d; }
+.plan-btn { width: 100%; padding: 11px; border-radius: 8px; font-size: 14px; font-weight: 700; font-family: 'Inter', sans-serif; cursor: pointer; border: none; transition: all 0.15s; }
+.plan-btn-outline { background: transparent; border: 1px solid rgba(255,255,255,0.15) !important; color: rgba(255,255,255,0.6); }
+.plan-btn-outline:hover { border-color: rgba(255,255,255,0.3) !important; color: #fff; }
+.plan-btn-gold { background: #F5A623; color: #0A1628; }
+.plan-btn-gold:hover { background: #f0b84a; }
+@media (min-width: 700px) { .pricing-grid { grid-template-columns: repeat(3, 1fr); } }
 
-/* ── CTA BANNER ── */
-.cta-banner {
-  background: linear-gradient(135deg, rgba(245,166,35,0.12), rgba(245,166,35,0.04));
-  border: 1px solid rgba(245,166,35,0.2); border-radius: 24px;
-  padding: 64px 40px; text-align: center; margin: 0 auto;
-  max-width: 800px;
-}
-.cta-banner h2 { font-family: 'Playfair Display', serif; font-size: clamp(26px, 4vw, 44px); font-weight: 900; margin-bottom: 16px; }
-.cta-banner p { color: rgba(255,255,255,0.55); font-size: 17px; margin-bottom: 36px; }
-.cta-actions { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; }
+/* ── TESTIMONIALS ── */
+.reviews-grid { display: grid; grid-template-columns: 1fr; gap: 12px; }
+.review-card { background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.07); border-radius: 12px; padding: 20px; }
+.review-stars { color: #F5A623; font-size: 13px; margin-bottom: 10px; }
+.review-text { font-size: 13px; color: rgba(255,255,255,0.6); line-height: 1.7; margin-bottom: 14px; font-style: italic; }
+.review-author { display: flex; align-items: center; gap: 10px; }
+.review-avatar { width: 36px; height: 36px; border-radius: 50%; background: linear-gradient(135deg, #F5A623, #e8920f); display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 800; color: #0A1628; flex-shrink: 0; }
+.review-name { font-size: 13px; font-weight: 700; }
+.review-role { font-size: 11px; color: rgba(255,255,255,0.35); }
+@media (min-width: 700px) { .reviews-grid { grid-template-columns: repeat(3, 1fr); } }
+
+/* ── CTA ── */
+.cta-section { padding: 56px 20px; background: rgba(245,166,35,0.05); border-top: 1px solid rgba(245,166,35,0.1); text-align: center; }
+.cta-inner { max-width: 560px; margin: 0 auto; }
+.cta-inner h2 { font-size: clamp(22px, 4vw, 36px); font-weight: 900; letter-spacing: -0.5px; margin-bottom: 12px; }
+.cta-inner p { font-size: 14px; color: rgba(255,255,255,0.5); margin-bottom: 24px; line-height: 1.7; }
+.cta-btns { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
 
 /* ── FOOTER ── */
-footer {
-  background: #060f1e;
-  border-top: 1px solid rgba(255,255,255,0.06);
-  padding: 80px 24px 40px;
-}
-.footer-grid { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 40px; max-width: 1100px; margin: 0 auto 60px; }
-.footer-brand p { color: rgba(255,255,255,0.45); font-size: 14px; line-height: 1.7; margin-top: 14px; max-width: 280px; }
-.footer-socials { display: flex; gap: 10px; margin-top: 20px; }
-.social-btn { width: 36px; height: 36px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 15px; transition: all 0.2s; cursor: pointer; }
-.social-btn:hover { background: rgba(245,166,35,0.1); border-color: rgba(245,166,35,0.3); }
-.footer-col h4 { font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; color: rgba(255,255,255,0.3); margin-bottom: 18px; }
-.footer-col ul { list-style: none; display: flex; flex-direction: column; gap: 11px; }
-.footer-col ul a { font-size: 14px; color: rgba(255,255,255,0.55); transition: color 0.2s; }
+footer { background: #060f1e; border-top: 1px solid rgba(255,255,255,0.06); padding: 48px 20px 28px; }
+.footer-inner { max-width: 1080px; margin: 0 auto; }
+.footer-top { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; margin-bottom: 40px; }
+.footer-brand-desc { font-size: 12px; color: rgba(255,255,255,0.35); line-height: 1.7; margin-top: 10px; max-width: 240px; }
+.footer-socials { display: flex; gap: 8px; margin-top: 16px; }
+.social { width: 32px; height: 32px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.08); border-radius: 7px; display: flex; align-items: center; justify-content: center; font-size: 13px; cursor: pointer; transition: all 0.15s; }
+.social:hover { background: rgba(245,166,35,0.1); border-color: rgba(245,166,35,0.25); }
+.footer-col h4 { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; color: rgba(255,255,255,0.3); margin-bottom: 14px; }
+.footer-col ul { list-style: none; display: flex; flex-direction: column; gap: 9px; }
+.footer-col ul a { font-size: 13px; color: rgba(255,255,255,0.45); transition: color 0.15s; }
 .footer-col ul a:hover { color: #F5A623; }
-.footer-bottom { max-width: 1100px; margin: 0 auto; padding-top: 32px; border-top: 1px solid rgba(255,255,255,0.06); display: flex; justify-content: space-between; align-items: center; flex-wrap: gap; gap: 14px; }
-.footer-bottom p { font-size: 13px; color: rgba(255,255,255,0.3); }
-.footer-bottom-links { display: flex; gap: 20px; }
-.footer-bottom-links a { font-size: 13px; color: rgba(255,255,255,0.3); transition: color 0.2s; }
+.footer-bottom { border-top: 1px solid rgba(255,255,255,0.06); padding-top: 20px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
+.footer-copy { font-size: 12px; color: rgba(255,255,255,0.25); }
+.footer-bottom-links { display: flex; gap: 16px; }
+.footer-bottom-links a { font-size: 12px; color: rgba(255,255,255,0.25); transition: color 0.15s; }
 .footer-bottom-links a:hover { color: #F5A623; }
 
-@media (max-width: 768px) {
-  .footer-grid { grid-template-columns: 1fr 1fr; }
-  .footer-brand { grid-column: 1 / -1; }
-  .stats-bar { gap: 24px; }
-  .hero-actions { flex-direction: column; align-items: center; }
+@media (min-width: 700px) {
+  .footer-top { grid-template-columns: 2fr 1fr 1fr 1fr; }
+  footer { padding: 56px 40px 32px; }
 }
-@media (max-width: 480px) {
-  .footer-grid { grid-template-columns: 1fr; }
-}
-
-/* Reveal animation */
-.reveal { opacity: 0; transform: translateY(30px); transition: all 0.7s ease; }
-.reveal.visible { opacity: 1; transform: translateY(0); }
-
 </style>
 </head>
 <body>
 
 <!-- NAV -->
 <nav>
-  <a href="index.html" class="logo">Analytica<span>.</span></a>
+  <a href="index.html" class="nav-logo">Analytica<span>.</span></a>
   <ul class="nav-links">
     <li><a href="community/index.html">Community</a></li>
     <li><a href="collab/index.html">Collab Rooms</a></li>
@@ -229,299 +198,305 @@ footer {
     <li><a href="learn/index.html">Learn</a></li>
     <li><a href="tools/ai.html">Tools</a></li>
     <li><a href="mentorship/index.html">Mentorship</a></li>
-</ul>
+  </ul>
   <div class="nav-actions">
-    <a href="auth/login.html"><button class="btn btn-ghost">Log In</button></a>
-    <a href="auth/signup.html"><button class="btn btn-gold">Join Free</button></a>
+    <button class="menu-btn" id="menu-btn">☰</button>
+    <a href="auth/login.html" class="btn btn-ghost">Log In</a>
+    <a href="auth/signup.html" class="btn btn-primary">Join Free</a>
   </div>
-  <button class="menu-btn" id="menu-btn">☰</button>
 </nav>
 
 <!-- MOBILE MENU -->
-<div class="mobile-menu" id="mobile-menu">
+<div class="mobile-nav" id="mobile-nav">
   <a href="community/index.html">🗣️ Community</a>
   <a href="collab/index.html">🤝 Collab Rooms</a>
   <a href="jobs/index.html">💼 Jobs</a>
   <a href="challenges/index.html">🏆 Challenges</a>
   <a href="learn/index.html">📚 Learn</a>
   <a href="tools/ai.html">🛠️ Tools</a>
-  <a href="mentorship/index.html">🤝 Mentorship</a>
+  <a href="mentorship/index.html">🎓 Mentorship</a>
   <a href="auth/login.html">🔐 Log In</a>
-  <a href="auth/signup.html">→ Join Free</a>
+  <a href="auth/signup.html" style="color:#F5A623;font-weight:700;">→ Join Free</a>
 </div>
 
 <!-- HERO -->
 <section class="hero">
-  <div class="orb orb-1"></div>
-  <div class="orb orb-2"></div>
-  <div class="orb orb-3"></div>
-
-  <div class="hero-badge">
-    <div class="badge-dot"></div>
-    The platform LinkedIn wishes it built
+  <div class="hero-badge"><div class="live-dot"></div> 312 people building right now</div>
+  <h1>Where Tech People<br><span>Connect, Build & Grow</span></h1>
+  <p>The all-in-one platform for developers, designers, founders and creators worldwide. Find jobs, collaborate on projects, prove your skills and grow your career.</p>
+  <div class="hero-btns">
+    <a href="auth/signup.html"><button class="btn-hero btn-hero-gold">Join Free — 30 Seconds →</button></a>
+    <a href="#features"><button class="btn-hero btn-hero-outline">Explore Platform</button></a>
   </div>
-
-  <h1>Where <em>Tech People</em><br>Build the Future<br>Together</h1>
-
-  <p class="hero-sub">
-    Connect with developers, designers, data scientists, founders, and creators worldwide.
-    Collaborate on real projects. Get hired. Build your portfolio. Grow your career.
-  </p>
-
-  <div class="hero-actions">
-    <a href="auth/signup.html"><button class="btn-hero-primary">Join Free — It Takes 30 Seconds →</button></a>
-    <a href="#features"><button class="btn-hero-secondary">See What's Inside</button></a>
-  </div>
-
-  <div class="stats-bar">
-    <div class="stat"><div class="stat-num">120K+</div><div class="stat-label">Tech People</div></div>
-    <div class="stat"><div class="stat-num">80+</div><div class="stat-label">Countries</div></div>
-    <div class="stat"><div class="stat-num">5,400+</div><div class="stat-label">Projects Built</div></div>
-    <div class="stat"><div class="stat-num">12K+</div><div class="stat-label">Jobs Posted</div></div>
+  <div class="hero-stats">
+    <div class="hstat"><div class="hstat-num">120K+</div><div class="hstat-label">Members</div></div>
+    <div class="hstat"><div class="hstat-num">80+</div><div class="hstat-label">Countries</div></div>
+    <div class="hstat"><div class="hstat-num">12K+</div><div class="hstat-label">Jobs</div></div>
+    <div class="hstat"><div class="hstat-num">5,400+</div><div class="hstat-label">Projects</div></div>
   </div>
 </section>
 
-<!-- TICKER -->
-<div class="ticker-wrap">
-  <div class="ticker">
-    <span class="ticker-item">🚀 <span>Frontend Dev</span> landed $140K role via Analytica</span>
-    <span class="ticker-item">🤝 Team of 4 shipped an app in <span>2 weeks</span> using Collab Rooms</span>
-    <span class="ticker-item">🏆 Weekly Challenge winner hired by <span>Google</span></span>
-    <span class="ticker-item">📦 Open source project hit <span>2K stars</span> after posting here</span>
-    <span class="ticker-item">🎓 Self-taught dev got <span>first job</span> after 3 portfolio projects</span>
-    <span class="ticker-item">💡 Startup found their <span>co-founder</span> in Collab Rooms</span>
-    <span class="ticker-item">🌍 Remote team across <span>6 countries</span> built a SaaS product</span>
-    <!-- Repeat for seamless loop -->
-    <span class="ticker-item">🚀 <span>Frontend Dev</span> landed $140K role via Analytica</span>
-    <span class="ticker-item">🤝 Team of 4 shipped an app in <span>2 weeks</span> using Collab Rooms</span>
-    <span class="ticker-item">🏆 Weekly Challenge winner hired by <span>Google</span></span>
-    <span class="ticker-item">📦 Open source project hit <span>2K stars</span> after posting here</span>
-    <span class="ticker-item">🎓 Self-taught dev got <span>first job</span> after 3 portfolio projects</span>
-    <span class="ticker-item">💡 Startup found their <span>co-founder</span> in Collab Rooms</span>
-    <span class="ticker-item">🌍 Remote team across <span>6 countries</span> built a SaaS product</span>
+<!-- MARQUEE -->
+<div class="marquee-wrap">
+  <div class="marquee-track">
+    <span class="marquee-item"><span class="marquee-dot"></span>Collab Rooms</span>
+    <span class="marquee-item"><span class="marquee-dot"></span>AI Matchmaking</span>
+    <span class="marquee-item"><span class="marquee-dot"></span>Skill Challenges</span>
+    <span class="marquee-item"><span class="marquee-dot"></span>Global Job Board</span>
+    <span class="marquee-item"><span class="marquee-dot"></span>Verified Badges</span>
+    <span class="marquee-item"><span class="marquee-dot"></span>Portfolio Builder</span>
+    <span class="marquee-item"><span class="marquee-dot"></span>SQL Playground</span>
+    <span class="marquee-item"><span class="marquee-dot"></span>Mentorship</span>
+    <span class="marquee-item"><span class="marquee-dot"></span>AI Assistant</span>
+    <span class="marquee-item"><span class="marquee-dot"></span>Community Forum</span>
+    <span class="marquee-item"><span class="marquee-dot"></span>Collab Rooms</span>
+    <span class="marquee-item"><span class="marquee-dot"></span>AI Matchmaking</span>
+    <span class="marquee-item"><span class="marquee-dot"></span>Skill Challenges</span>
+    <span class="marquee-item"><span class="marquee-dot"></span>Global Job Board</span>
+    <span class="marquee-item"><span class="marquee-dot"></span>Verified Badges</span>
+    <span class="marquee-item"><span class="marquee-dot"></span>Portfolio Builder</span>
+    <span class="marquee-item"><span class="marquee-dot"></span>SQL Playground</span>
+    <span class="marquee-item"><span class="marquee-dot"></span>Mentorship</span>
+    <span class="marquee-item"><span class="marquee-dot"></span>AI Assistant</span>
+    <span class="marquee-item"><span class="marquee-dot"></span>Community Forum</span>
   </div>
 </div>
 
 <!-- FEATURES -->
-<section id="features">
-  <div class="container">
-    <div class="reveal">
-      <div class="section-label">Why Analytica</div>
-      <h2 class="section-title">Everything LinkedIn <em>Can't Do.</em><br>All in One Place.</h2>
-      <p class="section-sub">Built from the ground up for people who actually build things — not just talk about them.</p>
+<section class="section" id="features">
+  <div class="section-inner">
+    <div class="section-top">
+      <div>
+        <div class="section-label">Platform</div>
+        <div class="section-title">Everything in One Place</div>
+      </div>
     </div>
-
     <div class="features-grid">
-
-      <div class="feature-card reveal">
+      <div class="feature-card">
         <div class="feature-icon">🤝</div>
-        <div class="feature-tag">🔥 Exclusive</div>
-        <h3>Live Collab Rooms</h3>
-        <p>Jump into a real-time project room with strangers who become teammates. Build together, ship together. LinkedIn has nothing like this.</p>
+        <div class="feature-new">Exclusive</div>
+        <div class="feature-title">Collab Rooms</div>
+        <div class="feature-desc">Real-time project rooms. Find teammates and ship together.</div>
       </div>
-
-      <div class="feature-card reveal">
+      <div class="feature-card">
         <div class="feature-icon">🤖</div>
-        <div class="feature-tag">🔥 Exclusive</div>
-        <h3>AI Project Matchmaking</h3>
-        <p>Our AI reads your skills, goals and interests — then matches you with the perfect project, job, or collaborator. No scrolling. No guessing.</p>
+        <div class="feature-new">AI</div>
+        <div class="feature-title">AI Matchmaking</div>
+        <div class="feature-desc">Matched to jobs, projects and people based on your skills.</div>
       </div>
-
-      <div class="feature-card reveal">
+      <div class="feature-card">
         <div class="feature-icon">🏆</div>
-        <div class="feature-tag">Portfolio Builder</div>
-        <h3>Skill Verification Challenges</h3>
-        <p>Don't just list your skills — prove them. Solve real challenges and earn verified badges that actually mean something to employers.</p>
+        <div class="feature-title">Challenges</div>
+        <div class="feature-desc">Solve real problems. Earn verified badges employers trust.</div>
       </div>
-
-      <div class="feature-card reveal">
+      <div class="feature-card">
         <div class="feature-icon">💼</div>
-        <div class="feature-tag">Jobs</div>
-        <h3>Smart Job Board</h3>
-        <p>Jobs matched to your verified skills, not your keywords. Apply in one click with your Analytica profile. Remote-first, global reach.</p>
+        <div class="feature-title">Job Board</div>
+        <div class="feature-desc">12,000+ global tech jobs. Remote-first. Apply in one click.</div>
       </div>
-
-      <div class="feature-card reveal">
+      <div class="feature-card">
         <div class="feature-icon">🛠️</div>
-        <div class="feature-tag">Built-In Tools</div>
-        <h3>Code & Build Without Leaving</h3>
-        <p>SQL playground, chart builder, AI assistant, code editor — all built in. Work on real problems inside the platform itself.</p>
+        <div class="feature-title">Built-in Tools</div>
+        <div class="feature-desc">SQL editor, chart builder, AI assistant — all inside Analytica.</div>
       </div>
-
-      <div class="feature-card reveal">
-        <div class="feature-icon">🌍</div>
-        <div class="feature-tag">Community</div>
-        <h3>Global Tech Communities</h3>
-        <p>Find your tribe. Local tech hubs for Nigeria, India, Brazil, UK, US and more — with global visibility for every member.</p>
+      <div class="feature-card">
+        <div class="feature-icon">🎓</div>
+        <div class="feature-title">Mentorship</div>
+        <div class="feature-desc">Connect with senior devs and industry leaders 1-on-1.</div>
       </div>
-
     </div>
   </div>
 </section>
 
 <!-- HOW IT WORKS -->
-<section class="how-bg">
-  <div class="container">
-    <div class="reveal" style="text-align:center;">
-      <div class="section-label">How It Works</div>
-      <h2 class="section-title">From Sign Up to <em>Hired</em> in 4 Steps</h2>
+<section class="section" style="background:rgba(255,255,255,0.01);">
+  <div class="section-inner">
+    <div class="section-top">
+      <div>
+        <div class="section-label">How It Works</div>
+        <div class="section-title">Get Started in 4 Steps</div>
+      </div>
     </div>
-    <div class="steps">
-      <div class="step reveal">
+    <div class="steps-grid">
+      <div class="step-card">
         <div class="step-num">01</div>
-        <h3>Create Your Profile</h3>
-        <p>Sign up in 30 seconds. Add your skills, pick your role — developer, designer, founder, creator — and you're live.</p>
+        <div><div class="step-title">Create Profile</div><div class="step-desc">Sign up in 30 seconds. Add your skills and role.</div></div>
       </div>
-      <div class="step reveal">
+      <div class="step-card">
         <div class="step-num">02</div>
-        <h3>Prove Your Skills</h3>
-        <p>Take a challenge. Solve a real problem. Earn a verified badge that sits on your profile forever.</p>
+        <div><div class="step-title">Prove Skills</div><div class="step-desc">Take a challenge. Earn a verified badge.</div></div>
       </div>
-      <div class="step reveal">
+      <div class="step-card">
         <div class="step-num">03</div>
-        <h3>Build With Others</h3>
-        <p>Join a Collab Room or get matched with a project. Ship real work with real people from anywhere on earth.</p>
+        <div><div class="step-title">Build With Others</div><div class="step-desc">Join a Collab Room. Ship real projects.</div></div>
       </div>
-      <div class="step reveal">
+      <div class="step-card">
         <div class="step-num">04</div>
-        <h3>Get Hired or Go Independent</h3>
-        <p>Apply to jobs with one click. Or launch your own project and find your first users right here.</p>
+        <div><div class="step-title">Get Hired</div><div class="step-desc">Apply to jobs or launch your own product.</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- STATS BAND -->
+<div class="stats-band">
+  <div class="stats-band-inner">
+    <div class="band-stat"><div class="band-num">120K+</div><div class="band-label">Tech People</div></div>
+    <div class="band-stat"><div class="band-num">1,840</div><div class="band-label">Projects Shipped</div></div>
+    <div class="band-stat"><div class="band-num">$50K+</div><div class="band-label">Prizes Awarded</div></div>
+    <div class="band-stat"><div class="band-num">80+</div><div class="band-label">Countries</div></div>
+  </div>
+</div>
+
+<!-- TESTIMONIALS -->
+<section class="section">
+  <div class="section-inner">
+    <div class="section-top">
+      <div>
+        <div class="section-label">Reviews</div>
+        <div class="section-title">What Our Members Say</div>
+      </div>
+    </div>
+    <div class="reviews-grid">
+      <div class="review-card">
+        <div class="review-stars">★★★★★</div>
+        <div class="review-text">"I joined a Collab Room and shipped my first real app in 2 weeks. Got hired a month later using my portfolio."</div>
+        <div class="review-author"><div class="review-avatar">AO</div><div><div class="review-name">Adaeze O.</div><div class="review-role">Frontend Dev · Nigeria</div></div></div>
+      </div>
+      <div class="review-card">
+        <div class="review-stars">★★★★★</div>
+        <div class="review-text">"The Challenges page is everything. I proved my Python skills with a badge and recruiters started reaching out."</div>
+        <div class="review-author"><div class="review-avatar">KM</div><div><div class="review-name">Kofi M.</div><div class="review-role">Data Scientist · Ghana</div></div></div>
+      </div>
+      <div class="review-card">
+        <div class="review-stars">★★★★★</div>
+        <div class="review-text">"Found my co-founder through Collab Rooms. We launched our startup 3 months later. This platform is special."</div>
+        <div class="review-author"><div class="review-avatar">PS</div><div><div class="review-name">Priya S.</div><div class="review-role">Founder · India</div></div></div>
       </div>
     </div>
   </div>
 </section>
 
 <!-- PRICING -->
-<section id="pricing">
-  <div class="container">
-    <div class="reveal" style="text-align:center; margin-bottom: 0;">
-      <div class="section-label">Pricing</div>
-      <h2 class="section-title">Start Free. <em>Upgrade When Ready.</em></h2>
-      <p class="section-sub" style="margin: 0 auto;">No credit card needed. Cancel anytime.</p>
+<section class="section" style="background:rgba(255,255,255,0.01);">
+  <div class="section-inner">
+    <div class="section-top">
+      <div>
+        <div class="section-label">Pricing</div>
+        <div class="section-title">Start Free. Upgrade When Ready.</div>
+      </div>
     </div>
     <div class="pricing-grid">
-
-      <div class="plan-card reveal">
+      <div class="plan">
         <div class="plan-name">Starter</div>
-        <div class="plan-price">$0 <span>/ forever</span></div>
-        <div class="plan-desc">Perfect to get started and explore</div>
+        <div class="plan-price">$0</div>
+        <div class="plan-period">Free forever</div>
         <ul class="plan-features">
-          <li>Community Forum Access</li>
+          <li>Community Forum</li>
           <li>3 Collab Room joins/month</li>
           <li>View Job Board</li>
           <li>5 Challenges/month</li>
-          <li>Basic AI Assistant</li>
-          <li class="no">Priority Job Applications</li>
-          <li class="no">Unlimited Collab Rooms</li>
-          <li class="no">Verified Skill Badges</li>
+          <li class="no">AI Matchmaking</li>
+          <li class="no">Verified Badges</li>
         </ul>
-        <a href="auth/signup.html"><button class="btn-plan btn-plan-outline">Get Started Free</button></a>
+        <a href="auth/signup.html"><button class="plan-btn plan-btn-outline">Get Started Free</button></a>
       </div>
-
-      <div class="plan-card featured reveal">
-        <div class="featured-badge">⭐ Most Popular</div>
+      <div class="plan featured">
+        <div class="plan-badge">⭐ Most Popular</div>
         <div class="plan-name">Pro</div>
-        <div class="plan-price">$9 <span>/ month</span></div>
-        <div class="plan-desc">For serious builders and job seekers</div>
+        <div class="plan-price"><sup>$</sup>9</div>
+        <div class="plan-period">per month</div>
         <ul class="plan-features">
           <li>Everything in Starter</li>
           <li>Unlimited Collab Rooms</li>
-          <li>Priority Job Applications</li>
+          <li>AI Matchmaking</li>
           <li>Unlimited Challenges</li>
           <li>Verified Skill Badges</li>
-          <li>Advanced AI Assistant</li>
-          <li>Portfolio Showcase Page</li>
-          <li>Mentorship Access</li>
+          <li>Priority Job Applications</li>
         </ul>
-        <a href="payment/index.html"><button class="btn-plan btn-plan-gold">Upgrade to Pro</button></a>
+        <a href="payment/index.html"><button class="plan-btn plan-btn-gold">Upgrade to Pro</button></a>
       </div>
-
-      <div class="plan-card reveal">
+      <div class="plan">
         <div class="plan-name">Company</div>
-        <div class="plan-price">$199 <span>/ month</span></div>
-        <div class="plan-desc">Hire the best tech talent worldwide</div>
+        <div class="plan-price"><sup>$</sup>199</div>
+        <div class="plan-period">per month</div>
         <ul class="plan-features">
           <li>Unlimited Job Postings</li>
           <li>Featured Listings</li>
           <li>Sponsor Challenges</li>
-          <li>Company Profile Page</li>
-          <li>Talent Search & Filter</li>
+          <li>Talent Search</li>
           <li>Analytics Dashboard</li>
-          <li>Dedicated Account Manager</li>
-          <li>API Access</li>
+          <li>Dedicated Support</li>
         </ul>
-        <a href="contact.html"><button class="btn-plan btn-plan-outline">Contact Sales</button></a>
+        <a href="contact.html"><button class="plan-btn plan-btn-outline">Contact Sales</button></a>
       </div>
-
     </div>
   </div>
 </section>
 
 <!-- CTA -->
-<section>
-  <div class="container">
-    <div class="cta-banner reveal">
-      <h2>The World's Best Tech People<br>Are Already Here.</h2>
-      <p>Join 120,000+ developers, designers, founders and creators building the future together.</p>
-      <div class="cta-actions">
-        <a href="auth/signup.html"><button class="btn-hero-primary">Create Free Account →</button></a>
-        <a href="about.html"><button class="btn-hero-secondary">Learn About Analytica</button></a>
-      </div>
+<div class="cta-section">
+  <div class="cta-inner">
+    <h2>Ready to Build<br>Your Tech Career?</h2>
+    <p>Join 120,000+ developers, designers and founders already using Analytica to build, connect and grow worldwide.</p>
+    <div class="cta-btns">
+      <a href="auth/signup.html"><button class="btn-hero btn-hero-gold">Create Free Account →</button></a>
+      <a href="about.html"><button class="btn-hero btn-hero-outline">Learn More</button></a>
     </div>
   </div>
-</section>
+</div>
 
 <!-- FOOTER -->
 <footer>
-  <div class="footer-grid">
-    <div class="footer-brand">
-      <div class="logo" style="font-size:24px;">Analytica<span style="color:#F5A623">.</span></div>
-      <p>The all-in-one platform where tech people worldwide connect, collaborate, build real projects, and grow their careers.</p>
-      <div class="footer-socials">
-        <div class="social-btn">𝕏</div>
-        <div class="social-btn">in</div>
-        <div class="social-btn">gh</div>
-        <div class="social-btn">📸</div>
+  <div class="footer-inner">
+    <div class="footer-top">
+      <div>
+        <div class="nav-logo" style="font-size:18px;">Analytica<span style="color:#F5A623">.</span></div>
+        <div class="footer-brand-desc">The all-in-one platform where tech people worldwide connect, collaborate, build projects and grow their careers.</div>
+        <div class="footer-socials">
+          <div class="social">𝕏</div>
+          <div class="social">in</div>
+          <div class="social">gh</div>
+          <div class="social">▶</div>
+        </div>
+      </div>
+      <div class="footer-col">
+        <h4>Platform</h4>
+        <ul>
+          <li><a href="community/index.html">Community</a></li>
+          <li><a href="collab/index.html">Collab Rooms</a></li>
+          <li><a href="jobs/index.html">Jobs</a></li>
+          <li><a href="challenges/index.html">Challenges</a></li>
+          <li><a href="tools/ai.html">AI Tools</a></li>
+          <li><a href="mentorship/index.html">Mentorship</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Company</h4>
+        <ul>
+          <li><a href="about.html">About</a></li>
+          <li><a href="blog/index.html">Blog</a></li>
+          <li><a href="contact.html">Contact</a></li>
+          <li><a href="pricing.html">Pricing</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Resources</h4>
+        <ul>
+          <li><a href="learn/index.html">Learning</a></li>
+          <li><a href="tools/sql.html">SQL Playground</a></li>
+          <li><a href="cv/index.html">CV Builder</a></li>
+          <li><a href="datasets/index.html">Datasets</a></li>
+        </ul>
       </div>
     </div>
-    <div class="footer-col">
-      <h4>Platform</h4>
-      <ul>
-        <li><a href="community/index.html">Community</a></li>
-        <li><a href="jobs/index.html">Jobs</a></li>
-        <li><a href="challenges/index.html">Challenges</a></li>
-        <li><a href="tools/ai.html">AI Assistant</a></li>
-        <li><a href="tools/sql.html">SQL Playground</a></li>
-        <li><a href="mentorship/index.html">Mentorship</a></li>
-      </ul>
-    </div>
-    <div class="footer-col">
-      <h4>Company</h4>
-      <ul>
-        <li><a href="about.html">About Us</a></li>
-        <li><a href="blog/index.html">Blog</a></li>
-        <li><a href="contact.html">Contact</a></li>
-        <li><a href="pricing.html">Pricing</a></li>
-        <li><a href="admin/index.html">Admin</a></li>
-      </ul>
-    </div>
-    <div class="footer-col">
-      <h4>Resources</h4>
-      <ul>
-        <li><a href="learn/index.html">Learning Roadmap</a></li>
-        <li><a href="tools/formulas.html">Formula Library</a></li>
-        <li><a href="errors/index.html">Error Encyclopedia</a></li>
-        <li><a href="datasets/index.html">Datasets</a></li>
-        <li><a href="cv/index.html">CV Builder</a></li>
-      </ul>
-    </div>
-  </div>
-  <div class="footer-bottom">
-    <p>© 2026 Analytica. Built for the world's tech people. 🌍</p>
-    <div class="footer-bottom-links">
-      <a href="#">Privacy Policy</a>
-      <a href="#">Terms of Service</a>
-      <a href="#">Cookie Policy</a>
+    <div class="footer-bottom">
+      <div class="footer-copy">© 2026 Analytica. Built for the world's tech people. 🌍</div>
+      <div class="footer-bottom-links">
+        <a href="#">Privacy</a>
+        <a href="#">Terms</a>
+        <a href="#">Cookies</a>
+      </div>
     </div>
   </div>
 </footer>
@@ -529,21 +504,11 @@ footer {
 <script src="js/supabase.js"></script>
 <script src="js/main.js"></script>
 <script>
-  document.addEventListener('DOMContentLoaded', () => {
-    // Mobile menu
-    const menuBtn = document.getElementById('menu-btn');
-    const mobileMenu = document.getElementById('mobile-menu');
-    menuBtn.addEventListener('click', () => {
-      mobileMenu.classList.toggle('open');
-      menuBtn.textContent = mobileMenu.classList.contains('open') ? '✕' : '☰';
-    });
-
-    // Scroll reveal
-    const reveals = document.querySelectorAll('.reveal');
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
-    }, { threshold: 0.08 });
-    reveals.forEach(el => observer.observe(el));
+  const menuBtn = document.getElementById('menu-btn');
+  const mobileNav = document.getElementById('mobile-nav');
+  menuBtn.addEventListener('click', () => {
+    mobileNav.classList.toggle('open');
+    menuBtn.textContent = mobileNav.classList.contains('open') ? '✕' : '☰';
   });
 </script>
 </body>

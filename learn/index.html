@@ -4,725 +4,468 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Learn — Analytica</title>
-<link rel="stylesheet" href="../css/main.css">
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
-* { box-sizing: border-box; }
-body { background: #0A1628; min-height: 100vh; margin: 0; }
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body { background: #0A1628; color: #fff; font-family: 'Inter', sans-serif; min-height: 100vh; }
+a { text-decoration: none; color: inherit; }
 
-.topnav {
-  position: fixed;
-  top: 0; left: 0; right: 0;
-  height: 60px;
-  background: rgba(10,22,40,0.95);
-  backdrop-filter: blur(20px);
-  border-bottom: 1px solid rgba(255,255,255,0.06);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0 20px;
-  z-index: 40;
-}
-.topnav-logo {
-  font-family: 'Playfair Display', serif;
-  font-size: 20px;
-  font-weight: 900;
-  color: #fff;
-  text-decoration: none;
-}
-.topnav-logo span { color: #F5A623; }
-.topnav-right { display: flex; gap: 10px; }
-.btn-sm {
-  padding: 7px 16px;
-  border-radius: 6px;
-  font-size: 13px;
-  font-weight: 600;
-  font-family: 'DM Sans', sans-serif;
-  cursor: pointer;
-  text-decoration: none;
-  transition: all 0.2s;
-  border: none;
-}
-.btn-gold { background: #F5A623; color: #0A1628; }
-.btn-gold:hover { background: #FFD07A; }
-.btn-outline {
-  background: transparent;
-  border: 1px solid rgba(255,255,255,0.2) !important;
-  color: #fff;
-}
+/* NAV */
+.topnav { position: fixed; top: 0; left: 0; right: 0; height: 58px; background: rgba(10,22,40,0.98); backdrop-filter: blur(12px); border-bottom: 1px solid rgba(255,255,255,0.07); display: flex; align-items: center; padding: 0 20px; gap: 12px; z-index: 100; }
+.nav-logo { font-size: 18px; font-weight: 800; color: #fff; letter-spacing: -0.5px; }
+.nav-logo span { color: #F5A623; }
+.nav-right { margin-left: auto; display: flex; gap: 8px; }
+.btn { padding: 7px 16px; border-radius: 7px; font-size: 13px; font-weight: 600; font-family: 'Inter', sans-serif; cursor: pointer; border: none; transition: all 0.15s; display: inline-block; }
+.btn-ghost { background: transparent; border: 1px solid rgba(255,255,255,0.15) !important; color: rgba(255,255,255,0.7); }
+.btn-ghost:hover { color: #fff; border-color: rgba(255,255,255,0.3) !important; }
+.btn-primary { background: #F5A623; color: #0A1628; font-weight: 700; }
+.btn-primary:hover { background: #f0b84a; }
 
-.page {
-  margin-top: 60px;
-  padding: 24px 20px;
-  max-width: 1000px;
-  margin-left: auto;
-  margin-right: auto;
-}
+/* PAGE */
+.page { margin-top: 58px; max-width: 1080px; margin-left: auto; margin-right: auto; padding: 28px 20px 60px; }
 
-.page-title {
-  font-family: 'Playfair Display', serif;
-  font-size: clamp(24px, 5vw, 36px);
-  font-weight: 700;
-  margin-bottom: 6px;
-}
-.page-title span { color: #F5A623; }
-.page-sub {
-  font-size: 14px;
-  color: rgba(255,255,255,0.45);
-  margin-bottom: 28px;
-}
+/* HERO */
+.hero { background: linear-gradient(135deg, rgba(245,166,35,0.08), rgba(10,22,40,0)); border: 1px solid rgba(255,255,255,0.06); border-radius: 14px; padding: 36px 28px; margin-bottom: 24px; display: flex; align-items: center; justify-content: space-between; gap: 20px; flex-wrap: wrap; }
+.hero-left h1 { font-size: clamp(22px, 4vw, 36px); font-weight: 900; letter-spacing: -0.5px; margin-bottom: 8px; }
+.hero-left h1 span { color: #F5A623; }
+.hero-left p { font-size: 14px; color: rgba(255,255,255,0.5); line-height: 1.7; max-width: 480px; }
+.hero-stats { display: flex; gap: 20px; flex-wrap: wrap; }
+.hstat { text-align: center; }
+.hstat-num { font-size: 24px; font-weight: 900; color: #F5A623; }
+.hstat-label { font-size: 10px; color: rgba(255,255,255,0.3); text-transform: uppercase; letter-spacing: 0.5px; margin-top: 2px; }
 
-/* ── ROADMAP ── */
-.roadmap-section { margin-bottom: 48px; }
+/* PROGRESS BANNER */
+.progress-banner { background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.07); border-radius: 12px; padding: 18px 20px; margin-bottom: 24px; display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+.progress-banner-left { flex: 1; min-width: 200px; }
+.progress-banner-title { font-size: 14px; font-weight: 700; margin-bottom: 6px; }
+.progress-banner-sub { font-size: 12px; color: rgba(255,255,255,0.4); margin-bottom: 10px; }
+.progress-bar { height: 6px; background: rgba(255,255,255,0.07); border-radius: 3px; overflow: hidden; }
+.progress-fill { height: 100%; border-radius: 3px; background: linear-gradient(90deg, #F5A623, #f0b84a); transition: width 0.6s ease; }
+.progress-pct { font-size: 13px; font-weight: 800; color: #F5A623; margin-left: auto; }
+.progress-streak { display: flex; align-items: center; gap: 8px; background: rgba(245,166,35,0.08); border: 1px solid rgba(245,166,35,0.15); border-radius: 8px; padding: 8px 14px; }
+.streak-num { font-size: 20px; font-weight: 900; color: #F5A623; }
+.streak-label { font-size: 10px; color: rgba(255,255,255,0.35); text-transform: uppercase; }
 
-.section-label {
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: 3px;
-  text-transform: uppercase;
-  color: #F5A623;
-  margin-bottom: 12px;
-}
+/* TABS */
+.tabs-row { display: flex; gap: 4px; margin-bottom: 20px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.07); border-radius: 10px; padding: 4px; width: fit-content; flex-wrap: wrap; }
+.tab { padding: 7px 18px; border-radius: 7px; font-size: 13px; font-weight: 600; cursor: pointer; border: none; background: transparent; color: rgba(255,255,255,0.4); font-family: 'Inter', sans-serif; transition: all 0.15s; }
+.tab.active { background: #F5A623; color: #0A1628; }
 
-.section-title {
-  font-family: 'Playfair Display', serif;
-  font-size: clamp(20px, 4vw, 28px);
-  font-weight: 700;
-  margin-bottom: 20px;
-}
+/* SECTION HEADER */
+.sec-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; flex-wrap: wrap; gap: 8px; }
+.sec-title { font-size: 15px; font-weight: 800; letter-spacing: -0.3px; }
+.sec-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; color: #F5A623; margin-bottom: 4px; }
+.sec-link { font-size: 12px; color: #F5A623; font-weight: 600; cursor: pointer; }
+.sec-link:hover { text-decoration: underline; }
 
-.roadmap {
-  display: flex;
-  flex-direction: column;
-  gap: 0;
-  position: relative;
-}
+/* ROADMAP */
+.roadmap { display: flex; flex-direction: column; gap: 0; margin-bottom: 32px; }
+.roadmap-item { display: flex; gap: 16px; position: relative; }
+.roadmap-item:not(:last-child)::before { content: ''; position: absolute; left: 15px; top: 36px; bottom: -8px; width: 2px; background: rgba(255,255,255,0.06); }
+.roadmap-left { display: flex; flex-direction: column; align-items: center; padding-top: 8px; }
+.roadmap-num { width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 800; flex-shrink: 0; }
+.rn-done { background: #27AE60; color: #fff; }
+.rn-active { background: #F5A623; color: #0A1628; }
+.rn-locked { background: rgba(255,255,255,0.06); color: rgba(255,255,255,0.3); }
+.roadmap-right { flex: 1; padding: 8px 0 24px; }
+.roadmap-card { background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.07); border-radius: 12px; padding: 16px; transition: all 0.15s; cursor: pointer; }
+.roadmap-card:hover { border-color: rgba(245,166,35,0.2); background: rgba(245,166,35,0.02); }
+.roadmap-card.active-card { border-color: rgba(245,166,35,0.3); background: rgba(245,166,35,0.04); }
+.roadmap-card.done-card { border-color: rgba(39,174,96,0.2); }
+.rc-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+.rc-title { font-size: 14px; font-weight: 700; }
+.rc-badge { font-size: 10px; font-weight: 700; padding: 3px 8px; border-radius: 4px; text-transform: uppercase; }
+.rcb-done { background: rgba(39,174,96,0.12); color: #27AE60; }
+.rcb-active { background: rgba(245,166,35,0.12); color: #F5A623; }
+.rcb-locked { background: rgba(255,255,255,0.05); color: rgba(255,255,255,0.25); }
+.rc-desc { font-size: 12px; color: rgba(255,255,255,0.4); line-height: 1.6; margin-bottom: 10px; }
+.rc-meta { display: flex; gap: 12px; flex-wrap: wrap; }
+.rc-meta-item { font-size: 11px; color: rgba(255,255,255,0.3); display: flex; align-items: center; gap: 4px; }
+.rc-progress { margin-top: 10px; }
+.rc-progress-bar { height: 4px; background: rgba(255,255,255,0.07); border-radius: 2px; overflow: hidden; }
+.rc-progress-fill { height: 100%; border-radius: 2px; }
+.fill-gold { background: linear-gradient(90deg, #F5A623, #f0b84a); }
+.fill-green { background: #27AE60; }
 
-.roadmap::before {
-  content: '';
-  position: absolute;
-  left: 20px;
-  top: 40px;
-  bottom: 40px;
-  width: 2px;
-  background: linear-gradient(180deg, #F5A623, rgba(245,166,35,0.1));
-}
+/* COURSE CARDS */
+.courses-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 14px; margin-bottom: 32px; }
+.course-card { background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.07); border-radius: 12px; overflow: hidden; transition: all 0.2s; cursor: pointer; }
+.course-card:hover { border-color: rgba(245,166,35,0.2); transform: translateY(-2px); }
+.course-thumb { height: 100px; display: flex; align-items: center; justify-content: center; font-size: 40px; position: relative; }
+.course-thumb-web { background: linear-gradient(135deg, #1a3a6b, #0d2444); }
+.course-thumb-python { background: linear-gradient(135deg, #1a4a2e, #0d2418); }
+.course-thumb-ai { background: linear-gradient(135deg, #2d1a6b, #150d44); }
+.course-thumb-mobile { background: linear-gradient(135deg, #4a1a1a, #2a0d0d); }
+.course-thumb-design { background: linear-gradient(135deg, #4a3a1a, #2a1f0d); }
+.course-thumb-data { background: linear-gradient(135deg, #1a3a4a, #0d1f2a); }
+.course-level { position: absolute; top: 8px; right: 8px; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 4px; }
+.level-beginner { background: rgba(39,174,96,0.15); color: #27AE60; }
+.level-intermediate { background: rgba(245,166,35,0.15); color: #F5A623; }
+.level-advanced { background: rgba(231,76,60,0.15); color: #E74C3C; }
+.course-body { padding: 14px; }
+.course-title { font-size: 13px; font-weight: 700; margin-bottom: 4px; }
+.course-desc { font-size: 11px; color: rgba(255,255,255,0.4); line-height: 1.5; margin-bottom: 10px; }
+.course-meta { display: flex; gap: 10px; margin-bottom: 10px; }
+.course-meta-item { font-size: 11px; color: rgba(255,255,255,0.3); }
+.course-footer { display: flex; align-items: center; justify-content: space-between; }
+.course-progress { flex: 1; margin-right: 12px; }
+.course-progress-bar { height: 3px; background: rgba(255,255,255,0.07); border-radius: 2px; overflow: hidden; }
+.course-progress-fill { height: 100%; border-radius: 2px; background: #F5A623; }
+.course-pct { font-size: 11px; color: #F5A623; font-weight: 700; margin-top: 3px; }
+.btn-course { padding: 6px 14px; border-radius: 6px; font-size: 12px; font-weight: 700; border: none; cursor: pointer; font-family: 'Inter', sans-serif; white-space: nowrap; transition: all 0.15s; }
+.btn-course-start { background: #F5A623; color: #0A1628; }
+.btn-course-start:hover { background: #f0b84a; }
+.btn-course-continue { background: rgba(245,166,35,0.1); color: #F5A623; border: 1px solid rgba(245,166,35,0.2) !important; }
+.btn-course-done { background: rgba(39,174,96,0.1); color: #27AE60; border: 1px solid rgba(39,174,96,0.2) !important; }
 
-.roadmap-step {
-  display: flex;
-  gap: 16px;
-  padding: 0 0 24px 0;
-  position: relative;
-}
+/* RESOURCES */
+.resources-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 12px; margin-bottom: 32px; }
+.resource-card { background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.07); border-radius: 12px; padding: 16px; transition: all 0.15s; cursor: pointer; display: flex; gap: 12px; align-items: flex-start; }
+.resource-card:hover { border-color: rgba(245,166,35,0.2); }
+.resource-icon { font-size: 24px; flex-shrink: 0; }
+.resource-title { font-size: 13px; font-weight: 700; margin-bottom: 3px; }
+.resource-desc { font-size: 11px; color: rgba(255,255,255,0.35); line-height: 1.5; }
+.resource-type { font-size: 10px; font-weight: 700; color: #F5A623; margin-top: 4px; text-transform: uppercase; letter-spacing: 0.5px; }
 
-.step-number {
-  width: 42px; height: 42px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 16px;
-  font-weight: 700;
-  flex-shrink: 0;
-  position: relative;
-  z-index: 2;
-  border: 2px solid;
-}
-
-.step-1 { background: rgba(245,166,35,0.15); border-color: #F5A623; color: #F5A623; }
-.step-2 { background: rgba(52,152,219,0.15); border-color: #3498db; color: #3498db; }
-.step-3 { background: rgba(155,89,182,0.15); border-color: #9b59b6; color: #9b59b6; }
-.step-4 { background: rgba(39,174,96,0.15); border-color: #27AE60; color: #27AE60; }
-.step-5 { background: rgba(231,76,60,0.15); border-color: #e74c3c; color: #e74c3c; }
-
-.step-content {
-  background: rgba(255,255,255,0.03);
-  border: 1px solid rgba(255,255,255,0.07);
-  border-radius: 14px;
-  padding: 18px;
-  flex: 1;
-  transition: all 0.3s;
-}
-.step-content:hover { border-color: rgba(245,166,35,0.2); }
-
-.step-title {
-  font-size: 16px;
-  font-weight: 600;
-  margin-bottom: 6px;
-}
-.step-desc {
-  font-size: 13px;
-  color: rgba(255,255,255,0.45);
-  line-height: 1.6;
-  margin-bottom: 12px;
-}
-.step-skills {
-  display: flex;
-  gap: 6px;
-  flex-wrap: wrap;
-}
-.skill-tag {
-  padding: 3px 10px;
-  border-radius: 100px;
-  font-size: 11px;
-  font-weight: 500;
-  background: rgba(255,255,255,0.06);
-  border: 1px solid rgba(255,255,255,0.1);
-  color: rgba(255,255,255,0.5);
-}
-.step-duration {
-  font-size: 11px;
-  color: rgba(255,255,255,0.3);
-  margin-top: 10px;
-  display: flex;
-  align-items: center;
-  gap: 4px;
-}
-
-/* ── COURSES ── */
-.courses-section { margin-bottom: 48px; }
-
-.filter-tabs {
-  display: flex;
-  gap: 8px;
-  overflow-x: auto;
-  padding-bottom: 4px;
-  margin-bottom: 20px;
-}
-.filter-tabs::-webkit-scrollbar { display: none; }
-.tab {
-  padding: 7px 16px;
-  border-radius: 100px;
-  font-size: 13px;
-  font-weight: 500;
-  white-space: nowrap;
-  cursor: pointer;
-  border: 1px solid rgba(255,255,255,0.1);
-  color: rgba(255,255,255,0.5);
-  background: transparent;
-  font-family: 'DM Sans', sans-serif;
-  transition: all 0.2s;
-}
-.tab.active, .tab:hover {
-  background: rgba(245,166,35,0.12);
-  border-color: rgba(245,166,35,0.3);
-  color: #F5A623;
-}
-
-.courses-grid {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 14px;
-}
-
-.course-card {
-  background: rgba(255,255,255,0.03);
-  border: 1px solid rgba(255,255,255,0.07);
-  border-radius: 14px;
-  padding: 18px;
-  display: flex;
-  gap: 16px;
-  align-items: flex-start;
-  transition: all 0.3s;
-  text-decoration: none;
-}
-.course-card:hover {
-  border-color: rgba(245,166,35,0.2);
-  transform: translateY(-2px);
-}
-
-.course-icon {
-  width: 50px; height: 50px;
-  border-radius: 12px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 24px;
-  flex-shrink: 0;
-}
-.icon-yt { background: rgba(231,76,60,0.15); }
-.icon-course { background: rgba(52,152,219,0.15); }
-.icon-free { background: rgba(39,174,96,0.15); }
-.icon-doc { background: rgba(245,166,35,0.15); }
-
-.course-info { flex: 1; }
-.course-title {
-  font-size: 15px;
-  font-weight: 600;
-  color: #fff;
-  margin-bottom: 4px;
-}
-.course-provider {
-  font-size: 12px;
-  color: rgba(255,255,255,0.4);
-  margin-bottom: 8px;
-}
-.course-tags { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 8px; }
-.ctag {
-  padding: 2px 8px;
-  border-radius: 100px;
-  font-size: 11px;
-  font-weight: 500;
-  background: rgba(255,255,255,0.06);
-  border: 1px solid rgba(255,255,255,0.08);
-  color: rgba(255,255,255,0.4);
-}
-.ctag.free { background: rgba(39,174,96,0.1); color: #27AE60; border-color: rgba(39,174,96,0.2); }
-.ctag.beginner { background: rgba(52,152,219,0.1); color: #3498db; border-color: rgba(52,152,219,0.2); }
-.ctag.intermediate { background: rgba(245,166,35,0.1); color: #F5A623; border-color: rgba(245,166,35,0.2); }
-.course-desc {
-  font-size: 13px;
-  color: rgba(255,255,255,0.4);
-  line-height: 1.5;
-}
-
-.course-arrow {
-  font-size: 18px;
-  color: rgba(255,255,255,0.2);
-  flex-shrink: 0;
-  align-self: center;
-  transition: all 0.2s;
-}
-.course-card:hover .course-arrow { color: #F5A623; transform: translateX(4px); }
-
-/* ── CHEAT SHEETS ── */
-.sheets-section { margin-bottom: 48px; }
-.sheets-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 12px;
-}
-.sheet-card {
-  background: rgba(255,255,255,0.03);
-  border: 1px solid rgba(255,255,255,0.07);
-  border-radius: 12px;
-  padding: 18px;
-  text-align: center;
-  cursor: pointer;
-  transition: all 0.3s;
-  text-decoration: none;
-  display: block;
-}
-.sheet-card:hover {
-  border-color: rgba(245,166,35,0.25);
-  transform: translateY(-2px);
-}
-.sheet-icon { font-size: 28px; margin-bottom: 8px; }
-.sheet-name { font-size: 13px; font-weight: 600; color: rgba(255,255,255,0.8); margin-bottom: 4px; }
-.sheet-pages { font-size: 11px; color: rgba(255,255,255,0.3); }
-.sheet-btn {
-  margin-top: 10px;
-  padding: 6px 14px;
-  background: rgba(245,166,35,0.1);
-  border: 1px solid rgba(245,166,35,0.2);
-  border-radius: 6px;
-  color: #F5A623;
-  font-size: 11px;
-  font-weight: 600;
-  font-family: 'DM Sans', sans-serif;
-  cursor: pointer;
-  transition: all 0.2s;
-  display: inline-block;
-}
-.sheet-btn:hover { background: rgba(245,166,35,0.2); }
-
-/* ── PROJECT IDEAS ── */
-.projects-section { margin-bottom: 48px; }
-.projects-grid {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 12px;
-}
-.project-card {
-  background: rgba(255,255,255,0.03);
-  border: 1px solid rgba(255,255,255,0.07);
-  border-radius: 12px;
-  padding: 18px;
-  display: flex;
-  gap: 14px;
-  align-items: flex-start;
-  transition: all 0.3s;
-}
-.project-card:hover { border-color: rgba(245,166,35,0.2); }
-.project-emoji { font-size: 28px; flex-shrink: 0; }
-.project-title { font-size: 14px; font-weight: 600; margin-bottom: 4px; }
-.project-desc { font-size: 13px; color: rgba(255,255,255,0.4); line-height: 1.5; margin-bottom: 8px; }
-.project-tools { display: flex; gap: 6px; flex-wrap: wrap; }
-.ptool {
-  padding: 2px 8px;
-  border-radius: 100px;
-  font-size: 10px;
-  font-weight: 600;
-  background: rgba(52,152,219,0.1);
-  color: #3498db;
-  border: 1px solid rgba(52,152,219,0.2);
-}
-.difficulty {
-  padding: 2px 8px;
-  border-radius: 100px;
-  font-size: 10px;
-  font-weight: 600;
-}
-.diff-easy { background: rgba(39,174,96,0.1); color: #27AE60; border: 1px solid rgba(39,174,96,0.2); }
-.diff-medium { background: rgba(245,166,35,0.1); color: #F5A623; border: 1px solid rgba(245,166,35,0.2); }
-.diff-hard { background: rgba(231,76,60,0.1); color: #e74c3c; border: 1px solid rgba(231,76,60,0.2); }
-
-@media (min-width: 600px) {
-  .courses-grid { grid-template-columns: repeat(2, 1fr); }
-  .projects-grid { grid-template-columns: repeat(2, 1fr); }
-  .sheets-grid { grid-template-columns: repeat(4, 1fr); }
-}
+/* TOAST */
+.toast { position: fixed; bottom: 20px; right: 20px; padding: 11px 18px; border-radius: 8px; font-size: 13px; font-weight: 500; color: #fff; z-index: 999; animation: slideUp 0.25s ease; box-shadow: 0 6px 24px rgba(0,0,0,0.4); }
+.toast-success { background: #27AE60; }
+.toast-info { background: #2980B9; }
+@keyframes slideUp { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:translateY(0)} }
 </style>
 </head>
 <body>
 
-<div class="topnav">
-  <a href="../index.html" class="topnav-logo">Analytica<span>.</span></a>
-  <div class="topnav-right">
-    <a href="../dashboard/index.html" class="btn-sm btn-outline">Dashboard</a>
-    <a href="../auth/signup.html" class="btn-sm btn-gold">Join Free</a>
+<!-- NAV -->
+<nav class="topnav">
+  <a href="../index.html" class="nav-logo">Analytica<span>.</span></a>
+  <div class="nav-right" id="topnav-right">
+    <a href="../auth/login.html" class="btn btn-ghost">Log In</a>
+    <a href="../auth/signup.html" class="btn btn-primary">Join Free</a>
   </div>
-</div>
+</nav>
 
 <div class="page">
 
-  <div class="page-title">Learning <span>Resources</span></div>
-  <div class="page-sub">Everything you need to go from zero to professional data analyst</div>
-
-  <!-- ── ROADMAP ── -->
-  <div class="roadmap-section">
-    <div class="section-label">Start Here</div>
-    <div class="section-title">The Data Analyst Roadmap</div>
-
-    <div class="roadmap">
-      <div class="roadmap-step">
-        <div class="step-number step-1">1</div>
-        <div class="step-content">
-          <div class="step-title">🏁 Foundation — Spreadsheets & Data Basics</div>
-          <div class="step-desc">Learn Excel or Google Sheets. Understand data types, formulas, pivot tables and basic charts. This is where every analyst starts.</div>
-          <div class="step-skills">
-            <span class="skill-tag">Excel</span>
-            <span class="skill-tag">Google Sheets</span>
-            <span class="skill-tag">Pivot Tables</span>
-            <span class="skill-tag">VLOOKUP</span>
-            <span class="skill-tag">Charts</span>
-          </div>
-          <div class="step-duration">⏱️ 4–6 weeks</div>
-        </div>
-      </div>
-
-      <div class="roadmap-step">
-        <div class="step-number step-2">2</div>
-        <div class="step-content">
-          <div class="step-title">🗄️ SQL — Query Your Data</div>
-          <div class="step-desc">Learn to query databases using SQL. SELECT, WHERE, JOIN, GROUP BY. SQL is the most important skill for every data analyst.</div>
-          <div class="step-skills">
-            <span class="skill-tag">SELECT</span>
-            <span class="skill-tag">WHERE</span>
-            <span class="skill-tag">JOIN</span>
-            <span class="skill-tag">GROUP BY</span>
-            <span class="skill-tag">Subqueries</span>
-            <span class="skill-tag">CTEs</span>
-          </div>
-          <div class="step-duration">⏱️ 6–8 weeks</div>
-        </div>
-      </div>
-
-      <div class="roadmap-step">
-        <div class="step-number step-3">3</div>
-        <div class="step-content">
-          <div class="step-title">📊 Data Visualization — Tell Stories With Data</div>
-          <div class="step-desc">Learn Power BI or Tableau. Build dashboards that help decision makers understand data at a glance.</div>
-          <div class="step-skills">
-            <span class="skill-tag">Power BI</span>
-            <span class="skill-tag">Tableau</span>
-            <span class="skill-tag">DAX</span>
-            <span class="skill-tag">Dashboards</span>
-            <span class="skill-tag">KPIs</span>
-          </div>
-          <div class="step-duration">⏱️ 6–8 weeks</div>
-        </div>
-      </div>
-
-      <div class="roadmap-step">
-        <div class="step-number step-4">4</div>
-        <div class="step-content">
-          <div class="step-title">🐍 Python for Data Analysis</div>
-          <div class="step-desc">Learn Python basics then move to pandas, numpy and matplotlib. Automate your analysis and handle large datasets.</div>
-          <div class="step-skills">
-            <span class="skill-tag">Python</span>
-            <span class="skill-tag">Pandas</span>
-            <span class="skill-tag">NumPy</span>
-            <span class="skill-tag">Matplotlib</span>
-            <span class="skill-tag">Seaborn</span>
-          </div>
-          <div class="step-duration">⏱️ 8–12 weeks</div>
-        </div>
-      </div>
-
-      <div class="roadmap-step">
-        <div class="step-number step-5">5</div>
-        <div class="step-content">
-          <div class="step-title">🚀 Build Projects & Get Hired</div>
-          <div class="step-desc">Build 3–5 real projects using Nigerian or African datasets. Create a portfolio, update your CV and start applying for roles.</div>
-          <div class="step-skills">
-            <span class="skill-tag">Portfolio</span>
-            <span class="skill-tag">GitHub</span>
-            <span class="skill-tag">CV Writing</span>
-            <span class="skill-tag">Interviews</span>
-            <span class="skill-tag">Networking</span>
-          </div>
-          <div class="step-duration">⏱️ Ongoing</div>
-        </div>
-      </div>
+  <!-- HERO -->
+  <div class="hero">
+    <div class="hero-left">
+      <h1>Learn. Build. <span>Get Hired.</span></h1>
+      <p>Structured roadmaps, hands-on courses and curated resources for every tech role. Learn at your pace, prove your skills with challenges.</p>
+    </div>
+    <div class="hero-stats">
+      <div class="hstat"><div class="hstat-num">120+</div><div class="hstat-label">Courses</div></div>
+      <div class="hstat"><div class="hstat-num">40+</div><div class="hstat-label">Roadmaps</div></div>
+      <div class="hstat"><div class="hstat-num">Free</div><div class="hstat-label">To Start</div></div>
     </div>
   </div>
 
-  <!-- ── COURSES ── -->
-  <div class="courses-section">
-    <div class="section-label">Free Courses</div>
-    <div class="section-title">Curated Learning Resources</div>
+  <!-- PROGRESS BANNER -->
+  <div class="progress-banner">
+    <div class="progress-banner-left">
+      <div class="progress-banner-title">Your Learning Progress</div>
+      <div class="progress-banner-sub">Full Stack Developer Roadmap · 3 of 8 modules done</div>
+      <div class="progress-bar"><div class="progress-fill" style="width:37%"></div></div>
+    </div>
+    <div class="progress-pct">37%</div>
+    <div class="progress-streak">
+      <div><div class="streak-num">🔥 7</div><div class="streak-label">Day Streak</div></div>
+    </div>
+  </div>
 
-    <div class="filter-tabs">
-      <button class="tab active" onclick="setFilter('all', this)">All</button>
-      <button class="tab" onclick="setFilter('excel', this)">Excel</button>
-      <button class="tab" onclick="setFilter('sql', this)">SQL</button>
-      <button class="tab" onclick="setFilter('powerbi', this)">Power BI</button>
-      <button class="tab" onclick="setFilter('python', this)">Python</button>
+  <!-- TABS -->
+  <div class="tabs-row">
+    <button class="tab active" onclick="setTab('roadmaps', this)">Roadmaps</button>
+    <button class="tab" onclick="setTab('courses', this)">Courses</button>
+    <button class="tab" onclick="setTab('resources', this)">Resources</button>
+  </div>
+
+  <!-- ROADMAPS TAB -->
+  <div id="tab-roadmaps">
+    <div class="sec-header">
+      <div>
+        <div class="sec-label">Learning Paths</div>
+        <div class="sec-title">Choose Your Roadmap</div>
+      </div>
     </div>
 
+    <div class="roadmap">
+
+      <div class="roadmap-item">
+        <div class="roadmap-left"><div class="roadmap-num rn-done">✓</div></div>
+        <div class="roadmap-right">
+          <div class="roadmap-card done-card">
+            <div class="rc-top">
+              <div class="rc-title">01 — The Basics of Web Development</div>
+              <div class="rc-badge rcb-done">✓ Done</div>
+            </div>
+            <div class="rc-desc">HTML, CSS, responsive design and how the web works. The foundation of everything.</div>
+            <div class="rc-meta">
+              <div class="rc-meta-item">📚 8 lessons</div>
+              <div class="rc-meta-item">⏱ 4 hours</div>
+              <div class="rc-meta-item">🎯 Beginner</div>
+            </div>
+            <div class="rc-progress">
+              <div class="rc-progress-bar"><div class="rc-progress-fill fill-green" style="width:100%"></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="roadmap-item">
+        <div class="roadmap-left"><div class="roadmap-num rn-done">✓</div></div>
+        <div class="roadmap-right">
+          <div class="roadmap-card done-card">
+            <div class="rc-top">
+              <div class="rc-title">02 — JavaScript Fundamentals</div>
+              <div class="rc-badge rcb-done">✓ Done</div>
+            </div>
+            <div class="rc-desc">Variables, functions, DOM manipulation, async/await and modern ES6+ syntax.</div>
+            <div class="rc-meta">
+              <div class="rc-meta-item">📚 12 lessons</div>
+              <div class="rc-meta-item">⏱ 8 hours</div>
+              <div class="rc-meta-item">🎯 Beginner</div>
+            </div>
+            <div class="rc-progress">
+              <div class="rc-progress-bar"><div class="rc-progress-fill fill-green" style="width:100%"></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="roadmap-item">
+        <div class="roadmap-left"><div class="roadmap-num rn-done">✓</div></div>
+        <div class="roadmap-right">
+          <div class="roadmap-card done-card">
+            <div class="rc-top">
+              <div class="rc-title">03 — Git & Version Control</div>
+              <div class="rc-badge rcb-done">✓ Done</div>
+            </div>
+            <div class="rc-desc">Git basics, branching, merging, pull requests and working with GitHub.</div>
+            <div class="rc-meta">
+              <div class="rc-meta-item">📚 6 lessons</div>
+              <div class="rc-meta-item">⏱ 3 hours</div>
+              <div class="rc-meta-item">🎯 Beginner</div>
+            </div>
+            <div class="rc-progress">
+              <div class="rc-progress-bar"><div class="rc-progress-fill fill-green" style="width:100%"></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="roadmap-item">
+        <div class="roadmap-left"><div class="roadmap-num rn-active">4</div></div>
+        <div class="roadmap-right">
+          <div class="roadmap-card active-card">
+            <div class="rc-top">
+              <div class="rc-title">04 — React — Building UI Components</div>
+              <div class="rc-badge rcb-active">In Progress</div>
+            </div>
+            <div class="rc-desc">Components, props, state, hooks, routing and building real React apps from scratch.</div>
+            <div class="rc-meta">
+              <div class="rc-meta-item">📚 16 lessons</div>
+              <div class="rc-meta-item">⏱ 12 hours</div>
+              <div class="rc-meta-item">🎯 Intermediate</div>
+            </div>
+            <div class="rc-progress">
+              <div class="rc-progress-bar"><div class="rc-progress-fill fill-gold" style="width:45%"></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="roadmap-item">
+        <div class="roadmap-left"><div class="roadmap-num rn-locked">5</div></div>
+        <div class="roadmap-right">
+          <div class="roadmap-card">
+            <div class="rc-top">
+              <div class="rc-title">05 — Node.js & Backend Development</div>
+              <div class="rc-badge rcb-locked">🔒 Locked</div>
+            </div>
+            <div class="rc-desc">REST APIs, Express, authentication, middleware and connecting to databases.</div>
+            <div class="rc-meta">
+              <div class="rc-meta-item">📚 14 lessons</div>
+              <div class="rc-meta-item">⏱ 10 hours</div>
+              <div class="rc-meta-item">🎯 Intermediate</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="roadmap-item">
+        <div class="roadmap-left"><div class="roadmap-num rn-locked">6</div></div>
+        <div class="roadmap-right">
+          <div class="roadmap-card">
+            <div class="rc-top">
+              <div class="rc-title">06 — Databases — SQL & PostgreSQL</div>
+              <div class="rc-badge rcb-locked">🔒 Locked</div>
+            </div>
+            <div class="rc-desc">Database design, SQL queries, joins, indexes and working with Supabase.</div>
+            <div class="rc-meta">
+              <div class="rc-meta-item">📚 10 lessons</div>
+              <div class="rc-meta-item">⏱ 7 hours</div>
+              <div class="rc-meta-item">🎯 Intermediate</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="roadmap-item">
+        <div class="roadmap-left"><div class="roadmap-num rn-locked">7</div></div>
+        <div class="roadmap-right">
+          <div class="roadmap-card">
+            <div class="rc-top">
+              <div class="rc-title">07 — Deployment & DevOps Basics</div>
+              <div class="rc-badge rcb-locked">🔒 Locked</div>
+            </div>
+            <div class="rc-desc">Deploy to Vercel, Docker basics, CI/CD pipelines and environment management.</div>
+            <div class="rc-meta">
+              <div class="rc-meta-item">📚 8 lessons</div>
+              <div class="rc-meta-item">⏱ 5 hours</div>
+              <div class="rc-meta-item">🎯 Advanced</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="roadmap-item">
+        <div class="roadmap-left"><div class="roadmap-num rn-locked">8</div></div>
+        <div class="roadmap-right">
+          <div class="roadmap-card">
+            <div class="rc-top">
+              <div class="rc-title">08 — Build & Ship a Full SaaS Product</div>
+              <div class="rc-badge rcb-locked">🔒 Locked</div>
+            </div>
+            <div class="rc-desc">Capstone project — build a complete SaaS from scratch and add it to your portfolio.</div>
+            <div class="rc-meta">
+              <div class="rc-meta-item">📚 20 lessons</div>
+              <div class="rc-meta-item">⏱ 20 hours</div>
+              <div class="rc-meta-item">🎯 Advanced</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- COURSES TAB -->
+  <div id="tab-courses" style="display:none;">
+    <div class="sec-header">
+      <div>
+        <div class="sec-label">All Courses</div>
+        <div class="sec-title">Learn by Doing</div>
+      </div>
+    </div>
     <div class="courses-grid" id="courses-grid"></div>
   </div>
 
-  <!-- ── CHEAT SHEETS ── -->
-  <div class="sheets-section">
-    <div class="section-label">Quick Reference</div>
-    <div class="section-title">Cheat Sheets</div>
-    <div class="sheets-grid">
-      <a href="../tools/formulas.html" class="sheet-card">
-        <div class="sheet-icon">📗</div>
-        <div class="sheet-name">Excel Formulas</div>
-        <div class="sheet-pages">20+ formulas</div>
-        <div class="sheet-btn">View →</div>
-      </a>
-      <a href="../tools/formulas.html" class="sheet-card">
-        <div class="sheet-icon">🗄️</div>
-        <div class="sheet-name">SQL Queries</div>
-        <div class="sheet-pages">15+ queries</div>
-        <div class="sheet-btn">View →</div>
-      </a>
-      <a href="../tools/formulas.html" class="sheet-card">
-        <div class="sheet-icon">📊</div>
-        <div class="sheet-name">DAX Formulas</div>
-        <div class="sheet-pages">10+ formulas</div>
-        <div class="sheet-btn">View →</div>
-      </a>
-      <a href="../tools/formulas.html" class="sheet-card">
-        <div class="sheet-icon">🐍</div>
-        <div class="sheet-name">Python Pandas</div>
-        <div class="sheet-pages">15+ snippets</div>
-        <div class="sheet-btn">View →</div>
-      </a>
-    </div>
-  </div>
-
-  <!-- ── PROJECT IDEAS ── -->
-  <div class="projects-section">
-    <div class="section-label">Build Your Portfolio</div>
-    <div class="section-title">Project Ideas for Nigerian Data</div>
-    <div class="projects-grid">
-      <div class="project-card">
-        <div class="project-emoji">📈</div>
-        <div>
-          <div class="project-title">Nigeria Inflation Analysis</div>
-          <div class="project-desc">Analyze CBN inflation data from 2015–2024. Find trends, peaks and compare food vs non-food inflation.</div>
-          <div class="project-tools">
-            <span class="ptool">Excel</span>
-            <span class="ptool">Power BI</span>
-            <span class="difficulty diff-easy">Easy</span>
-          </div>
-        </div>
-      </div>
-      <div class="project-card">
-        <div class="project-emoji">👥</div>
-        <div>
-          <div class="project-title">Nigeria Population Dashboard</div>
-          <div class="project-desc">Build an interactive dashboard showing population by state, zone and urban/rural split.</div>
-          <div class="project-tools">
-            <span class="ptool">Power BI</span>
-            <span class="ptool">SQL</span>
-            <span class="difficulty diff-easy">Easy</span>
-          </div>
-        </div>
-      </div>
-      <div class="project-card">
-        <div class="project-emoji">💰</div>
-        <div>
-          <div class="project-title">Lagos Property Price Analysis</div>
-          <div class="project-desc">Scrape or collect property listings data and analyze price trends by area and property type.</div>
-          <div class="project-tools">
-            <span class="ptool">Python</span>
-            <span class="ptool">Pandas</span>
-            <span class="difficulty diff-medium">Medium</span>
-          </div>
-        </div>
-      </div>
-      <div class="project-card">
-        <div class="project-emoji">🌾</div>
-        <div>
-          <div class="project-title">Nigeria Agricultural Output</div>
-          <div class="project-desc">Analyze crop production data across states. Find top producing states and seasonal patterns.</div>
-          <div class="project-tools">
-            <span class="ptool">SQL</span>
-            <span class="ptool">Python</span>
-            <span class="difficulty diff-medium">Medium</span>
-          </div>
-        </div>
-      </div>
-      <div class="project-card">
-        <div class="project-emoji">🏦</div>
-        <div>
-          <div class="project-title">Bank Customer Churn Prediction</div>
-          <div class="project-desc">Use a Nigerian bank dataset to predict which customers are likely to leave using ML.</div>
-          <div class="project-tools">
-            <span class="ptool">Python</span>
-            <span class="ptool">Scikit-learn</span>
-            <span class="difficulty diff-hard">Hard</span>
-          </div>
-        </div>
-      </div>
-      <div class="project-card">
-        <div class="project-emoji">⚡</div>
-        <div>
-          <div class="project-title">Nigeria Power Supply Analysis</div>
-          <div class="project-desc">Analyze NERC data on electricity generation, distribution and outages across Nigeria.</div>
-          <div class="project-tools">
-            <span class="ptool">Excel</span>
-            <span class="ptool">SQL</span>
-            <span class="difficulty diff-medium">Medium</span>
-          </div>
-        </div>
+  <!-- RESOURCES TAB -->
+  <div id="tab-resources" style="display:none;">
+    <div class="sec-header">
+      <div>
+        <div class="sec-label">Free Resources</div>
+        <div class="sec-title">Handpicked for Tech People</div>
       </div>
     </div>
+    <div class="resources-grid" id="resources-grid"></div>
   </div>
 
 </div>
 
+<script src="../js/supabase.js"></script>
 <script>
-const courses = [
-  {
-    title: 'Excel for Data Analysis — Full Course',
-    provider: 'freeCodeCamp — YouTube',
-    icon: '📗',
-    iconClass: 'icon-yt',
-    tags: ['free', 'beginner'],
-    desc: 'Complete Excel course covering formulas, pivot tables, charts and data analysis from scratch.',
-    url: 'https://www.youtube.com/watch?v=Vl0H-qTclOg',
-    tool: 'excel'
-  },
-  {
-    title: 'SQL for Beginners — Full Course',
-    provider: 'freeCodeCamp — YouTube',
-    icon: '🗄️',
-    iconClass: 'icon-yt',
-    tags: ['free', 'beginner'],
-    desc: 'Learn SQL from scratch with hands-on examples. Covers SELECT, JOIN, GROUP BY and more.',
-    url: 'https://www.youtube.com/watch?v=HXV3zeQKqGY',
-    tool: 'sql'
-  },
-  {
-    title: 'Power BI Full Course',
-    provider: 'Guy in a Cube — YouTube',
-    icon: '📊',
-    iconClass: 'icon-yt',
-    tags: ['free', 'beginner'],
-    desc: 'Build professional Power BI dashboards. Covers data modeling, DAX and report design.',
-    url: 'https://www.youtube.com/c/GuyinaCube',
-    tool: 'powerbi'
-  },
-  {
-    title: 'Python for Data Analysis',
-    provider: 'freeCodeCamp — YouTube',
-    icon: '🐍',
-    iconClass: 'icon-yt',
-    tags: ['free', 'beginner'],
-    desc: 'Learn Python with pandas, numpy and matplotlib for real data analysis projects.',
-    url: 'https://www.youtube.com/watch?v=r-uOLxNrNk8',
-    tool: 'python'
-  },
-  {
-    title: 'Advanced SQL — Window Functions',
-    provider: 'Mode Analytics',
-    icon: '🗄️',
-    iconClass: 'icon-doc',
-    tags: ['free', 'intermediate'],
-    desc: 'Master advanced SQL including window functions, CTEs and performance optimization.',
-    url: 'https://mode.com/sql-tutorial/sql-window-functions/',
-    tool: 'sql'
-  },
-  {
-    title: 'Google Data Analytics Certificate',
-    provider: 'Coursera — Google',
-    icon: '🎓',
-    iconClass: 'icon-course',
-    tags: ['intermediate'],
-    desc: 'Industry-recognized certificate. Covers spreadsheets, SQL, Tableau and R programming.',
-    url: 'https://www.coursera.org/professional-certificates/google-data-analytics',
-    tool: 'all'
-  },
-  {
-    title: 'DAX Patterns — Power BI',
-    provider: 'SQLBI',
-    icon: '📊',
-    iconClass: 'icon-doc',
-    tags: ['free', 'intermediate'],
-    desc: 'Learn advanced DAX patterns for Power BI. The most comprehensive DAX reference online.',
-    url: 'https://www.daxpatterns.com',
-    tool: 'powerbi'
-  },
-  {
-    title: 'Pandas Documentation & Tutorials',
-    provider: 'Pandas Official',
-    icon: '🐍',
-    iconClass: 'icon-free',
-    tags: ['free', 'intermediate'],
-    desc: 'Official pandas documentation with tutorials, user guide and API reference.',
-    url: 'https://pandas.pydata.org/docs/',
-    tool: 'python'
-  }
-]
 
-let currentFilter = 'all'
+const COURSES = [
+  { icon:'🌐', thumb:'course-thumb-web', title:'Complete Web Dev Bootcamp', desc:'HTML, CSS, JS, React and Node.js from zero to deployed app.', lessons:48, hours:32, level:'beginner', progress:37 },
+  { icon:'🐍', thumb:'course-thumb-python', title:'Python for Developers', desc:'Python basics, data structures, OOP, APIs and automation.', lessons:36, hours:24, level:'beginner', progress:0 },
+  { icon:'🤖', thumb:'course-thumb-ai', title:'AI & ML Fundamentals', desc:'Machine learning concepts, scikit-learn, neural networks and LLMs.', lessons:42, hours:30, level:'intermediate', progress:0 },
+  { icon:'📱', thumb:'course-thumb-mobile', title:'Flutter Mobile Development', desc:'Build cross-platform iOS and Android apps with Flutter and Dart.', lessons:30, hours:20, level:'intermediate', progress:0 },
+  { icon:'🎨', thumb:'course-thumb-design', title:'UI/UX Design with Figma', desc:'Design systems, wireframing, prototyping and user research.', lessons:24, hours:16, level:'beginner', progress:100 },
+  { icon:'📊', thumb:'course-thumb-data', title:'Data Science & Analytics', desc:'Data analysis, visualization, SQL, Python and storytelling with data.', lessons:40, hours:28, level:'intermediate', progress:0 },
+];
 
-function renderCourses(data) {
-  const grid = document.getElementById('courses-grid')
-  grid.innerHTML = data.map(c => `
-    <a href="${c.url}" target="_blank" class="course-card">
-      <div class="course-icon ${c.iconClass}">${c.icon}</div>
-      <div class="course-info">
-        <div class="course-title">${c.title}</div>
-        <div class="course-provider">${c.provider}</div>
-        <div class="course-tags">
-          ${c.tags.map(t => `<span class="ctag ${t}">${t.charAt(0).toUpperCase() + t.slice(1)}</span>`).join('')}
-        </div>
-        <div class="course-desc">${c.desc}</div>
-      </div>
-      <div class="course-arrow">→</div>
-    </a>
-  `).join('')
-}
+const RESOURCES = [
+  { icon:'📖', title:'MDN Web Docs', desc:'The definitive reference for HTML, CSS and JavaScript.', type:'Documentation' },
+  { icon:'🎬', title:'CS50 by Harvard', desc:'Free world-class intro to computer science. Highly recommended.', type:'Free Course' },
+  { icon:'🗄️', title:'PostgreSQL Tutorial', desc:'Complete guide to SQL and PostgreSQL from basics to advanced.', type:'Tutorial' },
+  { icon:'⚛️', title:'React Official Docs', desc:'The best place to learn React from the team that built it.', type:'Documentation' },
+  { icon:'🐙', title:'GitHub Learning Lab', desc:'Hands-on Git and GitHub courses directly in your browser.', type:'Interactive' },
+  { icon:'🧠', title:'fast.ai Deep Learning', desc:'Practical deep learning for coders. Free and beginner friendly.', type:'Free Course' },
+  { icon:'🎯', title:'The Odin Project', desc:'Full stack web development curriculum. 100% free and open source.', type:'Curriculum' },
+  { icon:'📐', title:'Figma Design Resources', desc:'Free UI kits, design systems and templates from the community.', type:'Design' },
+  { icon:'☁️', title:'AWS Free Tier Guide', desc:'Learn cloud computing with AWS free tier. No card needed to start.', type:'Tutorial' },
+  { icon:'🔐', title:'OWASP Security Guide', desc:'Learn web security best practices and common vulnerabilities.', type:'Guide' },
+  { icon:'📦', title:'npm Documentation', desc:'Everything about Node.js package management and ecosystem.', type:'Documentation' },
+  { icon:'🌍', title:'roadmap.sh', desc:'Developer roadmaps for every tech role. Community-driven.', type:'Roadmap' },
+];
 
-function setFilter(filter, btn) {
-  currentFilter = filter
+function setTab(tab, btn) {
   document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'))
   btn.classList.add('active')
-  const filtered = filter === 'all'
-    ? courses
-    : courses.filter(c => c.tool === filter || c.tool === 'all')
-  renderCourses(filtered)
+  document.getElementById('tab-roadmaps').style.display = tab === 'roadmaps' ? 'block' : 'none'
+  document.getElementById('tab-courses').style.display = tab === 'courses' ? 'block' : 'none'
+  document.getElementById('tab-resources').style.display = tab === 'resources' ? 'block' : 'none'
 }
 
-renderCourses(courses)
+function renderCourses() {
+  document.getElementById('courses-grid').innerHTML = COURSES.map(c => {
+    const levelClass = { beginner: 'level-beginner', intermediate: 'level-intermediate', advanced: 'level-advanced' }[c.level]
+    const btnClass = c.progress === 100 ? 'btn-course-done' : c.progress > 0 ? 'btn-course-continue' : 'btn-course-start'
+    const btnText = c.progress === 100 ? '✓ Completed' : c.progress > 0 ? 'Continue →' : 'Start Course →'
+    return `
+      <div class="course-card" onclick="startCourse('${c.title}')">
+        <div class="course-thumb ${c.thumb}">
+          <span>${c.icon}</span>
+          <span class="course-level ${levelClass}">${c.level}</span>
+        </div>
+        <div class="course-body">
+          <div class="course-title">${c.title}</div>
+          <div class="course-desc">${c.desc}</div>
+          <div class="course-meta">
+            <div class="course-meta-item">📚 ${c.lessons} lessons</div>
+            <div class="course-meta-item">⏱ ${c.hours}h</div>
+          </div>
+          <div class="course-footer">
+            <div class="course-progress">
+              <div class="course-progress-bar"><div class="course-progress-fill" style="width:${c.progress}%"></div></div>
+              <div class="course-pct">${c.progress}%</div>
+            </div>
+            <button class="btn-course ${btnClass}">${btnText}</button>
+          </div>
+        </div>
+      </div>`
+  }).join('')
+}
+
+function renderResources() {
+  document.getElementById('resources-grid').innerHTML = RESOURCES.map(r => `
+    <div class="resource-card" onclick="showToast('Opening ${r.title}...', 'info')">
+      <div class="resource-icon">${r.icon}</div>
+      <div>
+        <div class="resource-title">${r.title}</div>
+        <div class="resource-desc">${r.desc}</div>
+        <div class="resource-type">${r.type}</div>
+      </div>
+    </div>`).join('')
+}
+
+function startCourse(title) {
+  showToast(`📚 Opening "${title}"...`, 'info')
+}
+
+function showToast(msg, type = 'success') {
+  const t = document.createElement('div')
+  t.className = `toast toast-${type}`
+  t.textContent = msg
+  document.body.appendChild(t)
+  setTimeout(() => t.remove(), 3000)
+}
+
+renderCourses()
+renderResources()
 </script>
 </body>
 </html>

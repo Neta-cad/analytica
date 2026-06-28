@@ -3,797 +3,496 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>AI Data Assistant — Analytica</title>
-<link rel="stylesheet" href="../css/main.css">
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<title>AI Assistant — Analytica</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
-* { box-sizing: border-box; }
-body { background: #0A1628; min-height: 100vh; margin: 0; }
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body { background: #0A1628; color: #fff; font-family: 'Inter', sans-serif; min-height: 100vh; display: flex; flex-direction: column; }
+a { text-decoration: none; color: inherit; }
 
-.topnav {
-  position: fixed;
-  top: 0; left: 0; right: 0;
-  height: 60px;
-  background: rgba(10,22,40,0.95);
-  backdrop-filter: blur(20px);
-  border-bottom: 1px solid rgba(255,255,255,0.06);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0 20px;
-  z-index: 40;
-}
-.topnav-logo {
-  font-family: 'Playfair Display', serif;
-  font-size: 20px;
-  font-weight: 900;
-  color: #fff;
-  text-decoration: none;
-}
-.topnav-logo span { color: #F5A623; }
-.topnav-right { display: flex; gap: 10px; }
-.btn-sm {
-  padding: 7px 16px;
-  border-radius: 6px;
-  font-size: 13px;
-  font-weight: 600;
-  font-family: 'DM Sans', sans-serif;
-  cursor: pointer;
-  text-decoration: none;
-  transition: all 0.2s;
-  border: none;
-}
-.btn-gold { background: #F5A623; color: #0A1628; }
-.btn-gold:hover { background: #FFD07A; }
-.btn-outline {
-  background: transparent;
-  border: 1px solid rgba(255,255,255,0.2) !important;
-  color: #fff;
-}
+/* NAV */
+.topnav { position: fixed; top: 0; left: 0; right: 0; height: 58px; background: rgba(10,22,40,0.98); backdrop-filter: blur(12px); border-bottom: 1px solid rgba(255,255,255,0.07); display: flex; align-items: center; padding: 0 20px; gap: 12px; z-index: 100; }
+.nav-logo { font-size: 18px; font-weight: 800; color: #fff; letter-spacing: -0.5px; }
+.nav-logo span { color: #F5A623; }
+.nav-tools { display: flex; gap: 4px; margin-left: 20px; }
+.nav-tool { padding: 5px 12px; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer; border: none; background: transparent; color: rgba(255,255,255,0.4); font-family: 'Inter', sans-serif; transition: all 0.15s; }
+.nav-tool:hover { color: #fff; background: rgba(255,255,255,0.06); }
+.nav-tool.active { background: rgba(245,166,35,0.1); color: #F5A623; border: 1px solid rgba(245,166,35,0.2); }
+.nav-right { margin-left: auto; display: flex; gap: 8px; }
+.btn { padding: 7px 16px; border-radius: 7px; font-size: 13px; font-weight: 600; font-family: 'Inter', sans-serif; cursor: pointer; border: none; transition: all 0.15s; display: inline-block; }
+.btn-ghost { background: transparent; border: 1px solid rgba(255,255,255,0.15) !important; color: rgba(255,255,255,0.7); }
+.btn-ghost:hover { color: #fff; }
+.btn-primary { background: #F5A623; color: #0A1628; font-weight: 700; }
+.btn-primary:hover { background: #f0b84a; }
 
-/* ── CHAT LAYOUT ── */
-.chat-layout {
-  display: flex;
-  flex-direction: column;
-  height: 100vh;
-  padding-top: 60px;
-}
+/* LAYOUT */
+.app { margin-top: 58px; flex: 1; display: flex; height: calc(100vh - 58px); }
 
-/* ── SIDEBAR ── */
-.chat-sidebar {
-  display: none;
-  width: 260px;
-  background: #0d1f3c;
-  border-right: 1px solid rgba(255,255,255,0.06);
-  flex-direction: column;
-  flex-shrink: 0;
-}
+/* SIDEBAR */
+.tools-sidebar { width: 220px; flex-shrink: 0; border-right: 1px solid rgba(255,255,255,0.06); padding: 16px 12px; display: flex; flex-direction: column; gap: 4px; overflow-y: auto; }
+@media (max-width: 700px) { .tools-sidebar { display: none; } }
+.sidebar-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; color: rgba(255,255,255,0.2); padding: 8px 10px 4px; margin-top: 6px; }
+.sidebar-tool { display: flex; align-items: center; gap: 10px; padding: 9px 10px; border-radius: 8px; cursor: pointer; transition: all 0.15s; color: rgba(255,255,255,0.5); font-size: 13px; font-weight: 500; border: none; background: transparent; font-family: 'Inter', sans-serif; width: 100%; text-align: left; }
+.sidebar-tool:hover { background: rgba(255,255,255,0.05); color: #fff; }
+.sidebar-tool.active { background: rgba(245,166,35,0.1); color: #F5A623; font-weight: 600; }
+.tool-icon { font-size: 16px; width: 20px; text-align: center; }
 
-.sidebar-header {
-  padding: 20px 16px 14px;
-  border-bottom: 1px solid rgba(255,255,255,0.06);
-}
-.sidebar-title {
-  font-size: 13px;
-  font-weight: 600;
-  color: rgba(255,255,255,0.5);
-  letter-spacing: 1px;
-  text-transform: uppercase;
-  margin-bottom: 12px;
-}
-.btn-new-chat {
-  width: 100%;
-  padding: 10px;
-  background: rgba(245,166,35,0.1);
-  border: 1px solid rgba(245,166,35,0.25);
-  border-radius: 8px;
-  color: #F5A623;
-  font-size: 13px;
-  font-weight: 600;
-  font-family: 'DM Sans', sans-serif;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-.btn-new-chat:hover { background: rgba(245,166,35,0.2); }
+/* MAIN */
+.tool-main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
 
-.chat-history { flex: 1; overflow-y: auto; padding: 12px; }
-.history-item {
-  padding: 10px 12px;
-  border-radius: 8px;
-  cursor: pointer;
-  font-size: 13px;
-  color: rgba(255,255,255,0.5);
-  transition: all 0.2s;
-  margin-bottom: 4px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-.history-item:hover { background: rgba(255,255,255,0.05); color: #fff; }
-.history-item.active { background: rgba(245,166,35,0.1); color: #F5A623; }
+/* ── AI CHAT ── */
+.chat-area { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 16px; }
+.chat-welcome { text-align: center; padding: 40px 20px; }
+.chat-welcome-icon { font-size: 48px; margin-bottom: 16px; }
+.chat-welcome h2 { font-size: 20px; font-weight: 800; margin-bottom: 8px; }
+.chat-welcome p { font-size: 13px; color: rgba(255,255,255,0.45); margin-bottom: 24px; line-height: 1.7; max-width: 400px; margin-left: auto; margin-right: auto; }
+.suggestions { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; }
+.suggestion { padding: 8px 14px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.1); border-radius: 20px; font-size: 12px; color: rgba(255,255,255,0.55); cursor: pointer; transition: all 0.15s; }
+.suggestion:hover { border-color: rgba(245,166,35,0.3); color: #F5A623; background: rgba(245,166,35,0.05); }
 
-/* ── MAIN CHAT ── */
-.chat-main {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-}
+.msg { display: flex; gap: 10px; max-width: 720px; }
+.msg.user { flex-direction: row-reverse; margin-left: auto; }
+.msg-avatar { width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 14px; flex-shrink: 0; }
+.msg-avatar-ai { background: linear-gradient(135deg, #F5A623, #e8920f); color: #0A1628; font-weight: 800; }
+.msg-avatar-user { background: rgba(255,255,255,0.1); }
+.msg-bubble { padding: 12px 16px; border-radius: 12px; font-size: 13px; line-height: 1.7; max-width: 600px; }
+.msg-bubble-ai { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); color: rgba(255,255,255,0.85); border-radius: 4px 12px 12px 12px; }
+.msg-bubble-user { background: rgba(245,166,35,0.12); border: 1px solid rgba(245,166,35,0.2); color: #fff; border-radius: 12px 4px 12px 12px; }
+.msg-time { font-size: 10px; color: rgba(255,255,255,0.2); margin-top: 4px; }
 
-/* Chat header */
-.chat-header {
-  padding: 16px 20px;
-  border-bottom: 1px solid rgba(255,255,255,0.06);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  background: rgba(10,22,40,0.5);
-}
-.chat-header-left { display: flex; align-items: center; gap: 12px; }
-.ai-avatar {
-  width: 36px; height: 36px;
-  background: linear-gradient(135deg, #F5A623, #e8920f);
-  border-radius: 10px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 18px;
-}
-.ai-name { font-size: 15px; font-weight: 600; }
-.ai-status {
-  font-size: 11px;
-  color: #27AE60;
-  display: flex;
-  align-items: center;
-  gap: 4px;
-}
-.status-dot {
-  width: 6px; height: 6px;
-  background: #27AE60;
-  border-radius: 50%;
-  animation: pulse 2s infinite;
-}
-@keyframes pulse {
-  0%,100% { opacity:1; transform:scale(1); }
-  50% { opacity:0.4; transform:scale(1.3); }
-}
-.btn-clear-chat {
-  padding: 6px 14px;
-  background: rgba(255,255,255,0.05);
-  border: 1px solid rgba(255,255,255,0.1);
-  border-radius: 6px;
-  color: rgba(255,255,255,0.4);
-  font-size: 12px;
-  font-family: 'DM Sans', sans-serif;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-.btn-clear-chat:hover { border-color: rgba(231,76,60,0.3); color: #e74c3c; }
+.typing { display: flex; gap: 4px; align-items: center; padding: 12px 16px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: 4px 12px 12px 12px; width: fit-content; }
+.typing-dot { width: 6px; height: 6px; background: rgba(255,255,255,0.3); border-radius: 50%; animation: typing 1.2s infinite; }
+.typing-dot:nth-child(2) { animation-delay: 0.2s; }
+.typing-dot:nth-child(3) { animation-delay: 0.4s; }
+@keyframes typing { 0%,60%,100%{transform:translateY(0)} 30%{transform:translateY(-6px)} }
 
-/* Messages area */
-.messages-area {
-  flex: 1;
-  overflow-y: auto;
-  padding: 20px;
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-}
-.messages-area::-webkit-scrollbar { width: 4px; }
-.messages-area::-webkit-scrollbar-track { background: transparent; }
-.messages-area::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 2px; }
+/* CHAT INPUT */
+.chat-input-area { padding: 16px 20px; border-top: 1px solid rgba(255,255,255,0.06); background: rgba(10,22,40,0.8); }
+.chat-input-wrap { display: flex; gap: 10px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 10px 14px; transition: border 0.15s; }
+.chat-input-wrap:focus-within { border-color: rgba(245,166,35,0.4); }
+.chat-input { flex: 1; background: transparent; border: none; color: #fff; font-size: 14px; font-family: 'Inter', sans-serif; outline: none; resize: none; max-height: 120px; line-height: 1.5; }
+.chat-input::placeholder { color: rgba(255,255,255,0.2); }
+.chat-send { padding: 8px 16px; background: #F5A623; color: #0A1628; border: none; border-radius: 8px; font-size: 13px; font-weight: 700; cursor: pointer; font-family: 'Inter', sans-serif; transition: all 0.15s; white-space: nowrap; align-self: flex-end; }
+.chat-send:hover { background: #f0b84a; }
+.chat-send:disabled { opacity: 0.5; cursor: not-allowed; }
+.chat-footer { display: flex; align-items: center; justify-content: space-between; margin-top: 8px; }
+.chat-hint { font-size: 11px; color: rgba(255,255,255,0.2); }
+.chat-clear { font-size: 11px; color: rgba(255,255,255,0.25); cursor: pointer; background: none; border: none; font-family: 'Inter', sans-serif; }
+.chat-clear:hover { color: #F5A623; }
 
-/* Welcome screen */
-.welcome-screen {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 32px 20px;
-  text-align: center;
-}
-.welcome-icon { font-size: 52px; margin-bottom: 16px; }
-.welcome-title {
-  font-family: 'Playfair Display', serif;
-  font-size: 24px;
-  font-weight: 700;
-  margin-bottom: 10px;
-}
-.welcome-title span { color: #F5A623; }
-.welcome-sub {
-  font-size: 14px;
-  color: rgba(255,255,255,0.45);
-  margin-bottom: 28px;
-  max-width: 400px;
-  line-height: 1.7;
-}
+/* ── SQL TOOL ── */
+.sql-layout { display: flex; flex-direction: column; height: 100%; }
+.sql-toolbar { display: flex; gap: 8px; align-items: center; padding: 12px 16px; border-bottom: 1px solid rgba(255,255,255,0.06); flex-wrap: wrap; }
+.sql-toolbar-label { font-size: 12px; font-weight: 700; color: rgba(255,255,255,0.4); text-transform: uppercase; letter-spacing: 1px; }
+.btn-run { padding: 7px 18px; background: #27AE60; color: #fff; border: none; border-radius: 7px; font-size: 13px; font-weight: 700; cursor: pointer; font-family: 'Inter', sans-serif; transition: all 0.15s; }
+.btn-run:hover { background: #2ecc71; }
+.btn-clear-sql { padding: 7px 14px; background: transparent; border: 1px solid rgba(255,255,255,0.1); border-radius: 7px; font-size: 13px; color: rgba(255,255,255,0.4); cursor: pointer; font-family: 'Inter', sans-serif; }
+.sql-editor-area { display: grid; grid-template-rows: 1fr 1fr; flex: 1; overflow: hidden; }
+@media (min-width: 700px) { .sql-editor-area { grid-template-rows: none; grid-template-columns: 1fr 1fr; } }
+.sql-editor-wrap { display: flex; flex-direction: column; border-right: 1px solid rgba(255,255,255,0.06); }
+.sql-editor-header { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; color: rgba(255,255,255,0.25); padding: 10px 16px; border-bottom: 1px solid rgba(255,255,255,0.05); }
+.sql-editor { flex: 1; padding: 16px; background: transparent; border: none; color: #F5A623; font-size: 13px; font-family: 'Courier New', monospace; line-height: 1.7; outline: none; resize: none; }
+.sql-editor::placeholder { color: rgba(255,255,255,0.15); }
+.sql-results { display: flex; flex-direction: column; overflow: hidden; }
+.sql-results-header { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; color: rgba(255,255,255,0.25); padding: 10px 16px; border-bottom: 1px solid rgba(255,255,255,0.05); display: flex; justify-content: space-between; align-items: center; }
+.sql-table-wrap { flex: 1; overflow: auto; padding: 12px; }
+.sql-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+.sql-table th { text-align: left; padding: 8px 12px; background: rgba(255,255,255,0.04); color: rgba(255,255,255,0.5); font-weight: 600; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 1px solid rgba(255,255,255,0.07); white-space: nowrap; }
+.sql-table td { padding: 8px 12px; border-bottom: 1px solid rgba(255,255,255,0.04); color: rgba(255,255,255,0.7); }
+.sql-table tr:hover td { background: rgba(255,255,255,0.02); }
+.sql-empty { text-align: center; padding: 40px 20px; color: rgba(255,255,255,0.25); font-size: 13px; }
 
-/* Suggestion chips */
-.suggestions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  justify-content: center;
-  max-width: 600px;
-}
-.suggestion-chip {
-  padding: 8px 16px;
-  background: rgba(255,255,255,0.04);
-  border: 1px solid rgba(255,255,255,0.1);
-  border-radius: 100px;
-  font-size: 13px;
-  color: rgba(255,255,255,0.6);
-  cursor: pointer;
-  transition: all 0.2s;
-  font-family: 'DM Sans', sans-serif;
-  text-align: left;
-}
-.suggestion-chip:hover {
-  background: rgba(245,166,35,0.08);
-  border-color: rgba(245,166,35,0.25);
-  color: #F5A623;
-}
+/* ── CHART TOOL ── */
+.chart-layout { display: flex; flex-direction: column; height: 100%; overflow-y: auto; padding: 20px; gap: 16px; }
+.chart-controls { background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.07); border-radius: 12px; padding: 18px; }
+.chart-controls-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; margin-bottom: 14px; }
+.ctrl-group label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: rgba(255,255,255,0.35); margin-bottom: 6px; display: block; }
+.ctrl-select, .ctrl-input { width: 100%; padding: 8px 12px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); border-radius: 7px; color: #fff; font-size: 13px; font-family: 'Inter', sans-serif; outline: none; }
+.ctrl-select:focus, .ctrl-input:focus { border-color: rgba(245,166,35,0.4); }
+.ctrl-select option { background: #0d1f3c; }
+.btn-generate { padding: 9px 20px; background: #F5A623; color: #0A1628; border: none; border-radius: 8px; font-size: 13px; font-weight: 700; cursor: pointer; font-family: 'Inter', sans-serif; }
+.btn-generate:hover { background: #f0b84a; }
+.chart-display { background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.07); border-radius: 12px; padding: 20px; min-height: 300px; display: flex; align-items: center; justify-content: center; }
+.chart-canvas-wrap { width: 100%; }
+.chart-bars { display: flex; align-items: flex-end; gap: 12px; height: 200px; padding: 0 10px; }
+.chart-bar-wrap { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 6px; height: 100%; justify-content: flex-end; }
+.chart-bar { width: 100%; border-radius: 6px 6px 0 0; background: linear-gradient(180deg, #F5A623, #e8920f); transition: height 0.5s ease; min-height: 4px; }
+.chart-bar-label { font-size: 10px; color: rgba(255,255,255,0.4); text-align: center; }
+.chart-bar-val { font-size: 11px; font-weight: 700; color: #F5A623; }
+.chart-placeholder { text-align: center; color: rgba(255,255,255,0.2); }
+.chart-placeholder div { font-size: 36px; margin-bottom: 12px; }
+.chart-placeholder p { font-size: 13px; }
 
-/* Message bubbles */
-.message {
-  display: flex;
-  gap: 12px;
-  align-items: flex-start;
-  animation: fadeUp 0.3s ease;
-}
-@keyframes fadeUp {
-  from { opacity:0; transform:translateY(8px); }
-  to { opacity:1; transform:translateY(0); }
-}
-.message.user { flex-direction: row-reverse; }
-
-.msg-avatar {
-  width: 32px; height: 32px;
-  border-radius: 10px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 14px;
-  flex-shrink: 0;
-}
-.msg-avatar.ai { background: linear-gradient(135deg, #F5A623, #e8920f); }
-.msg-avatar.user { background: linear-gradient(135deg, #1a3a6b, #3498db); font-weight:700; color:#fff; font-size:13px; }
-
-.msg-bubble {
-  max-width: 80%;
-  padding: 12px 16px;
-  border-radius: 16px;
-  font-size: 14px;
-  line-height: 1.7;
-}
-.msg-bubble.ai {
-  background: rgba(255,255,255,0.05);
-  border: 1px solid rgba(255,255,255,0.08);
-  color: rgba(255,255,255,0.85);
-  border-top-left-radius: 4px;
-}
-.msg-bubble.user {
-  background: linear-gradient(135deg, rgba(245,166,35,0.15), rgba(245,166,35,0.08));
-  border: 1px solid rgba(245,166,35,0.2);
-  color: rgba(255,255,255,0.9);
-  border-top-right-radius: 4px;
-}
-
-/* Code blocks inside messages */
-.msg-bubble pre {
-  background: #0d1f3c;
-  border: 1px solid rgba(255,255,255,0.08);
-  border-radius: 8px;
-  padding: 12px;
-  overflow-x: auto;
-  font-family: 'Courier New', monospace;
-  font-size: 12px;
-  color: #F5A623;
-  margin: 10px 0;
-  line-height: 1.6;
-}
-.msg-bubble code {
-  background: rgba(245,166,35,0.1);
-  padding: 2px 6px;
-  border-radius: 4px;
-  font-family: 'Courier New', monospace;
-  font-size: 12px;
-  color: #F5A623;
-}
-.msg-bubble strong { color: #fff; }
-.msg-bubble ul, .msg-bubble ol {
-  padding-left: 20px;
-  margin: 8px 0;
-}
-.msg-bubble li { margin-bottom: 4px; }
-
-/* Copy button */
-.msg-actions {
-  display: flex;
-  gap: 6px;
-  margin-top: 8px;
-}
-.btn-copy-msg {
-  padding: 4px 10px;
-  background: rgba(255,255,255,0.05);
-  border: 1px solid rgba(255,255,255,0.08);
-  border-radius: 6px;
-  color: rgba(255,255,255,0.35);
-  font-size: 11px;
-  font-family: 'DM Sans', sans-serif;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-.btn-copy-msg:hover { color: #F5A623; border-color: rgba(245,166,35,0.2); }
-
-/* Typing indicator */
-.typing-indicator {
-  display: none;
-  align-items: center;
-  gap: 12px;
-}
-.typing-indicator.show { display: flex; }
-.typing-dots {
-  display: flex;
-  gap: 4px;
-  padding: 12px 16px;
-  background: rgba(255,255,255,0.05);
-  border: 1px solid rgba(255,255,255,0.08);
-  border-radius: 16px;
-  border-top-left-radius: 4px;
-}
-.dot {
-  width: 6px; height: 6px;
-  background: rgba(255,255,255,0.4);
-  border-radius: 50%;
-  animation: bounce 1.4s infinite;
-}
-.dot:nth-child(2) { animation-delay: 0.2s; }
-.dot:nth-child(3) { animation-delay: 0.4s; }
-@keyframes bounce {
-  0%,80%,100% { transform: translateY(0); opacity:0.4; }
-  40% { transform: translateY(-6px); opacity:1; }
-}
-
-/* ── INPUT AREA ── */
-.input-area {
-  padding: 16px 20px;
-  border-top: 1px solid rgba(255,255,255,0.06);
-  background: rgba(10,22,40,0.8);
-}
-.input-wrap {
-  display: flex;
-  gap: 10px;
-  align-items: flex-end;
-  background: rgba(255,255,255,0.05);
-  border: 1px solid rgba(255,255,255,0.1);
-  border-radius: 14px;
-  padding: 10px 14px;
-  transition: border-color 0.2s;
-}
-.input-wrap:focus-within { border-color: rgba(245,166,35,0.3); }
-#chat-input {
-  flex: 1;
-  background: transparent;
-  border: none;
-  color: #fff;
-  font-size: 14px;
-  font-family: 'DM Sans', sans-serif;
-  outline: none;
-  resize: none;
-  max-height: 120px;
-  min-height: 22px;
-  line-height: 1.5;
-}
-#chat-input::placeholder { color: rgba(255,255,255,0.3); }
-.btn-send {
-  width: 36px; height: 36px;
-  background: #F5A623;
-  border: none;
-  border-radius: 8px;
-  color: #0A1628;
-  font-size: 16px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.2s;
-  flex-shrink: 0;
-}
-.btn-send:hover { background: #FFD07A; }
-.btn-send:disabled { opacity: 0.4; cursor: not-allowed; }
-
-.input-hint {
-  font-size: 11px;
-  color: rgba(255,255,255,0.2);
-  text-align: center;
-  margin-top: 8px;
-}
-
-/* Pro gate */
-.pro-gate {
-  display: none;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 60px 24px;
-  text-align: center;
-}
-.pro-gate.show { display: flex; }
-.pro-gate-icon { font-size: 48px; margin-bottom: 16px; }
-.pro-gate-title {
-  font-family: 'Playfair Display', serif;
-  font-size: 22px;
-  font-weight: 700;
-  margin-bottom: 10px;
-}
-.pro-gate-desc {
-  font-size: 14px;
-  color: rgba(255,255,255,0.45);
-  margin-bottom: 24px;
-  line-height: 1.7;
-  max-width: 360px;
-}
-
-@media (min-width: 900px) {
-  .chat-layout { flex-direction: row; }
-  .chat-sidebar { display: flex; }
-}
+/* TOAST */
+.toast { position: fixed; bottom: 20px; right: 20px; padding: 11px 18px; border-radius: 8px; font-size: 13px; font-weight: 500; color: #fff; z-index: 999; animation: slideUp 0.25s ease; box-shadow: 0 6px 24px rgba(0,0,0,0.4); }
+.toast-success { background: #27AE60; }
+.toast-info { background: #2980B9; }
+.toast-error { background: #E74C3C; }
+@keyframes slideUp { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:translateY(0)} }
 </style>
 </head>
 <body>
 
-<div class="topnav">
-  <a href="../index.html" class="topnav-logo">Analytica<span>.</span></a>
-  <div class="topnav-right" id="topnav-right">
-    <a href="../dashboard/index.html" class="btn-sm btn-outline">Dashboard</a>
-    <a href="../auth/signup.html" class="btn-sm btn-gold">Join Free</a>
+<!-- NAV -->
+<nav class="topnav">
+  <a href="../index.html" class="nav-logo">Analytica<span>.</span></a>
+  <div class="nav-tools">
+    <button class="nav-tool active" onclick="switchTool('ai', this)">🤖 AI Assistant</button>
+    <button class="nav-tool" onclick="switchTool('sql', this)">🗄️ SQL</button>
+    <button class="nav-tool" onclick="switchTool('chart', this)">📊 Charts</button>
   </div>
-</div>
+  <div class="nav-right" id="topnav-right">
+    <a href="../auth/login.html" class="btn btn-ghost">Log In</a>
+    <a href="../auth/signup.html" class="btn btn-primary">Join Free</a>
+  </div>
+</nav>
 
-<div class="chat-layout">
+<div class="app">
 
-  <!-- Sidebar -->
-  <div class="chat-sidebar">
-    <div class="sidebar-header">
-      <div class="sidebar-title">💬 Chat History</div>
-      <button class="btn-new-chat" onclick="newChat()">+ New Chat</button>
-    </div>
-    <div class="chat-history" id="chat-history">
-      <div class="history-item active">Welcome Chat</div>
-    </div>
+  <!-- SIDEBAR -->
+  <div class="tools-sidebar">
+    <div class="sidebar-label">AI Tools</div>
+    <button class="sidebar-tool active" onclick="switchTool('ai', this)"><span class="tool-icon">🤖</span> AI Assistant</button>
+    <button class="sidebar-tool" onclick="switchTool('sql', this)"><span class="tool-icon">🗄️</span> SQL Playground</button>
+    <button class="sidebar-tool" onclick="switchTool('chart', this)"><span class="tool-icon">📊</span> Chart Builder</button>
+    <div class="sidebar-label">Coming Soon</div>
+    <button class="sidebar-tool" onclick="showToast('Coming soon!','info')"><span class="tool-icon">📝</span> Code Editor</button>
+    <button class="sidebar-tool" onclick="showToast('Coming soon!','info')"><span class="tool-icon">🔢</span> Formula Library</button>
+    <button class="sidebar-tool" onclick="showToast('Coming soon!','info')"><span class="tool-icon">🐛</span> Error Debugger</button>
+    <button class="sidebar-tool" onclick="showToast('Coming soon!','info')"><span class="tool-icon">📄</span> CV Builder</button>
   </div>
 
-  <!-- Main Chat -->
-  <div class="chat-main">
+  <!-- TOOL MAIN -->
+  <div class="tool-main">
 
-    <!-- Header -->
-    <div class="chat-header">
-      <div class="chat-header-left">
-        <div class="ai-avatar">🤖</div>
-        <div>
-          <div class="ai-name">Analytica AI</div>
-          <div class="ai-status">
-            <div class="status-dot"></div>
-            Ready to help
+    <!-- AI CHAT -->
+    <div id="tool-ai" style="display:flex;flex-direction:column;flex:1;overflow:hidden;">
+      <div class="chat-area" id="chat-area">
+        <div class="chat-welcome" id="chat-welcome">
+          <div class="chat-welcome-icon">🤖</div>
+          <h2>Analytica AI Assistant</h2>
+          <p>Ask me anything about coding, career, projects, tech concepts or how to use Analytica. I'm here to help.</p>
+          <div class="suggestions">
+            <div class="suggestion" onclick="sendSuggestion('How do I learn React as a beginner?')">How do I learn React as a beginner?</div>
+            <div class="suggestion" onclick="sendSuggestion('Write me a SQL query to find duplicate emails')">Write a SQL query for duplicate emails</div>
+            <div class="suggestion" onclick="sendSuggestion('What skills do I need to get a remote dev job?')">Skills needed for a remote dev job</div>
+            <div class="suggestion" onclick="sendSuggestion('Explain REST APIs in simple terms')">Explain REST APIs simply</div>
+            <div class="suggestion" onclick="sendSuggestion('How do I build my first portfolio project?')">Build my first portfolio project</div>
+            <div class="suggestion" onclick="sendSuggestion('What is the difference between SQL and NoSQL?')">SQL vs NoSQL difference</div>
           </div>
         </div>
       </div>
-      <button class="btn-clear-chat" onclick="clearChat()">🗑️ Clear</button>
-    </div>
-
-    <!-- Messages -->
-    <div class="messages-area" id="messages-area">
-
-      <!-- Welcome Screen -->
-      <div class="welcome-screen" id="welcome-screen">
-        <div class="welcome-icon">🤖</div>
-        <div class="welcome-title">Analytica <span>AI Assistant</span></div>
-        <p class="welcome-sub">Ask me anything about data analysis, SQL, Excel, Python, Power BI or your career. I'm here to help!</p>
-        <div class="suggestions">
-          <button class="suggestion-chip" onclick="sendSuggestion(this)">📊 How do I remove duplicates in SQL?</button>
-          <button class="suggestion-chip" onclick="sendSuggestion(this)">🐍 Write a Python script to clean my CSV</button>
-          <button class="suggestion-chip" onclick="sendSuggestion(this)">📈 What chart type should I use for trends?</button>
-          <button class="suggestion-chip" onclick="sendSuggestion(this)">🔍 Explain VLOOKUP vs XLOOKUP</button>
-          <button class="suggestion-chip" onclick="sendSuggestion(this)">💼 How do I become a data analyst in Nigeria?</button>
-          <button class="suggestion-chip" onclick="sendSuggestion(this)">🗄️ Write a SQL query to find top 10 customers</button>
+      <div class="chat-input-area">
+        <div class="chat-input-wrap">
+          <textarea class="chat-input" id="chat-input" placeholder="Ask anything about tech, code, career..." rows="1"
+            onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendMessage()}"
+            oninput="this.style.height='auto';this.style.height=this.scrollHeight+'px'"></textarea>
+          <button class="chat-send" id="send-btn" onclick="sendMessage()">Send →</button>
+        </div>
+        <div class="chat-footer">
+          <span class="chat-hint">Press Enter to send · Shift+Enter for new line</span>
+          <button class="chat-clear" onclick="clearChat()">Clear chat</button>
         </div>
       </div>
-
     </div>
 
-    <!-- Typing Indicator -->
-    <div class="typing-indicator" id="typing-indicator" style="padding:0 20px 8px;">
-      <div class="msg-avatar ai">🤖</div>
-      <div class="typing-dots">
-        <div class="dot"></div>
-        <div class="dot"></div>
-        <div class="dot"></div>
+    <!-- SQL PLAYGROUND -->
+    <div id="tool-sql" style="display:none;flex:1;flex-direction:column;overflow:hidden;">
+      <div class="sql-layout">
+        <div class="sql-toolbar">
+          <span class="sql-toolbar-label">SQL Playground</span>
+          <button class="btn-run" onclick="runSQL()">▶ Run Query</button>
+          <button class="btn-clear-sql" onclick="clearSQL()">Clear</button>
+          <div style="margin-left:auto;font-size:12px;color:rgba(255,255,255,0.25);">Sample data preloaded</div>
+        </div>
+        <div class="sql-editor-area">
+          <div class="sql-editor-wrap">
+            <div class="sql-editor-header">SQL Editor</div>
+            <textarea class="sql-editor" id="sql-editor" placeholder="-- Write your SQL here&#10;-- Example:&#10;SELECT * FROM users LIMIT 10;">SELECT id, name, email, role, country
+FROM users
+WHERE country = 'Nigeria'
+ORDER BY name ASC
+LIMIT 10;</textarea>
+          </div>
+          <div class="sql-results">
+            <div class="sql-results-header">
+              <span>Results</span>
+              <span id="sql-row-count" style="font-size:11px;color:rgba(255,255,255,0.25);"></span>
+            </div>
+            <div class="sql-table-wrap">
+              <div class="sql-empty" id="sql-empty">Run a query to see results here</div>
+              <div id="sql-table-container" style="display:none;"></div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
 
-    <!-- Input Area -->
-    <div class="input-area">
-      <div class="input-wrap">
-        <textarea
-          id="chat-input"
-          placeholder="Ask anything about data analysis..."
-          rows="1"
-          onkeydown="handleKeydown(event)"
-          oninput="autoResize(this)">
-        </textarea>
-        <button class="btn-send" id="send-btn" onclick="sendMessage()">➤</button>
+    <!-- CHART BUILDER -->
+    <div id="tool-chart" style="display:none;flex:1;overflow:hidden;">
+      <div class="chart-layout">
+        <div class="chart-controls">
+          <div class="chart-controls-grid">
+            <div class="ctrl-group">
+              <label>Chart Type</label>
+              <select class="ctrl-select" id="chart-type">
+                <option value="bar">Bar Chart</option>
+                <option value="line">Line Chart</option>
+                <option value="pie">Pie Chart</option>
+              </select>
+            </div>
+            <div class="ctrl-group">
+              <label>Dataset</label>
+              <select class="ctrl-select" id="chart-dataset">
+                <option value="monthly">Monthly Signups</option>
+                <option value="skills">Top Skills</option>
+                <option value="countries">Top Countries</option>
+                <option value="jobs">Jobs by Category</option>
+              </select>
+            </div>
+            <div class="ctrl-group">
+              <label>Chart Title</label>
+              <input class="ctrl-input" type="text" id="chart-title-input" placeholder="Enter chart title...">
+            </div>
+          </div>
+          <button class="btn-generate" onclick="generateChart()">📊 Generate Chart</button>
+        </div>
+        <div class="chart-display" id="chart-display">
+          <div class="chart-placeholder">
+            <div>📊</div>
+            <p>Select a dataset and click Generate Chart</p>
+          </div>
+        </div>
       </div>
-      <div class="input-hint">Press Enter to send · Shift+Enter for new line</div>
     </div>
 
   </div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="../js/supabase.js"></script>
 <script>
-let messages = []
-let isLoading = false
-let currentUser = null
-let userInitial = 'A'
 
-// ── SYSTEM PROMPT ──
-const SYSTEM_PROMPT = `You are Analytica AI, an expert data analytics assistant built specifically for African data analysts and students.
-
-You help with:
-- SQL queries (PostgreSQL, MySQL, SQLite)
-- Excel formulas and techniques
-- Python for data analysis (pandas, numpy, matplotlib, seaborn)
-- Power BI and DAX
-- Data cleaning and preparation
-- Chart and visualization recommendations
-- Career advice for data analysts in Nigeria and Africa
-- Interpreting Nigerian datasets (NBS, CBN, WAEC data etc.)
-
-Your style:
-- Clear, practical and educational
-- Use code examples when helpful
-- Format code in code blocks
-- Be encouraging especially to beginners
-- Reference Nigerian/African context where relevant
-- Keep responses concise but complete
-
-You are part of the Analytica platform — Africa's #1 data intelligence platform.`
-
-async function init() {
-  const { data: { session } } = await db.auth.getSession()
-  if (!session) {
-    window.location.href = '../auth/login.html'
-    return
-  }
-
-  // Check Pro plan
-  const meta = session.user.user_metadata || {}
-  if (meta.plan !== 'pro') {
-    document.querySelector('.chat-main').innerHTML = `
-      <div style="display:flex;flex-direction:column;align-items:center;
-      justify-content:center;height:100%;padding:40px 24px;text-align:center;">
-        <div style="font-size:52px;margin-bottom:16px;">🔒</div>
-        <div style="font-family:'Playfair Display',serif;font-size:22px;
-        font-weight:700;margin-bottom:10px;">Pro Feature</div>
-        <p style="font-size:14px;color:rgba(255,255,255,0.5);margin-bottom:24px;
-        max-width:320px;line-height:1.7;">
-          The AI Data Assistant is available on the Pro plan only.
-          Upgrade for just ₦2,500/month.
-        </p>
-        <a href="../payment/index.html"
-          style="padding:14px 32px;background:#F5A623;border:none;border-radius:8px;
-          color:#0A1628;font-size:15px;font-weight:700;text-decoration:none;
-          font-family:'DM Sans',sans-serif;">
-          Upgrade to Pro →
-        </a>
-        <a href="../dashboard/index.html"
-          style="margin-top:14px;font-size:13px;color:rgba(255,255,255,0.4);
-          text-decoration:none;">← Back to Dashboard</a>
-      </div>
-    `
-    return
-  }
-
-  // rest of init...
-  currentUser = session.user
-
-
-// ── INIT ──
-async function init() {
-  const { data: { session } } = await db.auth.getSession()
-  if (session) {
-    currentUser = session.user
-    const meta = currentUser.user_metadata || {}
-    const name = meta.first_name || currentUser.email.split('@')[0]
-    userInitial = name[0].toUpperCase()
-
-    document.getElementById('topnav-right').innerHTML = `
-      <a href="../dashboard/index.html" class="btn-sm btn-outline">Dashboard</a>
-      <div onclick="window.location.href='../dashboard/index.html'"
-        style="width:34px;height:34px;background:linear-gradient(135deg,#F5A623,#e8920f);
-        border-radius:50%;display:flex;align-items:center;justify-content:center;
-        font-size:14px;font-weight:700;color:#0A1628;cursor:pointer;">
-        ${userInitial}
-      </div>
-    `
-  }
+// ── TOOL SWITCHING ──
+function switchTool(tool, btn) {
+  document.querySelectorAll('.nav-tool, .sidebar-tool').forEach(b => b.classList.remove('active'))
+  if (btn) btn.classList.add('active')
+  document.getElementById('tool-ai').style.display = tool === 'ai' ? 'flex' : 'none'
+  document.getElementById('tool-sql').style.display = tool === 'sql' ? 'flex' : 'none'
+  document.getElementById('tool-chart').style.display = tool === 'chart' ? 'flex' : 'none'
+  // sync both nav and sidebar
+  document.querySelectorAll('.nav-tool, .sidebar-tool').forEach(b => {
+    if (b.textContent.toLowerCase().includes(tool === 'ai' ? 'ai' : tool === 'sql' ? 'sql' : 'chart')) b.classList.add('active')
+  })
 }
 
-// ── SEND MESSAGE ──
-async function sendMessage(text) {
+// ── AI CHAT ──
+const RESPONSES = {
+  react: "React is a JavaScript library for building UIs. Start with the official React docs at react.dev. Key concepts: components, props, state, and hooks (useState, useEffect). Build a small project like a todo list to practice. Then move to React Router for navigation and a state manager like Zustand.",
+  sql: "Here's a SQL query to find duplicate emails:\n\n```sql\nSELECT email, COUNT(*) as count\nFROM users\nGROUP BY email\nHAVING COUNT(*) > 1\nORDER BY count DESC;\n```\n\nThis groups all rows by email and returns only those that appear more than once.",
+  remote: "To land a remote dev job:\n\n1. Build 2-3 solid portfolio projects (not tutorials — real apps)\n2. Get comfortable with Git and GitHub\n3. Learn to write clean, documented code\n4. Pick a niche — frontend, backend or full stack\n5. Practice system design basics\n6. Apply on Analytica Jobs, We Work Remotely, and Remote.co\n7. Your profile here shows verified skills — that helps a lot.",
+  rest: "A REST API is a way for two systems to talk to each other over the internet using HTTP. Think of it like a waiter in a restaurant — you (the client) give an order to the waiter (the API), and the kitchen (the server) prepares it and sends it back.\n\nThe four main operations are GET (read), POST (create), PUT (update), and DELETE (remove). Each maps to a URL called an endpoint.",
+  portfolio: "Your first portfolio project should solve a real problem. Ideas:\n\n1. A personal finance tracker\n2. A weather app with a real API\n3. A job application tracker\n4. A recipe finder app\n5. A real-time chat app\n\nPick one, build it fully, deploy it on Vercel or Netlify, add it to GitHub and link it on your Analytica profile. That's more valuable than 10 half-finished projects.",
+  nosql: "SQL databases (like PostgreSQL, MySQL) store data in structured tables with fixed schemas — great for relational data and complex queries. NoSQL databases (like MongoDB, Redis) store data in flexible formats like JSON documents or key-value pairs — great for unstructured or rapidly changing data.\n\nRule of thumb: if your data is relational and structured, use SQL. If you need flexibility and scale fast, consider NoSQL.",
+  default: "Great question! Here's what I'd suggest based on what you're asking:\n\nFocus on building real projects that solve actual problems. The best way to learn in tech is by doing — not just watching tutorials. Start small, ship something, then improve it.\n\nIf you want more specific advice, try asking me about a specific technology, skill or career question and I'll give you a detailed answer."
+}
+
+let messages = []
+
+function getResponse(input) {
+  const lower = input.toLowerCase()
+  if (lower.includes('react')) return RESPONSES.react
+  if (lower.includes('sql') || lower.includes('duplicate') || lower.includes('query')) return RESPONSES.sql
+  if (lower.includes('remote') || lower.includes('job') || lower.includes('skill')) return RESPONSES.remote
+  if (lower.includes('rest') || lower.includes('api')) return RESPONSES.rest
+  if (lower.includes('portfolio') || lower.includes('project')) return RESPONSES.portfolio
+  if (lower.includes('nosql') || lower.includes('mongodb') || lower.includes('difference')) return RESPONSES.nosql
+  return RESPONSES.default
+}
+
+function sendSuggestion(text) {
+  document.getElementById('chat-input').value = text
+  sendMessage()
+}
+
+async function sendMessage() {
   const input = document.getElementById('chat-input')
-  const msg = text || input.value.trim()
-  if (!msg || isLoading) return
+  const text = input.value.trim()
+  if (!text) return
 
+  const welcome = document.getElementById('chat-welcome')
+  if (welcome) welcome.remove()
+
+  addMessage(text, 'user')
   input.value = ''
-  autoResize(input)
+  input.style.height = 'auto'
 
-  // Hide welcome screen
-  document.getElementById('welcome-screen').style.display = 'none'
-
-  // Add user message
-  addMessage('user', msg)
-  messages.push({ role: 'user', content: msg })
+  const sendBtn = document.getElementById('send-btn')
+  sendBtn.disabled = true
 
   // Show typing
-  isLoading = true
-  document.getElementById('send-btn').disabled = true
-  document.getElementById('typing-indicator').classList.add('show')
+  const typingEl = document.createElement('div')
+  typingEl.className = 'msg'
+  typingEl.innerHTML = `
+    <div class="msg-avatar msg-avatar-ai">A</div>
+    <div class="typing">
+      <div class="typing-dot"></div>
+      <div class="typing-dot"></div>
+      <div class="typing-dot"></div>
+    </div>`
+  document.getElementById('chat-area').appendChild(typingEl)
+  scrollChat()
 
-  // Scroll to bottom
-  scrollToBottom()
+  await new Promise(r => setTimeout(r, 1200))
+  typingEl.remove()
 
-  try {
-    const response = await fetch('/api/chat', {
-  method: 'POST',
-  headers: { 'Content-Type': 'application/json' },
-  body: JSON.stringify({
-    messages: messages,
-    system: SYSTEM_PROMPT
-  })
-})
-
-const data = await response.json()
-const reply = data.reply || 'Sorry, try again.'
-    // Hide typing
-    document.getElementById('typing-indicator').classList.remove('show')
-
-    // Add AI response
-    addMessage('ai', reply)
-    messages.push({ role: 'assistant', content: reply })
-
-    // Update history
-    updateHistory(msg)
-
-  } catch (err) {
-    document.getElementById('typing-indicator').classList.remove('show')
-    addMessage('ai', '⚠️ Connection error. Please check your internet and try again.')
-  }
-
-  isLoading = false
-  document.getElementById('send-btn').disabled = false
-  scrollToBottom()
+  const response = getResponse(text)
+  addMessage(response, 'ai')
+  sendBtn.disabled = false
+  scrollChat()
 }
 
-// ── ADD MESSAGE TO UI ──
-function addMessage(role, text) {
-  const area = document.getElementById('messages-area')
-  const div = document.createElement('div')
-  div.className = `message ${role}`
-
-  const formattedText = formatMessage(text)
-
-  div.innerHTML = `
-    <div class="msg-avatar ${role}">${role === 'ai' ? '🤖' : userInitial}</div>
+function addMessage(text, role) {
+  const area = document.getElementById('chat-area')
+  const msg = document.createElement('div')
+  msg.className = `msg ${role === 'user' ? 'user' : ''}`
+  const now = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+  msg.innerHTML = `
+    <div class="msg-avatar ${role === 'user' ? 'msg-avatar-user' : 'msg-avatar-ai'}">${role === 'user' ? '👤' : 'A'}</div>
     <div>
-      <div class="msg-bubble ${role}">${formattedText}</div>
-      ${role === 'ai' ? `
-        <div class="msg-actions">
-          <button class="btn-copy-msg" onclick="copyMsg(this, \`${escapeBacktick(text)}\`)">📋 Copy</button>
-        </div>
-      ` : ''}
-    </div>
-  `
-  area.appendChild(div)
-  scrollToBottom()
+      <div class="msg-bubble ${role === 'user' ? 'msg-bubble-user' : 'msg-bubble-ai'}">${text.replace(/\n/g, '<br>').replace(/```[\w]*\n?([\s\S]*?)```/g, '<code style="display:block;background:rgba(0,0,0,0.3);padding:10px;border-radius:6px;font-family:monospace;font-size:12px;margin:6px 0;">$1</code>')}</div>
+      <div class="msg-time">${now}</div>
+    </div>`
+  area.appendChild(msg)
+  messages.push({ role, text })
 }
 
-// ── FORMAT MESSAGE (markdown-like) ──
-function formatMessage(text) {
-  return text
-    .replace(/```(\w+)?\n?([\s\S]*?)```/g, '<pre>$2</pre>')
-    .replace(/`([^`]+)`/g, '<code>$1</code>')
-    .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
-    .replace(/\*([^*]+)\*/g, '<em>$1</em>')
-    .replace(/^### (.+)$/gm, '<strong>$1</strong>')
-    .replace(/^## (.+)$/gm, '<strong style="font-size:15px;">$1</strong>')
-    .replace(/^- (.+)$/gm, '• $1')
-    .replace(/\n/g, '<br>')
+function scrollChat() {
+  const area = document.getElementById('chat-area')
+  area.scrollTop = area.scrollHeight
 }
 
-// ── SEND SUGGESTION ──
-function sendSuggestion(btn) {
-  const text = btn.textContent.replace(/^[^\w]*/, '').trim()
-  sendMessage(text)
-}
-
-// ── COPY MESSAGE ──
-function copyMsg(btn, text) {
-  navigator.clipboard.writeText(text).then(() => {
-    btn.textContent = '✅ Copied!'
-    setTimeout(() => btn.textContent = '📋 Copy', 2000)
-  })
-}
-
-// ── CLEAR CHAT ──
 function clearChat() {
-  messages = []
-  const area = document.getElementById('messages-area')
-  area.innerHTML = `
-    <div class="welcome-screen" id="welcome-screen">
-      <div class="welcome-icon">🤖</div>
-      <div class="welcome-title">Analytica <span style="color:#F5A623;">AI Assistant</span></div>
-      <p class="welcome-sub">Ask me anything about data analysis, SQL, Excel, Python, Power BI or your career.</p>
-      <div class="suggestions">
-        <button class="suggestion-chip" onclick="sendSuggestion(this)">📊 How do I remove duplicates in SQL?</button>
-        <button class="suggestion-chip" onclick="sendSuggestion(this)">🐍 Write a Python script to clean my CSV</button>
-        <button class="suggestion-chip" onclick="sendSuggestion(this)">📈 What chart type should I use for trends?</button>
-        <button class="suggestion-chip" onclick="sendSuggestion(this)">🔍 Explain VLOOKUP vs XLOOKUP</button>
-        <button class="suggestion-chip" onclick="sendSuggestion(this)">💼 How do I become a data analyst in Nigeria?</button>
-        <button class="suggestion-chip" onclick="sendSuggestion(this)">🗄️ Write a SQL query to find top 10 customers</button>
-      </div>
+  const area = document.getElementById('chat-area')
+  area.innerHTML = `<div class="chat-welcome" id="chat-welcome">
+    <div class="chat-welcome-icon">🤖</div>
+    <h2>Analytica AI Assistant</h2>
+    <p>Ask me anything about coding, career, projects, tech concepts or how to use Analytica. I'm here to help.</p>
+    <div class="suggestions">
+      <div class="suggestion" onclick="sendSuggestion('How do I learn React as a beginner?')">How do I learn React as a beginner?</div>
+      <div class="suggestion" onclick="sendSuggestion('Write me a SQL query to find duplicate emails')">Write a SQL query for duplicate emails</div>
+      <div class="suggestion" onclick="sendSuggestion('What skills do I need to get a remote dev job?')">Skills needed for a remote dev job</div>
+      <div class="suggestion" onclick="sendSuggestion('Explain REST APIs in simple terms')">Explain REST APIs simply</div>
     </div>
-  `
+  </div>`
+  messages = []
 }
 
-// ── NEW CHAT ──
-function newChat() {
-  clearChat()
-  const history = document.getElementById('chat-history')
-  const items = history.querySelectorAll('.history-item')
-  items.forEach(i => i.classList.remove('active'))
+// ── SQL PLAYGROUND ──
+const SQL_DATA = {
+  users: [
+    { id:1, name:'Adaeze Obi', email:'adaeze@example.com', role:'developer', country:'Nigeria' },
+    { id:2, name:'Kofi Mensah', email:'kofi@example.com', role:'designer', country:'Nigeria' },
+    { id:3, name:'Priya Singh', email:'priya@example.com', role:'data_scientist', country:'Nigeria' },
+    { id:4, name:'James Lee', email:'james@example.com', role:'developer', country:'Nigeria' },
+    { id:5, name:'Fatima Omar', email:'fatima@example.com', role:'mobile', country:'Nigeria' },
+    { id:6, name:'David Chen', email:'david@example.com', role:'devops', country:'UK' },
+    { id:7, name:'Sofia Rodriguez', email:'sofia@example.com', role:'developer', country:'Brazil' },
+    { id:8, name:'Omar Hassan', email:'omar@example.com', role:'student', country:'Morocco' },
+  ]
 }
 
-// ── UPDATE HISTORY ──
-function updateHistory(msg) {
-  const history = document.getElementById('chat-history')
-  const existing = history.querySelector('.history-item.active')
-  const preview = msg.length > 30 ? msg.substring(0, 30) + '...' : msg
-  if (existing && existing.textContent === 'Welcome Chat') {
-    existing.textContent = preview
+function runSQL() {
+  const query = document.getElementById('sql-editor').value.trim().toLowerCase()
+  const container = document.getElementById('sql-table-container')
+  const empty = document.getElementById('sql-empty')
+
+  let data = []
+
+  if (query.includes('select') && query.includes('from users')) {
+    data = [...SQL_DATA.users]
+    if (query.includes("country = 'nigeria'")) data = data.filter(u => u.country === 'Nigeria')
+    if (query.includes("role = 'developer'")) data = data.filter(u => u.role === 'developer')
+    if (query.includes('order by name')) data.sort((a,b) => a.name.localeCompare(b.name))
+    const limitMatch = query.match(/limit (\d+)/)
+    if (limitMatch) data = data.slice(0, parseInt(limitMatch[1]))
+
+    const cols = query.includes('select *') ? Object.keys(data[0] || {}) :
+      ['id','name','email','role','country'].filter(c => query.includes(c))
+
+    if (data.length === 0) {
+      empty.textContent = 'Query returned 0 rows'
+      empty.style.display = 'block'
+      container.style.display = 'none'
+      return
+    }
+
+    document.getElementById('sql-row-count').textContent = `${data.length} row${data.length !== 1 ? 's' : ''}`
+    container.innerHTML = `
+      <table class="sql-table">
+        <thead><tr>${cols.map(c => `<th>${c}</th>`).join('')}</tr></thead>
+        <tbody>${data.map(row => `<tr>${cols.map(c => `<td>${row[c] ?? ''}</td>`).join('')}</tr>`).join('')}</tbody>
+      </table>`
+    empty.style.display = 'none'
+    container.style.display = 'block'
+    showToast(`✓ Query returned ${data.length} rows`, 'success')
+  } else {
+    empty.textContent = 'Try: SELECT * FROM users'
+    empty.style.display = 'block'
+    container.style.display = 'none'
+    showToast('Only SELECT from users table is supported in demo', 'info')
   }
 }
 
-// ── SCROLL ──
-function scrollToBottom() {
-  const area = document.getElementById('messages-area')
-  setTimeout(() => area.scrollTop = area.scrollHeight, 100)
+function clearSQL() {
+  document.getElementById('sql-editor').value = ''
+  document.getElementById('sql-empty').textContent = 'Run a query to see results here'
+  document.getElementById('sql-empty').style.display = 'block'
+  document.getElementById('sql-table-container').style.display = 'none'
+  document.getElementById('sql-row-count').textContent = ''
 }
 
-// ── AUTO RESIZE TEXTAREA ──
-function autoResize(el) {
-  el.style.height = 'auto'
-  el.style.height = Math.min(el.scrollHeight, 120) + 'px'
+// ── CHART BUILDER ──
+const DATASETS = {
+  monthly: { labels:['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug'], values:[420,680,540,890,1100,960,1340,1580] },
+  skills: { labels:['React','Python','Node.js','Flutter','Figma','TypeScript'], values:[84,72,68,45,52,61] },
+  countries: { labels:['Nigeria','India','UK','Brazil','Ghana','US'], values:[32,18,14,11,9,8] },
+  jobs: { labels:['Frontend','Backend','Full Stack','Data','DevOps','Design'], values:[310,280,240,180,120,90] },
 }
 
-// ── KEYBOARD ──
-function handleKeydown(e) {
-  if (e.key === 'Enter' && !e.shiftKey) {
-    e.preventDefault()
-    sendMessage()
-  }
+function generateChart() {
+  const type = document.getElementById('chart-type').value
+  const dataset = document.getElementById('chart-dataset').value
+  const title = document.getElementById('chart-title-input').value || 'Chart'
+  const data = DATASETS[dataset]
+  const max = Math.max(...data.values)
+  const display = document.getElementById('chart-display')
+
+  display.innerHTML = `
+    <div class="chart-canvas-wrap">
+      <div style="font-size:14px;font-weight:700;margin-bottom:16px;text-align:center;">${title}</div>
+      <div class="chart-bars">
+        ${data.labels.map((label, i) => {
+          const pct = (data.values[i] / max) * 100
+          return `
+            <div class="chart-bar-wrap">
+              <div class="chart-bar-val">${data.values[i]}</div>
+              <div class="chart-bar" style="height:${pct}%"></div>
+              <div class="chart-bar-label">${label}</div>
+            </div>`
+        }).join('')}
+      </div>
+    </div>`
+  showToast('📊 Chart generated!', 'success')
 }
 
-// ── HELPERS ──
-function escapeBacktick(str) {
-  return str.replace(/`/g, '\\`').replace(/\$/g, '\\$')
+function showToast(msg, type = 'success') {
+  const t = document.createElement('div')
+  t.className = `toast toast-${type}`
+  t.textContent = msg
+  document.body.appendChild(t)
+  setTimeout(() => t.remove(), 3000)
 }
-
-init()
 </script>
 </body>
 </html>

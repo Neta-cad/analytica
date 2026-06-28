@@ -4,206 +4,43 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Sign Up — Analytica</title>
-<link rel="stylesheet" href="../css/main.css">
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
-body {
-  min-height: 100vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 24px;
-  background: #0A1628;
-  position: relative;
-  overflow: hidden;
-}
-
-/* Background grid */
-body::before {
-  content: '';
-  position: fixed; inset: 0;
-  background-image:
-    linear-gradient(rgba(245,166,35,0.04) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(245,166,35,0.04) 1px, transparent 1px);
-  background-size: 50px 50px;
-  pointer-events: none;
-}
-
-/* Orbs */
-.orb {
-  position: fixed;
-  border-radius: 50%;
-  filter: blur(70px);
-  pointer-events: none;
-}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 24px; background: #0A1628; font-family: 'Inter', sans-serif; position: relative; overflow: hidden; }
+body::before { content: ''; position: fixed; inset: 0; background-image: linear-gradient(rgba(245,166,35,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(245,166,35,0.04) 1px, transparent 1px); background-size: 50px 50px; pointer-events: none; }
+.orb { position: fixed; border-radius: 50%; filter: blur(70px); pointer-events: none; }
 .orb-1 { width:300px; height:300px; background:rgba(245,166,35,0.08); top:-80px; right:-80px; }
 .orb-2 { width:250px; height:250px; background:rgba(26,58,107,0.5); bottom:-60px; left:-60px; }
-
-/* Card */
-.auth-card {
-  background: rgba(255,255,255,0.04);
-  border: 1px solid rgba(255,255,255,0.08);
-  border-radius: 20px;
-  padding: 40px 32px;
-  width: 100%;
-  max-width: 440px;
-  position: relative;
-  z-index: 2;
-}
-
-/* Logo */
-.auth-logo {
-  font-family: 'Playfair Display', serif;
-  font-size: 24px;
-  font-weight: 900;
-  color: #fff;
-  text-align: center;
-  margin-bottom: 8px;
-  display: block;
-  text-decoration: none;
-}
+.auth-card { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: 20px; padding: 36px 28px; width: 100%; max-width: 440px; position: relative; z-index: 2; }
+.auth-logo { font-size: 22px; font-weight: 900; color: #fff; text-align: center; margin-bottom: 6px; display: block; text-decoration: none; letter-spacing: -0.5px; }
 .auth-logo span { color: #F5A623; }
-
-.auth-tagline {
-  text-align: center;
-  font-size: 13px;
-  color: rgba(255,255,255,0.4);
-  margin-bottom: 32px;
-}
-
-.auth-title {
-  font-family: 'Playfair Display', serif;
-  font-size: 26px;
-  font-weight: 700;
-  text-align: center;
-  margin-bottom: 6px;
-}
-
-.auth-sub {
-  text-align: center;
-  font-size: 13px;
-  color: rgba(255,255,255,0.45);
-  margin-bottom: 28px;
-}
-
-/* Form */
-.form-group { margin-bottom: 18px; }
-
-.form-row {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 14px;
-}
-
-label {
-  display: block;
-  font-size: 13px;
-  font-weight: 500;
-  color: rgba(255,255,255,0.7);
-  margin-bottom: 7px;
-}
-
-input, select {
-  width: 100%;
-  padding: 12px 16px;
-  background: rgba(255,255,255,0.06);
-  border: 1px solid rgba(255,255,255,0.12);
-  border-radius: 8px;
-  color: #fff;
-  font-size: 14px;
-  font-family: 'DM Sans', sans-serif;
-  outline: none;
-  transition: border-color 0.2s;
-}
-
-input:focus, select:focus {
-  border-color: #F5A623;
-  background: rgba(255,255,255,0.08);
-}
-
-input::placeholder { color: rgba(255,255,255,0.25); }
-
-select option { background: #112240; color: #fff; }
-
-/* Submit button */
-.btn-submit {
-  width: 100%;
-  padding: 14px;
-  background: #F5A623;
-  border: none;
-  border-radius: 8px;
-  color: #0A1628;
-  font-size: 15px;
-  font-weight: 700;
-  font-family: 'DM Sans', sans-serif;
-  cursor: pointer;
-  transition: all 0.2s;
-  margin-top: 8px;
-}
-.btn-submit:hover { background: #FFD07A; transform: translateY(-1px); }
+.auth-tagline { text-align: center; font-size: 12px; color: rgba(255,255,255,0.4); margin-bottom: 28px; }
+.auth-title { font-size: 22px; font-weight: 800; text-align: center; margin-bottom: 4px; letter-spacing: -0.5px; }
+.auth-sub { text-align: center; font-size: 13px; color: rgba(255,255,255,0.4); margin-bottom: 24px; }
+.alert { padding: 11px 14px; border-radius: 8px; font-size: 13px; margin-bottom: 16px; display: none; }
+.alert.error { background: rgba(231,76,60,0.12); border: 1px solid rgba(231,76,60,0.3); color: #ff6b6b; display: block; }
+.alert.success { background: rgba(39,174,96,0.12); border: 1px solid rgba(39,174,96,0.3); color: #2ecc71; display: block; }
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.form-group { margin-bottom: 14px; }
+label { display: block; font-size: 12px; font-weight: 600; color: rgba(255,255,255,0.6); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px; }
+input, select { width: 100%; padding: 11px 14px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; color: #fff; font-size: 14px; font-family: 'Inter', sans-serif; outline: none; transition: border-color 0.2s; }
+input:focus, select:focus { border-color: rgba(245,166,35,0.5); background: rgba(255,255,255,0.07); }
+input::placeholder { color: rgba(255,255,255,0.2); }
+select option { background: #0d1f3c; color: #fff; }
+.btn-submit { width: 100%; padding: 13px; background: #F5A623; border: none; border-radius: 8px; color: #0A1628; font-size: 15px; font-weight: 700; font-family: 'Inter', sans-serif; cursor: pointer; transition: all 0.2s; margin-top: 6px; }
+.btn-submit:hover { background: #f0b84a; transform: translateY(-1px); }
 .btn-submit:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
-
-/* Divider */
-.divider {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin: 20px 0;
-}
-.divider-line { flex: 1; height: 1px; background: rgba(255,255,255,0.08); }
-.divider-text { font-size: 12px; color: rgba(255,255,255,0.3); }
-
-/* Google button */
-.btn-google {
-  width: 100%;
-  padding: 13px;
-  background: rgba(255,255,255,0.05);
-  border: 1px solid rgba(255,255,255,0.12);
-  border-radius: 8px;
-  color: #fff;
-  font-size: 14px;
-  font-weight: 500;
-  font-family: 'DM Sans', sans-serif;
-  cursor: pointer;
-  transition: all 0.2s;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-}
-.btn-google:hover { background: rgba(255,255,255,0.09); border-color: rgba(255,255,255,0.2); }
-
-/* Terms */
-.terms {
-  font-size: 12px;
-  color: rgba(255,255,255,0.3);
-  text-align: center;
-  margin-top: 16px;
-  line-height: 1.6;
-}
-.terms a { color: #F5A623; }
-
-/* Login link */
-.login-link {
-  text-align: center;
-  font-size: 13px;
-  color: rgba(255,255,255,0.45);
-  margin-top: 20px;
-}
-.login-link a { color: #F5A623; font-weight: 600; }
-
-/* Alert */
-.alert {
-  padding: 12px 16px;
-  border-radius: 8px;
-  font-size: 13px;
-  margin-bottom: 18px;
-  display: none;
-}
-.alert.error { background: rgba(231,76,60,0.15); border: 1px solid rgba(231,76,60,0.3); color: #ff6b6b; }
-.alert.success { background: rgba(39,174,96,0.15); border: 1px solid rgba(39,174,96,0.3); color: #2ecc71; }
-.alert.show { display: block; }
+.divider { display: flex; align-items: center; gap: 12px; margin: 18px 0; }
+.divider-line { flex: 1; height: 1px; background: rgba(255,255,255,0.07); }
+.divider-text { font-size: 12px; color: rgba(255,255,255,0.25); }
+.btn-google { width: 100%; padding: 12px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; color: #fff; font-size: 14px; font-weight: 500; font-family: 'Inter', sans-serif; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 10px; }
+.btn-google:hover { background: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.2); }
+.terms { font-size: 12px; color: rgba(255,255,255,0.25); text-align: center; margin-top: 14px; line-height: 1.6; }
+.terms a { color: #F5A623; text-decoration: none; }
+.login-link { text-align: center; font-size: 13px; color: rgba(255,255,255,0.4); margin-top: 16px; }
+.login-link a { color: #F5A623; font-weight: 600; text-decoration: none; }
 </style>
 </head>
 <body>
@@ -214,23 +51,23 @@ select option { background: #112240; color: #fff; }
 <div class="auth-card">
 
   <a href="../index.html" class="auth-logo">Analytica<span>.</span></a>
-<p class="auth-tagline">Where Tech People Connect & Build</p>
-<p class="auth-sub">Join 120,000+ tech people worldwide</p>
+  <p class="auth-tagline">Where Tech People Connect & Build</p>
 
-  <!-- Alert box -->
+  <h1 class="auth-title">Create Your Account</h1>
+  <p class="auth-sub">Join 120,000+ tech people worldwide</p>
+
   <div class="alert" id="alert"></div>
 
-  <!-- Form -->
   <form id="signup-form">
 
     <div class="form-row">
       <div class="form-group">
         <label for="firstname">First Name</label>
-        <input type="text" id="firstname" placeholder="Ayomide" required>
+        <input type="text" id="firstname" placeholder="John" required>
       </div>
       <div class="form-group">
         <label for="lastname">Last Name</label>
-        <input type="text" id="lastname" placeholder="Akingboye" required>
+        <input type="text" id="lastname" placeholder="Doe" required>
       </div>
     </div>
 
@@ -252,12 +89,19 @@ select option { background: #112240; color: #fff; }
         <option value="Ghana">🇬🇭 Ghana</option>
         <option value="Kenya">🇰🇪 Kenya</option>
         <option value="South Africa">🇿🇦 South Africa</option>
+        <option value="India">🇮🇳 India</option>
+        <option value="United Kingdom">🇬🇧 United Kingdom</option>
+        <option value="United States">🇺🇸 United States</option>
+        <option value="Canada">🇨🇦 Canada</option>
+        <option value="Brazil">🇧🇷 Brazil</option>
+        <option value="Germany">🇩🇪 Germany</option>
+        <option value="France">🇫🇷 France</option>
+        <option value="Australia">🇦🇺 Australia</option>
         <option value="Ethiopia">🇪🇹 Ethiopia</option>
         <option value="Tanzania">🇹🇿 Tanzania</option>
         <option value="Uganda">🇺🇬 Uganda</option>
         <option value="Rwanda">🇷🇼 Rwanda</option>
-        <option value="Cameroon">🇨🇲 Cameroon</option>
-        <option value="Other">🌍 Other African Country</option>
+        <option value="Other">🌍 Other</option>
       </select>
     </div>
 
@@ -265,12 +109,14 @@ select option { background: #112240; color: #fff; }
       <label for="role">I am a</label>
       <select id="role" required>
         <option value="">Select your role</option>
+        <option value="developer">💻 Developer</option>
+        <option value="designer">🎨 Designer</option>
+        <option value="data_scientist">📊 Data Scientist</option>
+        <option value="devops">⚙️ DevOps Engineer</option>
+        <option value="mobile">📱 Mobile Developer</option>
+        <option value="founder">🚀 Founder / Entrepreneur</option>
         <option value="student">📚 Student / Beginner</option>
-        <option value="analyst">📊 Data Analyst</option>
-        <option value="engineer">⚙️ Data Engineer</option>
-        <option value="scientist">🔬 Data Scientist</option>
-        <option value="teacher">🎓 Teacher / Trainer</option>
-        <option value="recruiter">💼 Recruiter / HR</option>
+        <option value="product">📋 Product Manager</option>
         <option value="other">🙂 Other</option>
       </select>
     </div>
@@ -297,17 +143,10 @@ select option { background: #112240; color: #fff; }
     Continue with Google
   </button>
 
-  <p class="terms">
-    By signing up you agree to our
-    <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a>
-  </p>
-
-  <p class="login-link">
-    Already have an account? <a href="login.html">Log In</a>
-  </p>
+  <p class="terms">By signing up you agree to our <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a></p>
+  <p class="login-link">Already have an account? <a href="login.html">Log In</a></p>
 
 </div>
-
 
 <script src="../js/supabase.js"></script>
 <script>
@@ -317,7 +156,7 @@ const submitBtn = document.getElementById('submit-btn')
 
 function showAlert(message, type) {
   alertBox.textContent = message
-  alertBox.className = `alert ${type} show`
+  alertBox.className = 'alert ' + type
 }
 
 form.addEventListener('submit', async (e) => {
@@ -330,17 +169,14 @@ form.addEventListener('submit', async (e) => {
   const country   = document.getElementById('country').value
   const role      = document.getElementById('role').value
 
-  // Basic validation
-  if (password.length < 8) {
-    showAlert('Password must be at least 8 characters.', 'error')
-    return
-  }
+  if (!firstname || !lastname) { showAlert('Please enter your full name.', 'error'); return }
+  if (!country) { showAlert('Please select your country.', 'error'); return }
+  if (!role) { showAlert('Please select your role.', 'error'); return }
+  if (password.length < 8) { showAlert('Password must be at least 8 characters.', 'error'); return }
 
-  // Disable button
   submitBtn.disabled = true
   submitBtn.textContent = 'Creating account...'
 
-  // Sign up with Supabase
   const { data, error } = await db.auth.signUp({
     email,
     password,
@@ -362,17 +198,14 @@ form.addEventListener('submit', async (e) => {
     return
   }
 
-  // Success
-  showAlert('Account created! Check your email to verify your account.', 'success')
+  showAlert('Account created! Redirecting to your dashboard...', 'success')
   submitBtn.textContent = 'Account Created ✓'
 
-  // Redirect after 2 seconds
   setTimeout(() => {
-    window.location.href = '/dashboard/index.html'
+    window.location.href = '../dashboard/index.html'
   }, 2000)
 })
 
-// Google sign up
 document.getElementById('google-btn').addEventListener('click', async () => {
   const { error } = await db.auth.signInWithOAuth({
     provider: 'google',
@@ -381,6 +214,5 @@ document.getElementById('google-btn').addEventListener('click', async () => {
   if (error) showAlert(error.message, 'error')
 })
 </script>
-
 </body>
 </html>

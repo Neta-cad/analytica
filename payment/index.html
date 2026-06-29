@@ -4,430 +4,529 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Upgrade to Pro — Analytica</title>
-<link rel="stylesheet" href="../css/main.css">
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
-<script src="https://js.paystack.co/v1/inline.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
-* { box-sizing: border-box; }
-body {
-  background: #0A1628;
-  min-height: 100vh;
-  margin: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 80px 20px 40px;
-}
-body::before {
-  content: '';
-  position: fixed; inset: 0;
-  background-image:
-    linear-gradient(rgba(245,166,35,0.04) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(245,166,35,0.04) 1px, transparent 1px);
-  background-size: 50px 50px;
-  pointer-events: none;
-}
-.topnav {
-  position: fixed;
-  top: 0; left: 0; right: 0;
-  height: 60px;
-  background: rgba(10,22,40,0.95);
-  backdrop-filter: blur(20px);
-  border-bottom: 1px solid rgba(255,255,255,0.06);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0 20px;
-  z-index: 40;
-}
-.topnav-logo {
-  font-family: 'Playfair Display', serif;
-  font-size: 20px;
-  font-weight: 900;
-  color: #fff;
-  text-decoration: none;
-}
-.topnav-logo span { color: #F5A623; }
-.back-btn {
-  color: rgba(255,255,255,0.6);
-  font-size: 14px;
-  text-decoration: none;
-  transition: color 0.2s;
-}
-.back-btn:hover { color: #F5A623; }
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body { background: #0A1628; color: #fff; font-family: 'Inter', sans-serif; min-height: 100vh; }
+a { text-decoration: none; color: inherit; }
 
-.payment-wrap {
-  width: 100%;
-  max-width: 480px;
-  position: relative;
-  z-index: 2;
-}
+/* NAV */
+.topnav { position: fixed; top: 0; left: 0; right: 0; height: 58px; background: rgba(10,22,40,0.98); backdrop-filter: blur(12px); border-bottom: 1px solid rgba(255,255,255,0.07); display: flex; align-items: center; padding: 0 20px; gap: 12px; z-index: 100; }
+.nav-logo { font-size: 18px; font-weight: 800; color: #fff; letter-spacing: -0.5px; }
+.nav-logo span { color: #F5A623; }
+.nav-right { margin-left: auto; display: flex; gap: 8px; align-items: center; }
+.btn { padding: 7px 16px; border-radius: 7px; font-size: 13px; font-weight: 600; font-family: 'Inter', sans-serif; cursor: pointer; border: none; transition: all 0.15s; display: inline-block; }
+.btn-ghost { background: transparent; border: 1px solid rgba(255,255,255,0.15) !important; color: rgba(255,255,255,0.7); }
+.btn-ghost:hover { color: #fff; }
+.btn-primary { background: #F5A623; color: #0A1628; font-weight: 700; }
+.btn-primary:hover { background: #f0b84a; }
 
-/* Plan selector */
-.plan-toggle {
-  display: flex;
-  background: rgba(255,255,255,0.05);
-  border: 1px solid rgba(255,255,255,0.1);
-  border-radius: 100px;
-  padding: 4px;
-  margin-bottom: 28px;
-  gap: 4px;
-}
-.plan-toggle-btn {
-  flex: 1;
-  padding: 9px;
-  border-radius: 100px;
-  border: none;
-  background: transparent;
-  color: rgba(255,255,255,0.5);
-  font-size: 13px;
-  font-weight: 500;
-  font-family: 'DM Sans', sans-serif;
-  cursor: pointer;
-  transition: all 0.2s;
-  text-align: center;
-  position: relative;
-}
-.plan-toggle-btn.active {
-  background: #F5A623;
-  color: #0A1628;
-  font-weight: 700;
-}
-.save-tag {
-  position: absolute;
-  top: -10px; right: -6px;
-  background: #27AE60;
-  color: #fff;
-  font-size: 9px;
-  font-weight: 700;
-  padding: 2px 6px;
-  border-radius: 100px;
-}
+/* PAGE */
+.page { margin-top: 58px; max-width: 1000px; margin-left: auto; margin-right: auto; padding: 36px 20px 60px; }
 
-/* Payment card */
-.payment-card {
-  background: rgba(255,255,255,0.04);
-  border: 1px solid rgba(255,255,255,0.08);
-  border-radius: 20px;
-  padding: 32px 28px;
-  margin-bottom: 16px;
-}
+/* HERO */
+.pay-hero { text-align: center; margin-bottom: 36px; }
+.pay-hero-badge { display: inline-flex; align-items: center; gap: 7px; background: rgba(245,166,35,0.1); border: 1px solid rgba(245,166,35,0.2); padding: 5px 14px; border-radius: 20px; font-size: 12px; font-weight: 600; color: #F5A623; margin-bottom: 16px; }
+.pay-hero h1 { font-size: clamp(24px, 4vw, 40px); font-weight: 900; letter-spacing: -0.5px; margin-bottom: 10px; }
+.pay-hero h1 span { color: #F5A623; }
+.pay-hero p { font-size: 14px; color: rgba(255,255,255,0.5); max-width: 480px; margin: 0 auto; line-height: 1.7; }
 
-.plan-header {
-  text-align: center;
-  margin-bottom: 24px;
-  padding-bottom: 24px;
-  border-bottom: 1px solid rgba(255,255,255,0.06);
-}
-.plan-icon { font-size: 36px; margin-bottom: 8px; }
-.plan-name {
-  font-size: 13px;
-  font-weight: 600;
-  letter-spacing: 2px;
-  text-transform: uppercase;
-  color: #F5A623;
-  margin-bottom: 8px;
-}
-.plan-price {
-  font-family: 'Playfair Display', serif;
-  font-size: 48px;
-  font-weight: 900;
-  color: #fff;
-  line-height: 1;
-  margin-bottom: 4px;
-}
-.plan-price span { font-size: 20px; color: rgba(255,255,255,0.5); }
-.plan-period { font-size: 13px; color: rgba(255,255,255,0.4); }
-.plan-savings {
-  display: inline-block;
-  margin-top: 8px;
-  padding: 3px 12px;
-  background: rgba(39,174,96,0.12);
-  color: #27AE60;
-  border: 1px solid rgba(39,174,96,0.25);
-  border-radius: 100px;
-  font-size: 12px;
-  font-weight: 600;
-}
+/* CURRENCY TOGGLE */
+.currency-toggle { display: flex; gap: 0; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; padding: 4px; width: fit-content; margin: 0 auto 32px; }
+.currency-btn { padding: 7px 20px; border-radius: 7px; font-size: 13px; font-weight: 600; cursor: pointer; border: none; background: transparent; color: rgba(255,255,255,0.4); font-family: 'Inter', sans-serif; transition: all 0.15s; }
+.currency-btn.active { background: #F5A623; color: #0A1628; }
 
-/* Features list */
-.features-list { margin-bottom: 24px; }
-.feature-item {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 8px 0;
-  border-bottom: 1px solid rgba(255,255,255,0.04);
-  font-size: 14px;
-  color: rgba(255,255,255,0.7);
-}
-.feature-item:last-child { border-bottom: none; }
-.feature-check { color: #27AE60; font-size: 14px; flex-shrink: 0; }
+/* PLANS */
+.plans-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px; margin-bottom: 36px; }
+.plan-card { background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.07); border-radius: 14px; padding: 24px; cursor: pointer; transition: all 0.2s; position: relative; }
+.plan-card:hover { border-color: rgba(245,166,35,0.3); transform: translateY(-2px); }
+.plan-card.selected { border-color: #F5A623; background: rgba(245,166,35,0.05); }
+.plan-card.popular { border-color: rgba(245,166,35,0.25); }
+.popular-badge { position: absolute; top: -10px; left: 50%; transform: translateX(-50%); background: #F5A623; color: #0A1628; font-size: 10px; font-weight: 800; padding: 3px 12px; border-radius: 20px; white-space: nowrap; text-transform: uppercase; letter-spacing: 0.5px; }
+.plan-name { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; color: rgba(255,255,255,0.4); margin-bottom: 8px; }
+.plan-price { font-size: 36px; font-weight: 900; letter-spacing: -1px; margin-bottom: 4px; color: #fff; }
+.plan-price sup { font-size: 16px; font-weight: 700; vertical-align: top; margin-top: 8px; display: inline-block; }
+.plan-period { font-size: 12px; color: rgba(255,255,255,0.35); margin-bottom: 6px; }
+.plan-save { font-size: 11px; font-weight: 700; color: #27AE60; margin-bottom: 16px; }
+.plan-features { list-style: none; display: flex; flex-direction: column; gap: 8px; margin-bottom: 20px; }
+.plan-features li { font-size: 12px; color: rgba(255,255,255,0.6); display: flex; gap: 8px; align-items: flex-start; }
+.plan-features li::before { content: '✓'; color: #27AE60; font-weight: 700; flex-shrink: 0; }
+.plan-select-btn { width: 100%; padding: 11px; border-radius: 8px; font-size: 13px; font-weight: 700; font-family: 'Inter', sans-serif; cursor: pointer; border: none; transition: all 0.15s; }
+.plan-select-btn-outline { background: transparent; border: 1px solid rgba(255,255,255,0.15) !important; color: rgba(255,255,255,0.6); }
+.plan-select-btn-gold { background: #F5A623; color: #0A1628; }
+.plan-select-btn-gold:hover { background: #f0b84a; }
+.selected-check { position: absolute; top: 14px; right: 14px; width: 22px; height: 22px; background: #F5A623; border-radius: 50%; display: none; align-items: center; justify-content: center; font-size: 12px; font-weight: 900; color: #0A1628; }
+.plan-card.selected .selected-check { display: flex; }
 
-/* Form */
-.form-group { margin-bottom: 16px; }
-label {
-  display: block;
-  font-size: 12px;
-  font-weight: 600;
-  color: rgba(255,255,255,0.5);
-  margin-bottom: 6px;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
-input {
-  width: 100%;
-  padding: 12px 16px;
-  background: rgba(255,255,255,0.06);
-  border: 1px solid rgba(255,255,255,0.1);
-  border-radius: 8px;
-  color: #fff;
-  font-size: 14px;
-  font-family: 'DM Sans', sans-serif;
-  outline: none;
-  transition: border-color 0.2s;
-}
-input:focus { border-color: #F5A623; }
-input::placeholder { color: rgba(255,255,255,0.25); }
-input:read-only { opacity: 0.7; cursor: not-allowed; }
+/* PAYMENT SECTION */
+.pay-section { display: grid; grid-template-columns: 1fr; gap: 14px; }
+@media (min-width: 700px) { .pay-section { grid-template-columns: 1fr 1fr; } }
 
-/* Pay button */
-.btn-pay {
-  width: 100%;
-  padding: 16px;
-  background: linear-gradient(135deg, #F5A623, #e8920f);
-  border: none;
-  border-radius: 10px;
-  color: #0A1628;
-  font-size: 16px;
-  font-weight: 700;
-  font-family: 'DM Sans', sans-serif;
-  cursor: pointer;
-  transition: all 0.2s;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-}
-.btn-pay:hover { transform: translateY(-2px); box-shadow: 0 8px 32px rgba(245,166,35,0.3); }
-.btn-pay:disabled { opacity: 0.6; cursor: not-allowed; transform: none; box-shadow: none; }
+/* BOX */
+.box { background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.07); border-radius: 12px; padding: 20px; }
+.box-title { font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: rgba(255,255,255,0.35); margin-bottom: 16px; }
 
-/* Security badges */
-.security-row {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 16px;
-  margin-top: 16px;
-  flex-wrap: wrap;
-}
-.security-badge {
-  display: flex;
-  align-items: center;
-  gap: 5px;
-  font-size: 11px;
-  color: rgba(255,255,255,0.3);
-}
+/* BANK DETAILS */
+.bank-detail { display: flex; align-items: center; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
+.bank-detail:last-child { border-bottom: none; }
+.bank-detail-label { font-size: 12px; color: rgba(255,255,255,0.35); }
+.bank-detail-value { font-size: 14px; font-weight: 700; display: flex; align-items: center; gap: 8px; }
+.copy-btn { padding: 3px 10px; background: rgba(245,166,35,0.1); border: 1px solid rgba(245,166,35,0.2); border-radius: 4px; font-size: 11px; font-weight: 600; color: #F5A623; cursor: pointer; font-family: 'Inter', sans-serif; transition: all 0.15s; }
+.copy-btn:hover { background: rgba(245,166,35,0.2); }
 
-/* Guarantee */
-.guarantee {
-  background: rgba(39,174,96,0.06);
-  border: 1px solid rgba(39,174,96,0.15);
-  border-radius: 12px;
-  padding: 14px 16px;
-  display: flex;
-  gap: 12px;
-  align-items: center;
-  margin-top: 16px;
-}
-.guarantee-icon { font-size: 24px; flex-shrink: 0; }
-.guarantee-text { font-size: 12px; color: rgba(255,255,255,0.5); line-height: 1.5; }
-.guarantee-text strong { color: #27AE60; }
+/* AMOUNT DISPLAY */
+.amount-display { background: rgba(245,166,35,0.08); border: 1px solid rgba(245,166,35,0.2); border-radius: 10px; padding: 16px; text-align: center; margin-bottom: 16px; }
+.amount-label { font-size: 12px; color: rgba(255,255,255,0.4); margin-bottom: 4px; }
+.amount-value { font-size: 28px; font-weight: 900; color: #F5A623; letter-spacing: -0.5px; }
+.amount-plan { font-size: 12px; color: rgba(255,255,255,0.35); margin-top: 4px; }
 
-/* Alert */
-.alert {
-  padding: 12px 16px;
-  border-radius: 8px;
-  font-size: 13px;
-  margin-bottom: 16px;
-  display: none;
-  text-align: center;
-}
-.alert.success { background: rgba(39,174,96,0.15); border: 1px solid rgba(39,174,96,0.3); color: #2ecc71; display: block; }
-.alert.error { background: rgba(231,76,60,0.15); border: 1px solid rgba(231,76,60,0.3); color: #ff6b6b; display: block; }
+/* WHATSAPP */
+.whatsapp-box { background: rgba(37,211,102,0.08); border: 1px solid rgba(37,211,102,0.2); border-radius: 10px; padding: 14px; display: flex; align-items: center; gap: 12px; margin-top: 14px; cursor: pointer; transition: all 0.15s; }
+.whatsapp-box:hover { background: rgba(37,211,102,0.12); }
+.whatsapp-icon { font-size: 28px; flex-shrink: 0; }
+.whatsapp-text { font-size: 13px; color: rgba(255,255,255,0.6); line-height: 1.5; }
+.whatsapp-text strong { color: #25d366; }
+
+/* FORM */
+.form-group { margin-bottom: 14px; }
+.form-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: rgba(255,255,255,0.4); margin-bottom: 6px; display: block; }
+.form-input, .form-select { width: 100%; padding: 10px 14px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; color: #fff; font-size: 13px; font-family: 'Inter', sans-serif; outline: none; transition: border 0.15s; }
+.form-input:focus, .form-select:focus { border-color: rgba(245,166,35,0.4); }
+.form-input::placeholder { color: rgba(255,255,255,0.2); }
+.form-select option { background: #0d1f3c; }
+.form-hint { font-size: 11px; color: rgba(255,255,255,0.25); margin-top: 4px; }
+
+/* SUBMIT */
+.btn-submit { width: 100%; padding: 14px; background: #F5A623; color: #0A1628; border: none; border-radius: 10px; font-size: 15px; font-weight: 800; cursor: pointer; font-family: 'Inter', sans-serif; transition: all 0.15s; margin-top: 6px; }
+.btn-submit:hover { background: #f0b84a; transform: translateY(-1px); }
+.btn-submit:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+
+/* STEPS */
+.steps { display: flex; flex-direction: column; gap: 12px; }
+.step { display: flex; gap: 12px; align-items: flex-start; }
+.step-num { width: 28px; height: 28px; border-radius: 7px; background: rgba(245,166,35,0.1); border: 1px solid rgba(245,166,35,0.2); display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 800; color: #F5A623; flex-shrink: 0; }
+.step-text { font-size: 13px; color: rgba(255,255,255,0.55); line-height: 1.6; padding-top: 4px; }
+.step-text strong { color: #fff; }
+
+/* TRUST BADGES */
+.trust-row { display: flex; gap: 16px; flex-wrap: wrap; justify-content: center; margin-top: 28px; }
+.trust-item { display: flex; align-items: center; gap: 7px; font-size: 12px; color: rgba(255,255,255,0.35); }
+
+/* SUCCESS */
+.success-screen { display: none; text-align: center; padding: 60px 20px; }
+.success-icon { font-size: 64px; margin-bottom: 20px; }
+.success-title { font-size: 24px; font-weight: 900; margin-bottom: 10px; }
+.success-sub { font-size: 14px; color: rgba(255,255,255,0.5); line-height: 1.7; max-width: 420px; margin: 0 auto 28px; }
+
+/* ALERT */
+.alert { padding: 10px 14px; border-radius: 8px; font-size: 13px; margin-bottom: 14px; display: none; }
+.alert.error { background: rgba(231,76,60,0.1); border: 1px solid rgba(231,76,60,0.25); color: #E74C3C; display: block; }
+.alert.success { background: rgba(39,174,96,0.1); border: 1px solid rgba(39,174,96,0.25); color: #27AE60; display: block; }
+
+/* TOAST */
+.toast { position: fixed; bottom: 20px; right: 20px; padding: 11px 18px; border-radius: 8px; font-size: 13px; font-weight: 500; color: #fff; z-index: 999; animation: slideUp 0.25s ease; }
+.toast-success { background: #27AE60; }
+.toast-info { background: #2980B9; }
+@keyframes slideUp { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:translateY(0)} }
 </style>
 </head>
 <body>
 
-<div class="topnav">
-  <a href="../dashboard/index.html" class="back-btn">← Back</a>
-  <a href="../index.html" class="topnav-logo">Analytica<span>.</span></a>
+<!-- NAV -->
+<nav class="topnav">
+  <a href="../index.html" class="nav-logo">Analytica<span>.</span></a>
+  <div class="nav-right" id="topnav-right">
+    <a href="../auth/login.html" class="btn btn-ghost">Log In</a>
+    <a href="../auth/signup.html" class="btn btn-primary">Join Free</a>
+  </div>
+</nav>
+
+<div class="page">
+
+  <!-- SUCCESS SCREEN -->
+  <div class="success-screen" id="success-screen">
+    <div class="success-icon">🎉</div>
+    <div class="success-title">Payment Submitted!</div>
+    <div class="success-sub">Thank you! We have received your payment details. Your Pro account will be activated within <strong>30 minutes</strong> after verification. Check your WhatsApp for confirmation.</div>
+    <a href="../dashboard/index.html"><button class="btn-submit" style="max-width:300px;margin:0 auto;">Go to Dashboard →</button></a>
+  </div>
+
+  <!-- MAIN CONTENT -->
+  <div id="main-content">
+
+    <!-- HERO -->
+    <div class="pay-hero">
+      <div class="pay-hero-badge">⭐ Upgrade to Pro</div>
+      <h1>Unlock the Full <span>Analytica</span> Experience</h1>
+      <p>Join thousands of tech professionals who use Analytica Pro to build faster, get hired and grow their careers.</p>
+    </div>
+
+    <!-- CURRENCY TOGGLE -->
+    <div class="currency-toggle">
+      <button class="currency-btn active" onclick="setCurrency('ngn', this)">🇳🇬 Naira (₦)</button>
+      <button class="currency-btn" onclick="setCurrency('usd', this)">🌍 USD ($)</button>
+    </div>
+
+    <!-- PLANS -->
+    <div class="plans-grid">
+
+      <div class="plan-card" id="plan-monthly" onclick="selectPlan('monthly')">
+        <div class="selected-check">✓</div>
+        <div class="plan-name">Monthly</div>
+        <div class="plan-price" id="price-monthly"><sup>₦</sup>2,500</div>
+        <div class="plan-period">per month</div>
+        <div class="plan-save"> </div>
+        <ul class="plan-features">
+          <li>Unlimited Collab Rooms</li>
+          <li>AI Job Matchmaking</li>
+          <li>Verified Skill Badges</li>
+          <li>Priority Job Applications</li>
+          <li>Mentorship Access</li>
+        </ul>
+        <button class="plan-select-btn plan-select-btn-outline">Select Plan</button>
+      </div>
+
+      <div class="plan-card popular" id="plan-quarterly" onclick="selectPlan('quarterly')">
+        <div class="popular-badge">⭐ Most Popular</div>
+        <div class="selected-check">✓</div>
+        <div class="plan-name">Quarterly</div>
+        <div class="plan-price" id="price-quarterly"><sup>₦</sup>6,000</div>
+        <div class="plan-period">every 3 months</div>
+        <div class="plan-save">Save 20% — ₦2,000/month</div>
+        <ul class="plan-features">
+          <li>Everything in Monthly</li>
+          <li>Portfolio Showcase Page</li>
+          <li>Advanced AI Assistant</li>
+          <li>Unlimited Challenges</li>
+          <li>Early Access to Features</li>
+        </ul>
+        <button class="plan-select-btn plan-select-btn-gold">Select Plan</button>
+      </div>
+
+      <div class="plan-card" id="plan-yearly" onclick="selectPlan('yearly')">
+        <div class="selected-check">✓</div>
+        <div class="plan-name">Yearly</div>
+        <div class="plan-price" id="price-yearly"><sup>₦</sup>20,000</div>
+        <div class="plan-period">per year</div>
+        <div class="plan-save">Save 33% — ₦1,667/month</div>
+        <ul class="plan-features">
+          <li>Everything in Quarterly</li>
+          <li>1 Free Mentorship Session</li>
+          <li>Founder Badge on Profile</li>
+          <li>Direct Support Line</li>
+          <li>Lock in Launch Price Forever</li>
+        </ul>
+        <button class="plan-select-btn plan-select-btn-outline">Select Plan</button>
+      </div>
+
+    </div>
+
+    <!-- PAYMENT SECTION -->
+    <div class="pay-section">
+
+      <!-- BANK DETAILS -->
+      <div>
+        <div class="box" style="margin-bottom:14px;">
+          <div class="box-title">How to Pay</div>
+          <div class="steps">
+            <div class="step">
+              <div class="step-num">1</div>
+              <div class="step-text"><strong>Select your plan</strong> above and note the amount</div>
+            </div>
+            <div class="step">
+              <div class="step-num">2</div>
+              <div class="step-text"><strong>Transfer the exact amount</strong> to the account below</div>
+            </div>
+            <div class="step">
+              <div class="step-num">3</div>
+              <div class="step-text"><strong>Fill the form</strong> on the right with your payment details</div>
+            </div>
+            <div class="step">
+              <div class="step-num">4</div>
+              <div class="step-text"><strong>Send your receipt</strong> on WhatsApp for faster verification</div>
+            </div>
+            <div class="step">
+              <div class="step-num">5</div>
+              <div class="step-text">Your account will be <strong>upgraded within 30 minutes</strong></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="box">
+          <div class="box-title">Bank Details</div>
+          <div class="bank-detail">
+            <div class="bank-detail-label">Bank</div>
+            <div class="bank-detail-value">OPay</div>
+          </div>
+          <div class="bank-detail">
+            <div class="bank-detail-label">Account Number</div>
+            <div class="bank-detail-value">
+              8128129139
+              <button class="copy-btn" onclick="copyText('8128129139')">Copy</button>
+            </div>
+          </div>
+          <div class="bank-detail">
+            <div class="bank-detail-label">Account Name</div>
+            <div class="bank-detail-value">Akingboye Ayomide Mishael</div>
+          </div>
+          <div class="bank-detail">
+            <div class="bank-detail-label">Amount</div>
+            <div class="bank-detail-value" id="bank-amount" style="color:#F5A623;">Select a plan above</div>
+          </div>
+
+          <div class="whatsapp-box" onclick="openWhatsApp()">
+            <div class="whatsapp-icon">💬</div>
+            <div class="whatsapp-text">Send payment proof on WhatsApp for <strong>instant verification</strong> — tap here to open chat</div>
+          </div>
+        </div>
+
+        <!-- USD NOTE -->
+        <div id="usd-note" style="display:none;margin-top:14px;">
+          <div class="box" style="border-color:rgba(41,128,185,0.2);background:rgba(41,128,185,0.04);">
+            <div class="box-title" style="color:#2980B9;">International Payment</div>
+            <div style="font-size:13px;color:rgba(255,255,255,0.5);line-height:1.7;">
+              For USD payments, please send via <strong style="color:#fff;">Wise, Payoneer or Western Union</strong> to the email below, then fill the form with your transfer reference.<br><br>
+              <strong style="color:#F5A623;">analytica.pay@gmail.com</strong><br><br>
+              <span style="font-size:12px;">Exchange rate used: $1 = ₦1,600. Prices shown in USD are approximate.</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PAYMENT FORM -->
+      <div class="box">
+        <div class="box-title">Confirm Your Payment</div>
+
+        <div class="amount-display">
+          <div class="amount-label">You are paying</div>
+          <div class="amount-value" id="form-amount">Select a plan</div>
+          <div class="amount-plan" id="form-plan">No plan selected</div>
+        </div>
+
+        <div class="alert" id="form-alert"></div>
+
+        <div class="form-group">
+          <label class="form-label">Full Name *</label>
+          <input class="form-input" type="text" id="f-name" placeholder="As it appears on your account">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Email Address *</label>
+          <input class="form-input" type="email" id="f-email" placeholder="Your Analytica account email">
+          <div class="form-hint">Must match your Analytica account</div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Phone Number *</label>
+          <input class="form-input" type="tel" id="f-phone" placeholder="e.g. 08012345678">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Selected Plan *</label>
+          <select class="form-select" id="f-plan">
+            <option value="">Select your plan</option>
+            <option value="monthly_ngn">Monthly — ₦2,500</option>
+            <option value="quarterly_ngn">Quarterly — ₦6,000</option>
+            <option value="yearly_ngn">Yearly — ₦20,000</option>
+            <option value="monthly_usd">Monthly — $2</option>
+            <option value="quarterly_usd">Quarterly — $4</option>
+            <option value="yearly_usd">Yearly — $13</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Payment Reference / Teller *</label>
+          <input class="form-input" type="text" id="f-ref" placeholder="e.g. OPay ref number or transfer ID">
+          <div class="form-hint">Find this in your bank app after transfer</div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Date of Payment *</label>
+          <input class="form-input" type="date" id="f-date">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Additional Notes (optional)</label>
+          <input class="form-input" type="text" id="f-notes" placeholder="Any extra info for us">
+        </div>
+
+        <button class="btn-submit" id="submit-btn" onclick="submitPayment()">
+          Submit Payment Details →
+        </button>
+
+        <div style="text-align:center;margin-top:14px;font-size:12px;color:rgba(255,255,255,0.25);">
+          Your Pro account will be activated within 30 minutes of verification
+        </div>
+      </div>
+
+    </div>
+
+    <!-- TRUST -->
+    <div class="trust-row">
+      <div class="trust-item">🔒 Secure & Private</div>
+      <div class="trust-item">⚡ Activated in 30 min</div>
+      <div class="trust-item">💬 WhatsApp Support</div>
+      <div class="trust-item">↩️ 7-day refund policy</div>
+      <div class="trust-item">🌍 Worldwide access</div>
+    </div>
+
+  </div>
 </div>
 
-<div class="payment-wrap">
-
-  <!-- Plan Toggle -->
-  <div class="plan-toggle">
-    <button class="plan-toggle-btn active" id="monthly-btn" onclick="setPlan('monthly')">
-      Monthly
-    </button>
-    <button class="plan-toggle-btn" id="yearly-btn" onclick="setPlan('yearly')">
-      Yearly
-      <span class="save-tag">-20%</span>
-    </button>
-  </div>
-
-  <div class="alert" id="payment-alert"></div>
-
-  <!-- Payment Card -->
-  <div class="payment-card">
-
-    <div class="plan-header">
-      <div class="plan-icon">⚡</div>
-      <div class="plan-name">Pro Plan</div>
-      <div class="plan-price" id="price-display">₦2,500<span>/mo</span></div>
-      <div class="plan-period" id="period-display">Billed monthly • Cancel anytime</div>
-      <div class="plan-savings" id="savings-display" style="display:none;">Save ₦6,000/year</div>
-    </div>
-
-    <!-- Features -->
-    <div class="features-list">
-      <div class="feature-item"><span class="feature-check">✓</span> Everything in Free</div>
-      <div class="feature-item"><span class="feature-check">✓</span> 🤖 AI Data Assistant</div>
-      <div class="feature-item"><span class="feature-check">✓</span> 📝 SQL Playground</div>
-      <div class="feature-item"><span class="feature-check">✓</span> Unlimited Dataset Downloads</div>
-      <div class="feature-item"><span class="feature-check">✓</span> 📄 CV & Portfolio Builder</div>
-      <div class="feature-item"><span class="feature-check">✓</span> Apply to Jobs</div>
-      <div class="feature-item"><span class="feature-check">✓</span> Premium Certificates</div>
-      <div class="feature-item"><span class="feature-check">✓</span> Priority Forum Support</div>
-    </div>
-
-    <!-- Form -->
-    <div class="form-group">
-      <label>Full Name</label>
-      <input type="text" id="pay-name" placeholder="Your full name">
-    </div>
-    <div class="form-group">
-      <label>Email Address</label>
-      <input type="email" id="pay-email" placeholder="your@email.com">
-    </div>
-
-    <button class="btn-pay" id="pay-btn" onclick="initiatePayment()">
-      🔒 Pay <span id="pay-amount">₦2,500</span> — Upgrade Now
-    </button>
-
-    <div class="security-row">
-      <div class="security-badge">🔒 Secured by Paystack</div>
-      <div class="security-badge">🏦 Nigerian Banks Supported</div>
-      <div class="security-badge">📱 USSD & Cards</div>
-    </div>
-  </div>
-
-  <div class="guarantee">
-    <div class="guarantee-icon">🛡️</div>
-    <div class="guarantee-text">
-      <strong>30-Day Money-Back Guarantee.</strong> Not satisfied? Contact us within 30 days for a full refund — no questions asked.
-    </div>
-  </div>
-
-</div>
-
-<script src="https://js.paystack.co/v1/inline.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="../js/supabase.js"></script>
 <script>
-let currentPlan = 'monthly'
-let currentUser = null
 
-const PAYSTACK_PUBLIC_KEY = 'pk_test_xxxxxxxxxxxxxxxxxxxxxxxxxx'
-
-const plans = {
-  monthly: { amount: 250000, display: '₦2,500', period: 'Billed monthly • Cancel anytime' },
-  yearly: { amount: 2400000, display: '₦24,000', period: 'Billed yearly • Save ₦6,000' }
+// PRICING
+const PRICES = {
+  ngn: { monthly: '₦2,500', quarterly: '₦6,000', yearly: '₦20,000' },
+  usd: { monthly: '$2', quarterly: '$4', yearly: '$13' }
+}
+const PRICE_LABELS = {
+  ngn: { monthly: '₦2,500 / month', quarterly: '₦6,000 / 3 months', yearly: '₦20,000 / year' },
+  usd: { monthly: '$2 / month', quarterly: '$4 / 3 months', yearly: '$13 / year' }
+}
+const BANK_AMOUNTS = {
+  ngn: { monthly: '₦2,500', quarterly: '₦6,000', yearly: '₦20,000' },
+  usd: { monthly: '$2 (via Wise/Payoneer)', quarterly: '$4 (via Wise/Payoneer)', yearly: '$13 (via Wise/Payoneer)' }
 }
 
-// ── LOAD USER ──
-async function loadUser() {
-  const { data: { session } } = await db.auth.getSession()
-  if (!session) {
-    window.location.href = '../auth/login.html'
-    return
+let currentCurrency = 'ngn'
+let currentPlan = 'quarterly'
+
+// CURRENCY
+function setCurrency(cur, btn) {
+  currentCurrency = cur
+  document.querySelectorAll('.currency-btn').forEach(b => b.classList.remove('active'))
+  btn.classList.add('active')
+  document.getElementById('usd-note').style.display = cur === 'usd' ? 'block' : 'none'
+  updatePrices()
+  updateSelected()
+}
+
+function updatePrices() {
+  const p = PRICES[currentCurrency]
+  document.getElementById('price-monthly').innerHTML = `${p.monthly}`
+  document.getElementById('price-quarterly').innerHTML = `${p.quarterly}`
+  document.getElementById('price-yearly').innerHTML = `${p.yearly}`
+  // Update save labels
+  if (currentCurrency === 'usd') {
+    document.querySelectorAll('.plan-save')[0].textContent = ' '
+    document.querySelectorAll('.plan-save')[1].textContent = 'Save 33% — $1.33/month'
+    document.querySelectorAll('.plan-save')[2].textContent = 'Save 46% — $1.08/month'
+  } else {
+    document.querySelectorAll('.plan-save')[0].textContent = ' '
+    document.querySelectorAll('.plan-save')[1].textContent = 'Save 20% — ₦2,000/month'
+    document.querySelectorAll('.plan-save')[2].textContent = 'Save 33% — ₦1,667/month'
   }
-  currentUser = session.user
-  const meta = currentUser.user_metadata || {}
-  const name = meta.full_name || meta.first_name || ''
-  document.getElementById('pay-name').value = name
-  document.getElementById('pay-email').value = currentUser.email
-  document.getElementById('pay-email').readOnly = true
 }
 
-// ── SET PLAN ──
-function setPlan(plan) {
+// SELECT PLAN
+function selectPlan(plan) {
   currentPlan = plan
-  document.getElementById('monthly-btn').classList.toggle('active', plan === 'monthly')
-  document.getElementById('yearly-btn').classList.toggle('active', plan === 'yearly')
-  document.getElementById('price-display').innerHTML = `${plans[plan].display}<span>/mo</span>`
-  document.getElementById('period-display').textContent = plans[plan].period
-  document.getElementById('pay-amount').textContent = plans[plan].display
-  const savings = document.getElementById('savings-display')
-  savings.style.display = plan === 'yearly' ? 'inline-block' : 'none'
+  document.querySelectorAll('.plan-card').forEach(c => c.classList.remove('selected'))
+  document.getElementById(`plan-${plan}`).classList.add('selected')
+  updateSelected()
 }
 
-// ── INITIATE PAYMENT ──
-function initiatePayment() {
-  const name = document.getElementById('pay-name').value.trim()
-  const email = document.getElementById('pay-email').value.trim()
-  const alertBox = document.getElementById('payment-alert')
-  const btn = document.getElementById('pay-btn')
+function updateSelected() {
+  const label = PRICE_LABELS[currentCurrency][currentPlan] || 'Select a plan'
+  const bankAmt = BANK_AMOUNTS[currentCurrency][currentPlan] || 'Select a plan above'
+  document.getElementById('form-amount').textContent = PRICES[currentCurrency][currentPlan] || 'Select a plan'
+  document.getElementById('form-plan').textContent = `Pro ${currentPlan.charAt(0).toUpperCase() + currentPlan.slice(1)} Plan`
+  document.getElementById('bank-amount').textContent = bankAmt
+  // Auto-select in dropdown
+  const planVal = `${currentPlan}_${currentCurrency}`
+  const select = document.getElementById('f-plan')
+  for (let opt of select.options) { if (opt.value === planVal) { select.value = planVal; break; } }
+}
 
-  if (!name) {
-    alertBox.textContent = 'Please enter your full name.'
-    alertBox.className = 'alert error'
-    return
+// COPY
+function copyText(text) {
+  navigator.clipboard.writeText(text).then(() => showToast('✓ Account number copied!', 'success'))
+}
+
+// WHATSAPP
+function openWhatsApp() {
+  const plan = currentPlan.charAt(0).toUpperCase() + currentPlan.slice(1)
+  const price = PRICES[currentCurrency][currentPlan] || ''
+  const msg = encodeURIComponent(`Hi! I just made payment for Analytica Pro ${plan} Plan (${price}). Please find my payment details attached. My email is: `)
+  window.open(`https://wa.me/2348128129139?text=${msg}`, '_blank')
+}
+
+// SUBMIT PAYMENT
+async function submitPayment() {
+  const name = document.getElementById('f-name').value.trim()
+  const email = document.getElementById('f-email').value.trim()
+  const phone = document.getElementById('f-phone').value.trim()
+  const plan = document.getElementById('f-plan').value
+  const ref = document.getElementById('f-ref').value.trim()
+  const date = document.getElementById('f-date').value
+  const notes = document.getElementById('f-notes').value.trim()
+  const alertBox = document.getElementById('form-alert')
+
+  if (!name) { alertBox.textContent = 'Please enter your full name.'; alertBox.className = 'alert error'; return }
+  if (!email) { alertBox.textContent = 'Please enter your email address.'; alertBox.className = 'alert error'; return }
+  if (!phone) { alertBox.textContent = 'Please enter your phone number.'; alertBox.className = 'alert error'; return }
+  if (!plan) { alertBox.textContent = 'Please select a plan.'; alertBox.className = 'alert error'; return }
+  if (!ref) { alertBox.textContent = 'Please enter your payment reference.'; alertBox.className = 'alert error'; return }
+  if (!date) { alertBox.textContent = 'Please enter the date of payment.'; alertBox.className = 'alert error'; return }
+
+  const btn = document.getElementById('submit-btn')
+  btn.disabled = true
+  btn.textContent = 'Submitting...'
+
+  // Save to Supabase
+  try {
+    const { error } = await db.from('payment_requests').insert([{
+      full_name: name,
+      email: email,
+      phone: phone,
+      plan: plan,
+      payment_ref: ref,
+      payment_date: date,
+      notes: notes,
+      status: 'pending',
+      created_at: new Date().toISOString()
+    }])
+
+    if (error) throw error
+
+    // Show success
+    document.getElementById('main-content').style.display = 'none'
+    document.getElementById('success-screen').style.display = 'block'
+    window.scrollTo(0, 0)
+
+    // Also open WhatsApp automatically
+    setTimeout(() => openWhatsApp(), 1500)
+
+  } catch (err) {
+    // Even if DB fails, show success and open WhatsApp
+    // so no payment is lost
+    document.getElementById('main-content').style.display = 'none'
+    document.getElementById('success-screen').style.display = 'block'
+    window.scrollTo(0, 0)
+    setTimeout(() => openWhatsApp(), 1500)
   }
 
-  alertBox.className = 'alert'
-  btn.disabled = true
-  btn.textContent = '⏳ Opening payment...'
-
-  const handler = PaystackPop.setup({
-    key: PAYSTACK_PUBLIC_KEY,
-    email: email,
-    amount: plans[currentPlan].amount,
-    currency: 'NGN',
-    ref: 'ANALYTICA_' + Date.now(),
-    metadata: {
-      custom_fields: [
-        { display_name: 'Plan', variable_name: 'plan', value: currentPlan },
-        { display_name: 'User ID', variable_name: 'user_id', value: currentUser?.id || '' }
-      ]
-    },
-    callback: async function(response) {
-      // Payment successful
-      alertBox.textContent = '🎉 Payment successful! Upgrading your account...'
-      alertBox.className = 'alert success'
-      btn.textContent = '✅ Payment Successful!'
-
-      // Update user metadata to Pro
-      await db.auth.updateUser({
-        data: { plan: 'pro', payment_ref: response.reference }
-      })
-
-      setTimeout(() => {
-        window.location.href = '../dashboard/index.html'
-      }, 2000)
-    },
-    onClose: function() {
-      btn.disabled = false
-      btn.innerHTML = `🔒 Pay <span id="pay-amount">${plans[currentPlan].display}</span> — Upgrade Now`
-    }
-  })
-
-  handler.openIframe()
+  btn.disabled = false
+  btn.textContent = 'Submit Payment Details →'
 }
 
-loadUser()
+function showToast(msg, type = 'success') {
+  const t = document.createElement('div')
+  t.className = `toast toast-${type}`
+  t.textContent = msg
+  document.body.appendChild(t)
+  setTimeout(() => t.remove(), 3000)
+}
+
+// Pre-select quarterly on load
+selectPlan('quarterly')
+
+// Load user email if logged in
+document.addEventListener('DOMContentLoaded', async () => {
+  const user = await getCurrentUser()
+  if (user) {
+    document.getElementById('f-email').value = user.email || ''
+    const meta = user.user_metadata || {}
+    document.getElementById('f-name').value = meta.full_name || ''
+  }
+})
 </script>
 </body>
 </html>

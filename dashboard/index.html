@@ -514,7 +514,22 @@ a { text-decoration: none; color: inherit; }
 </div>
 
 <script src="../js/supabase.js"></script>
-<script>
+// Protect this page — must be logged in
+let currentDashUser = null;
+(async () => {
+  currentDashUser = await requireAuth();
+  if (currentDashUser) loadDashboardUser();
+})();
+
+function loadDashboardUser() {
+  const meta = currentDashUser.user_metadata || {};
+  const name = meta.full_name || meta.first_name || currentDashUser.email.split('@')[0];
+  const initial = name[0].toUpperCase();
+  document.querySelector('.nav-avatar').textContent = initial;
+  document.querySelector('.welcome-left h2').innerHTML = `👋 Welcome back, ${meta.first_name || name}!`;
+  document.querySelector('.profile-avatar-lg').textContent = initial;
+  document.querySelector('.profile-name').textContent = name;
+}
 
 const NOTIFS = [
   { id:1, init:'SK', text:'<strong>Sarah K.</strong> invited you to join her Collab Room', time:'5 min ago', unread:true },

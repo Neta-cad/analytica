@@ -157,10 +157,10 @@ a { text-decoration: none; color: inherit; }
 <!-- NAV -->
 <nav class="topnav">
   <a href="../index.html" class="nav-logo">Analytica<span>.</span></a>
-  <div class="nav-right">
-    <a href="../auth/login.html" class="btn btn-ghost">Log In</a>
-    <a href="../auth/signup.html" class="btn btn-primary">Join Free</a>
-  </div>
+<div class="nav-right" id="topnav-right">
+  <a href="../auth/login.html" class="btn btn-ghost">Log In</a>
+  <a href="../auth/signup.html" class="btn btn-primary">Join Free</a>
+</div>
 </nav>
 
 <div class="page">
@@ -411,9 +411,23 @@ function searchMentors(val) {
   renderMentors();
 }
 
-function openBooking(id, name, e) {
+async function openBooking(id, name, e) {
   e.stopPropagation();
   selectedMentor = MENTORS.find(m => m.id === id);
+
+  // Free sessions — open straight away, just need to be logged in
+  if (selectedMentor.free) {
+    const user = await getCurrentUser();
+    if (!user) {
+      window.location.href = '../auth/login.html';
+      return;
+    }
+  } else {
+    // Paid sessions — require Pro
+    const allowed = await requirePro();
+    if (!allowed) return;
+  }
+
   document.getElementById('modal-title').textContent = `Book with ${name}`;
   document.getElementById('modal-sub').textContent = selectedMentor.available ? 'Choose your session type and preferred time' : 'Join the waitlist — we\'ll notify you when they\'re available';
   document.getElementById('modal-bg').classList.add('open');

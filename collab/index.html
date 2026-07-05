@@ -4,384 +4,140 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Collab Rooms — Analytica</title>
-<link rel="stylesheet" href="../css/main.css">
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-body { background: #0A1628; color: #fff; font-family: 'DM Sans', sans-serif; min-height: 100vh; }
+body { background: #0A1628; color: #fff; font-family: 'Inter', sans-serif; min-height: 100vh; }
 a { text-decoration: none; color: inherit; }
 
-/* ── TOPNAV ── */
-.topnav {
-  position: fixed; top: 0; left: 0; right: 0; height: 60px;
-  background: rgba(10,22,40,0.97); backdrop-filter: blur(20px);
-  border-bottom: 1px solid rgba(255,255,255,0.06);
-  display: flex; align-items: center; justify-content: space-between;
-  padding: 0 24px; z-index: 40;
-}
-.topnav-logo { font-family: 'Playfair Display', serif; font-size: 20px; font-weight: 900; color: #fff; }
-.topnav-logo span { color: #F5A623; }
-.topnav-right { display: flex; gap: 10px; align-items: center; }
-.btn-sm {
-  padding: 7px 16px; border-radius: 6px; font-size: 13px; font-weight: 600;
-  font-family: 'DM Sans', sans-serif; cursor: pointer; border: none; transition: all 0.2s;
-  text-decoration: none; display: inline-block;
-}
-.btn-gold { background: #F5A623; color: #0A1628; }
-.btn-gold:hover { background: #ffc14d; }
-.btn-outline { background: transparent; border: 1px solid rgba(255,255,255,0.2) !important; color: #fff; }
-.btn-outline:hover { border-color: #F5A623 !important; color: #F5A623; }
+.topnav { position: fixed; top: 0; left: 0; right: 0; height: 58px; background: rgba(10,22,40,0.98); backdrop-filter: blur(12px); border-bottom: 1px solid rgba(255,255,255,0.07); display: flex; align-items: center; padding: 0 20px; gap: 12px; z-index: 100; }
+.nav-logo { font-size: 18px; font-weight: 800; color: #fff; letter-spacing: -0.5px; }
+.nav-logo span { color: #F5A623; }
+.nav-right { margin-left: auto; display: flex; gap: 8px; }
+.btn { padding: 7px 16px; border-radius: 7px; font-size: 13px; font-weight: 600; font-family: 'Inter', sans-serif; cursor: pointer; border: none; transition: all 0.15s; display: inline-block; }
+.btn-ghost { background: transparent; border: 1px solid rgba(255,255,255,0.15) !important; color: rgba(255,255,255,0.7); }
+.btn-ghost:hover { color: #fff; }
+.btn-primary { background: #F5A623; color: #0A1628; font-weight: 700; }
+.btn-primary:hover { background: #f0b84a; }
 
-/* ── PAGE ── */
-.page { margin-top: 60px; padding: 36px 20px; max-width: 1100px; margin-left: auto; margin-right: auto; }
+.page { margin-top: 58px; max-width: 1080px; margin-left: auto; margin-right: auto; padding: 28px 20px 60px; }
 
-/* ── HERO BANNER ── */
-.collab-hero {
-  background: linear-gradient(135deg, rgba(245,166,35,0.1), rgba(245,166,35,0.02));
-  border: 1px solid rgba(245,166,35,0.2);
-  border-radius: 20px; padding: 48px 32px; text-align: center; margin-bottom: 40px;
-  position: relative; overflow: hidden;
-}
-.collab-hero::before {
-  content: '';
-  position: absolute; inset: 0;
-  background-image: linear-gradient(rgba(245,166,35,0.03) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(245,166,35,0.03) 1px, transparent 1px);
-  background-size: 40px 40px;
-}
-.collab-hero-badge {
-  display: inline-flex; align-items: center; gap: 8px;
-  background: rgba(245,166,35,0.12); border: 1px solid rgba(245,166,35,0.3);
-  padding: 6px 16px; border-radius: 50px; font-size: 12px; font-weight: 600;
-  color: #F5A623; margin-bottom: 20px; position: relative;
-}
-.live-dot { width: 7px; height: 7px; background: #27AE60; border-radius: 50%; animation: pulse 1.5s infinite; }
-@keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.5;transform:scale(1.5)} }
-.collab-hero h1 {
-  font-family: 'Playfair Display', serif; font-size: clamp(28px, 5vw, 52px);
-  font-weight: 900; line-height: 1.15; margin-bottom: 16px; position: relative;
-}
-.collab-hero h1 em { font-style: italic; color: #F5A623; }
-.collab-hero p { color: rgba(255,255,255,0.55); font-size: 16px; line-height: 1.7; max-width: 560px; margin: 0 auto 28px; position: relative; }
-.hero-btns { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; position: relative; }
-.btn-create {
-  padding: 13px 28px; background: #F5A623; color: #0A1628;
-  border-radius: 10px; font-size: 15px; font-weight: 700;
-  border: none; cursor: pointer; font-family: 'DM Sans', sans-serif;
-  transition: all 0.2s;
-}
-.btn-create:hover { background: #ffc14d; transform: translateY(-2px); }
-.btn-browse {
-  padding: 13px 28px; background: transparent;
-  border: 1px solid rgba(255,255,255,0.2); color: #fff;
-  border-radius: 10px; font-size: 15px; font-weight: 600;
-  cursor: pointer; font-family: 'DM Sans', sans-serif; transition: all 0.2s;
-}
-.btn-browse:hover { border-color: #F5A623; color: #F5A623; }
+/* HERO */
+.hero { background: linear-gradient(135deg, rgba(245,166,35,0.08), rgba(245,166,35,0.02)); border: 1px solid rgba(245,166,35,0.15); border-radius: 14px; padding: 36px 28px; margin-bottom: 24px; position: relative; overflow: hidden; }
+.hero::before { content: ''; position: absolute; inset: 0; background-image: linear-gradient(rgba(245,166,35,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(245,166,35,0.03) 1px, transparent 1px); background-size: 40px 40px; }
+.hero-badge { display: inline-flex; align-items: center; gap: 7px; background: rgba(245,166,35,0.1); border: 1px solid rgba(245,166,35,0.2); padding: 5px 14px; border-radius: 20px; font-size: 12px; font-weight: 600; color: #F5A623; margin-bottom: 14px; position: relative; }
+.live-dot { width: 7px; height: 7px; background: #27AE60; border-radius: 50%; animation: blink 1.5s infinite; }
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
+.hero h1 { font-size: clamp(22px, 4vw, 40px); font-weight: 900; letter-spacing: -0.5px; margin-bottom: 10px; line-height: 1.2; position: relative; }
+.hero h1 span { color: #F5A623; }
+.hero p { font-size: 14px; color: rgba(255,255,255,0.5); line-height: 1.7; max-width: 520px; margin-bottom: 20px; position: relative; }
+.hero-btns { display: flex; gap: 10px; flex-wrap: wrap; position: relative; }
+.btn-create { padding: 11px 24px; background: #F5A623; color: #0A1628; border: none; border-radius: 8px; font-size: 14px; font-weight: 700; cursor: pointer; font-family: 'Inter', sans-serif; transition: all 0.15s; }
+.btn-create:hover { background: #f0b84a; transform: translateY(-1px); }
 
-/* ── STATS ROW ── */
-.stats-row { display: flex; gap: 16px; margin-bottom: 36px; flex-wrap: wrap; }
-.stat-pill {
-  background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.07);
-  border-radius: 10px; padding: 14px 20px; flex: 1; min-width: 120px; text-align: center;
-}
-.stat-pill-num { font-family: 'Playfair Display', serif; font-size: 24px; font-weight: 900; color: #F5A623; }
-.stat-pill-label { font-size: 11px; color: rgba(255,255,255,0.4); margin-top: 2px; text-transform: uppercase; letter-spacing: 1px; }
+/* STATS */
+.stats-row { display: flex; gap: 12px; margin-bottom: 24px; flex-wrap: wrap; }
+.stat-pill { background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.07); border-radius: 10px; padding: 12px 18px; flex: 1; min-width: 100px; text-align: center; }
+.stat-num { font-size: 22px; font-weight: 900; color: #F5A623; }
+.stat-label { font-size: 10px; color: rgba(255,255,255,0.3); text-transform: uppercase; letter-spacing: 0.5px; margin-top: 2px; }
 
-/* ── FILTERS ── */
-.filters-bar { display: flex; gap: 10px; margin-bottom: 28px; flex-wrap: wrap; align-items: center; }
-.filter-btn {
-  padding: 7px 16px; border-radius: 20px; font-size: 13px; font-weight: 500;
-  cursor: pointer; border: 1px solid rgba(255,255,255,0.1);
-  background: transparent; color: rgba(255,255,255,0.5); transition: all 0.2s;
-  font-family: 'DM Sans', sans-serif;
-}
-.filter-btn:hover, .filter-btn.active { background: rgba(245,166,35,0.1); border-color: rgba(245,166,35,0.4); color: #F5A623; }
-.search-box {
-  margin-left: auto; padding: 8px 16px;
-  background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1);
-  border-radius: 8px; color: #fff; font-size: 13px; font-family: 'DM Sans', sans-serif;
-  outline: none; width: 200px;
-}
-.search-box:focus { border-color: rgba(245,166,35,0.4); }
-.search-box::placeholder { color: rgba(255,255,255,0.3); }
+/* FILTERS */
+.filters-bar { display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; align-items: center; }
+.filter-pill { padding: 6px 14px; border-radius: 20px; font-size: 12px; font-weight: 500; cursor: pointer; border: 1px solid rgba(255,255,255,0.1); background: transparent; color: rgba(255,255,255,0.4); transition: all 0.15s; font-family: 'Inter', sans-serif; }
+.filter-pill:hover, .filter-pill.active { background: rgba(245,166,35,0.08); border-color: rgba(245,166,35,0.3); color: #F5A623; }
+.search-box { margin-left: auto; padding: 7px 14px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; color: #fff; font-size: 12px; font-family: 'Inter', sans-serif; outline: none; width: 180px; }
+.search-box:focus { border-color: rgba(245,166,35,0.3); }
+.search-box::placeholder { color: rgba(255,255,255,0.2); }
 
-/* ── SECTION TITLE ── */
-.section-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
-.section-head h2 { font-size: 16px; font-weight: 700; }
-.section-head span { font-size: 12px; color: rgba(255,255,255,0.3); }
+/* SECTION HEADER */
+.sec-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+.sec-title { font-size: 14px; font-weight: 700; }
+.sec-count { font-size: 12px; color: rgba(255,255,255,0.3); }
 
-/* ── ROOMS GRID ── */
-.rooms-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 16px; margin-bottom: 48px; }
+/* ROOMS GRID */
+.rooms-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 14px; }
 
-.room-card {
-  background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.07);
-  border-radius: 16px; padding: 22px; transition: all 0.3s; cursor: pointer; position: relative;
-}
-.room-card:hover { background: rgba(245,166,35,0.04); border-color: rgba(245,166,35,0.2); transform: translateY(-3px); }
+.room-card { background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.07); border-radius: 14px; padding: 18px; transition: all 0.2s; cursor: pointer; position: relative; }
+.room-card:hover { background: rgba(245,166,35,0.03); border-color: rgba(245,166,35,0.2); transform: translateY(-2px); }
+.room-card.mine { border-color: rgba(245,166,35,0.2); }
 
-.room-top { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 12px; }
-.room-status {
-  display: flex; align-items: center; gap: 6px;
-  font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px;
-  padding: 4px 10px; border-radius: 20px;
-}
-.status-live { background: rgba(39,174,96,0.12); color: #27AE60; border: 1px solid rgba(39,174,96,0.2); }
-.status-open { background: rgba(245,166,35,0.12); color: #F5A623; border: 1px solid rgba(245,166,35,0.2); }
+.room-top { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 10px; }
+.room-status { display: flex; align-items: center; gap: 5px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; padding: 3px 9px; border-radius: 20px; }
+.status-open { background: rgba(245,166,35,0.1); color: #F5A623; border: 1px solid rgba(245,166,35,0.2); }
 .status-full { background: rgba(255,255,255,0.05); color: rgba(255,255,255,0.3); border: 1px solid rgba(255,255,255,0.08); }
-.status-dot { width: 6px; height: 6px; border-radius: 50%; }
-.dot-green { background: #27AE60; animation: pulse 1.5s infinite; }
-.dot-gold { background: #F5A623; }
-.dot-gray { background: rgba(255,255,255,0.3); }
+.room-cat { font-size: 10px; color: rgba(255,255,255,0.3); background: rgba(255,255,255,0.05); padding: 3px 9px; border-radius: 4px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+.mine-badge { font-size: 10px; color: #F5A623; font-weight: 700; }
 
-.room-type-badge {
-  font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px;
-  padding: 3px 8px; border-radius: 4px; background: rgba(255,255,255,0.06); color: rgba(255,255,255,0.4);
-}
+.room-title { font-size: 14px; font-weight: 700; margin-bottom: 6px; line-height: 1.4; }
+.room-desc { font-size: 12px; color: rgba(255,255,255,0.4); line-height: 1.6; margin-bottom: 10px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
 
-.room-title { font-size: 16px; font-weight: 700; margin-bottom: 8px; line-height: 1.4; }
-.room-desc { font-size: 13px; color: rgba(255,255,255,0.45); line-height: 1.6; margin-bottom: 16px; }
-
-.room-tags { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 16px; }
-.tag {
-  font-size: 11px; font-weight: 500; padding: 3px 10px; border-radius: 4px;
-  background: rgba(245,166,35,0.08); color: rgba(245,166,35,0.8);
-  border: 1px solid rgba(245,166,35,0.12);
-}
+.room-tags { display: flex; gap: 5px; flex-wrap: wrap; margin-bottom: 12px; }
+.room-tag { font-size: 11px; padding: 2px 8px; border-radius: 4px; background: rgba(245,166,35,0.06); color: rgba(245,166,35,0.7); border: 1px solid rgba(245,166,35,0.1); }
 
 .room-footer { display: flex; align-items: center; justify-content: space-between; }
-.room-members { display: flex; align-items: center; gap: 8px; }
-.avatars { display: flex; }
-.avatar {
-  width: 26px; height: 26px; border-radius: 50%;
-  background: linear-gradient(135deg, #F5A623, #e8920f);
-  border: 2px solid #0A1628;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 10px; font-weight: 700; color: #0A1628;
-  margin-left: -6px;
-}
-.avatar:first-child { margin-left: 0; }
-.avatar-more {
-  background: rgba(255,255,255,0.1); color: rgba(255,255,255,0.5);
-  font-size: 9px;
-}
-.member-count { font-size: 12px; color: rgba(255,255,255,0.4); }
-.room-slots { font-size: 12px; color: rgba(255,255,255,0.35); }
-
-.btn-join {
-  padding: 7px 18px; border-radius: 7px; font-size: 13px; font-weight: 600;
-  border: none; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: all 0.2s;
-}
+.room-creator { font-size: 11px; color: rgba(255,255,255,0.3); }
+.room-slots { font-size: 11px; color: rgba(255,255,255,0.3); }
+.btn-join { padding: 6px 16px; border-radius: 6px; font-size: 12px; font-weight: 700; border: none; cursor: pointer; font-family: 'Inter', sans-serif; transition: all 0.15s; }
 .btn-join-active { background: #F5A623; color: #0A1628; }
-.btn-join-active:hover { background: #ffc14d; }
-.btn-join-full { background: rgba(255,255,255,0.05); color: rgba(255,255,255,0.3); cursor: not-allowed; }
+.btn-join-active:hover { background: #f0b84a; }
+.btn-join-full { background: rgba(255,255,255,0.05); color: rgba(255,255,255,0.25); cursor: not-allowed; }
+.btn-leave { background: rgba(231,76,60,0.1); color: #E74C3C; border: 1px solid rgba(231,76,60,0.2) !important; }
+.btn-leave:hover { background: rgba(231,76,60,0.2); }
 
-/* ── CREATE ROOM MODAL ── */
-.modal-overlay {
-  display: none; position: fixed; inset: 0;
-  background: rgba(0,0,0,0.7); backdrop-filter: blur(8px);
-  z-index: 200; align-items: center; justify-content: center; padding: 20px;
-}
-.modal-overlay.open { display: flex; }
-.modal {
-  background: #0d1f3c; border: 1px solid rgba(245,166,35,0.2);
-  border-radius: 20px; padding: 36px; width: 100%; max-width: 520px;
-  max-height: 90vh; overflow-y: auto;
-}
-.modal h2 { font-family: 'Playfair Display', serif; font-size: 24px; font-weight: 900; margin-bottom: 6px; }
-.modal-sub { font-size: 13px; color: rgba(255,255,255,0.4); margin-bottom: 28px; }
-.form-group { margin-bottom: 18px; }
-.form-label { font-size: 13px; font-weight: 600; color: rgba(255,255,255,0.6); margin-bottom: 8px; display: block; }
-.form-input, .form-select, .form-textarea {
-  width: 100%; padding: 11px 14px;
-  background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1);
-  border-radius: 8px; color: #fff; font-size: 14px;
-  font-family: 'DM Sans', sans-serif; outline: none; transition: border 0.2s;
-}
-.form-input:focus, .form-select:focus, .form-textarea:focus { border-color: rgba(245,166,35,0.5); }
-.form-input::placeholder, .form-textarea::placeholder { color: rgba(255,255,255,0.25); }
+/* MODAL */
+.modal-bg { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.75); backdrop-filter: blur(6px); z-index: 200; align-items: center; justify-content: center; padding: 20px; }
+.modal-bg.open { display: flex; }
+.modal { background: #0d1f3c; border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; padding: 26px; width: 100%; max-width: 500px; max-height: 90vh; overflow-y: auto; }
+.modal-title { font-size: 18px; font-weight: 800; margin-bottom: 18px; }
+.form-group { margin-bottom: 14px; }
+.form-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: rgba(255,255,255,0.35); margin-bottom: 6px; display: block; }
+.form-input, .form-select, .form-textarea { width: 100%; padding: 10px 13px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; color: #fff; font-size: 13px; font-family: 'Inter', sans-serif; outline: none; transition: border 0.15s; }
+.form-input:focus, .form-select:focus, .form-textarea:focus { border-color: rgba(245,166,35,0.4); }
+.form-input::placeholder, .form-textarea::placeholder { color: rgba(255,255,255,0.2); }
 .form-select option { background: #0d1f3c; }
-.form-textarea { resize: vertical; min-height: 90px; }
-.skills-input-wrap { display: flex; gap: 8px; }
-.skills-input-wrap .form-input { flex: 1; }
-.add-skill-btn {
-  padding: 11px 16px; background: rgba(245,166,35,0.1);
-  border: 1px solid rgba(245,166,35,0.25); border-radius: 8px;
-  color: #F5A623; font-size: 13px; font-weight: 600;
-  cursor: pointer; white-space: nowrap; font-family: 'DM Sans', sans-serif;
-}
-.skills-tags { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 8px; }
-.skill-tag-rm {
-  display: flex; align-items: center; gap: 6px;
-  background: rgba(245,166,35,0.1); border: 1px solid rgba(245,166,35,0.2);
-  color: #F5A623; font-size: 12px; font-weight: 500;
-  padding: 4px 10px; border-radius: 4px; cursor: pointer;
-}
-.skill-tag-rm:hover { background: rgba(245,166,35,0.2); }
-.slots-row { display: flex; gap: 10px; }
-.slots-option {
-  flex: 1; padding: 10px; border: 1px solid rgba(255,255,255,0.1);
-  border-radius: 8px; text-align: center; cursor: pointer;
-  font-size: 14px; font-weight: 600; transition: all 0.2s;
-  background: transparent; color: rgba(255,255,255,0.5);
-}
-.slots-option.selected { border-color: #F5A623; color: #F5A623; background: rgba(245,166,35,0.08); }
-.modal-actions { display: flex; gap: 10px; margin-top: 24px; }
-.btn-modal-create {
-  flex: 1; padding: 13px; background: #F5A623; color: #0A1628;
-  border-radius: 10px; font-size: 15px; font-weight: 700;
-  border: none; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: all 0.2s;
-}
-.btn-modal-create:hover { background: #ffc14d; }
-.btn-modal-cancel {
-  padding: 13px 20px; background: transparent;
-  border: 1px solid rgba(255,255,255,0.15); border-radius: 10px;
-  color: rgba(255,255,255,0.5); font-size: 15px; font-weight: 600;
-  cursor: pointer; font-family: 'DM Sans', sans-serif;
-}
+.form-textarea { min-height: 80px; resize: vertical; line-height: 1.6; }
+.slots-row { display: flex; gap: 8px; }
+.slot-opt { flex: 1; padding: 9px; border: 1px solid rgba(255,255,255,0.1); border-radius: 7px; text-align: center; cursor: pointer; font-size: 13px; font-weight: 600; color: rgba(255,255,255,0.4); transition: all 0.15s; background: transparent; font-family: 'Inter', sans-serif; }
+.slot-opt.selected { border-color: #F5A623; color: #F5A623; background: rgba(245,166,35,0.08); }
+.modal-actions { display: flex; gap: 10px; margin-top: 18px; }
+.btn-create-room { flex: 1; padding: 11px; background: #F5A623; color: #0A1628; border: none; border-radius: 8px; font-size: 14px; font-weight: 700; cursor: pointer; font-family: 'Inter', sans-serif; }
+.btn-create-room:hover { background: #f0b84a; }
+.btn-cancel { padding: 11px 16px; background: transparent; border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; color: rgba(255,255,255,0.4); font-size: 14px; cursor: pointer; font-family: 'Inter', sans-serif; }
 
-/* ── HOW IT WORKS ── */
-.how-section { background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05); border-radius: 20px; padding: 40px 28px; margin-bottom: 48px; }
-.how-title { font-family: 'Playfair Display', serif; font-size: 24px; font-weight: 900; margin-bottom: 8px; }
-.how-sub { font-size: 14px; color: rgba(255,255,255,0.4); margin-bottom: 32px; }
-.how-steps { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 24px; }
-.how-step { text-align: center; }
-.how-icon { font-size: 32px; margin-bottom: 12px; }
-.how-step h3 { font-size: 15px; font-weight: 700; margin-bottom: 6px; }
-.how-step p { font-size: 13px; color: rgba(255,255,255,0.4); line-height: 1.6; }
+.empty { text-align: center; padding: 48px 20px; color: rgba(255,255,255,0.3); grid-column: 1/-1; }
+.empty-icon { font-size: 36px; margin-bottom: 12px; }
+.loading { text-align: center; padding: 40px; color: rgba(255,255,255,0.3); font-size: 13px; grid-column: 1/-1; }
 
-/* ── EMPTY STATE ── */
-.empty-state { text-align: center; padding: 60px 20px; }
-.empty-icon { font-size: 48px; margin-bottom: 16px; }
-.empty-state h3 { font-size: 18px; font-weight: 700; margin-bottom: 8px; }
-.empty-state p { font-size: 14px; color: rgba(255,255,255,0.4); }
-
-/* ── TOAST ── */
-.toast {
-  position: fixed; bottom: 24px; right: 24px;
-  padding: 13px 20px; border-radius: 10px;
-  font-size: 14px; font-weight: 500; color: #fff;
-  z-index: 999; animation: slideUp 0.3s ease;
-  box-shadow: 0 8px 32px rgba(0,0,0,0.4);
-}
+.toast { position: fixed; bottom: 20px; right: 20px; padding: 11px 18px; border-radius: 8px; font-size: 13px; font-weight: 500; color: #fff; z-index: 999; animation: slideUp 0.25s ease; }
 .toast-success { background: #27AE60; }
-.toast-error { background: #E74C3C; }
 .toast-info { background: #2980B9; }
-@keyframes slideUp { from { opacity:0; transform:translateY(20px); } to { opacity:1; transform:translateY(0); } }
-
-@media (max-width: 600px) {
-  .page { padding: 24px 16px; }
-  .collab-hero { padding: 36px 20px; }
-  .search-box { width: 100%; margin-left: 0; }
-  .filters-bar { flex-direction: column; align-items: stretch; }
-}
+.toast-error { background: #E74C3C; }
+@keyframes slideUp { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:translateY(0)} }
 </style>
 </head>
 <body>
 
-<!-- TOPNAV -->
 <nav class="topnav">
-  <a href="../index.html" class="topnav-logo">Analytica<span>.</span></a>
-  <div class="topnav-right" id="topnav-right">
-    <a href="../auth/login.html" class="btn-sm btn-outline">Log In</a>
-    <a href="../auth/signup.html" class="btn-sm btn-gold">Join Free</a>
+  <a href="../index.html" class="nav-logo">Analytica<span>.</span></a>
+  <div class="nav-right" id="topnav-right">
+    <a href="../auth/login.html" class="btn btn-ghost">Log In</a>
+    <a href="../auth/signup.html" class="btn btn-primary">Join Free</a>
   </div>
 </nav>
 
-<!-- PAGE -->
-<div class="page" style="margin-top:96px;">
-
-  <!-- HERO -->
-  <div class="collab-hero">
-    <div class="collab-hero-badge">
-      <div class="live-dot"></div>
-      Live Now — 47 Active Rooms
-    </div>
-    <h1>Build Real Things<br>With <em>Real People.</em></h1>
-    <p>Jump into a Collab Room. Find teammates. Ship projects together. No LinkedIn connections required — just skills and ambition.</p>
-    <div class="hero-btns">
-      <button class="btn-create" onclick="openModal()">+ Create a Room</button>
-      <button class="btn-browse" onclick="scrollToRooms()">Browse Rooms ↓</button>
-    </div>
-  </div>
-
-  <!-- STATS -->
-  <div class="stats-row">
-    <div class="stat-pill"><div class="stat-pill-num">47</div><div class="stat-pill-label">Active Rooms</div></div>
-    <div class="stat-pill"><div class="stat-pill-num">312</div><div class="stat-pill-label">People Building</div></div>
-    <div class="stat-pill"><div class="stat-pill-num">1,840</div><div class="stat-pill-label">Projects Shipped</div></div>
-    <div class="stat-pill"><div class="stat-pill-num">68</div><div class="stat-pill-label">Countries</div></div>
-  </div>
-
-  <!-- HOW IT WORKS -->
-  <div class="how-section">
-    <div class="how-title">How Collab Rooms Work</div>
-    <div class="how-sub">From zero to shipped in 4 simple steps</div>
-    <div class="how-steps">
-      <div class="how-step">
-        <div class="how-icon">🔍</div>
-        <h3>Find a Room</h3>
-        <p>Browse rooms by tech stack, project type or skill needed. Filter by open spots.</p>
-      </div>
-      <div class="how-step">
-        <div class="how-icon">🚀</div>
-        <h3>Join & Introduce</h3>
-        <p>Hit Join, drop a quick intro. The room leader gets notified instantly.</p>
-      </div>
-      <div class="how-step">
-        <div class="how-icon">🛠️</div>
-        <h3>Build Together</h3>
-        <p>Collaborate in real time. Use Analytica's built-in tools or connect your own.</p>
-      </div>
-      <div class="how-step">
-        <div class="how-icon">🏆</div>
-        <h3>Ship & Showcase</h3>
-        <p>Launch your project. It auto-appears on everyone's Analytica portfolio.</p>
-      </div>
-    </div>
-  </div>
-
-  <!-- FILTERS -->
-  <div id="rooms-section">
-    <div class="filters-bar">
-      <button class="filter-btn active" onclick="filterRooms('all', this)">All</button>
-      <button class="filter-btn" onclick="filterRooms('open', this)">🟢 Open</button>
-      <button class="filter-btn" onclick="filterRooms('live', this)">🔴 Live</button>
-      <button class="filter-btn" onclick="filterRooms('web', this)">Web</button>
-      <button class="filter-btn" onclick="filterRooms('mobile', this)">Mobile</button>
-      <button class="filter-btn" onclick="filterRooms('ai', this)">AI / ML</button>
-      <button class="filter-btn" onclick="filterRooms('design', this)">Design</button>
-      <button class="filter-btn" onclick="filterRooms('data', this)">Data</button>
-      <input class="search-box" type="text" placeholder="🔍 Search rooms..." oninput="searchRooms(this.value)">
-    </div>
-
-    <div class="section-head">
-      <h2>Active Rooms</h2>
-      <span id="rooms-count">Showing all rooms</span>
-    </div>
-
-    <div class="rooms-grid" id="rooms-grid"></div>
-  </div>
-
-</div>
-
 <!-- CREATE ROOM MODAL -->
-<div class="modal-overlay" id="modal-overlay" onclick="closeModalOutside(event)">
+<div class="modal-bg" id="modal-bg" onclick="closeModalOutside(event)">
   <div class="modal">
-    <h2>Create a Collab Room</h2>
-    <p class="modal-sub">Set up your room and find your perfect teammates</p>
-
+    <div class="modal-title">🚀 Create a Collab Room</div>
     <div class="form-group">
       <label class="form-label">Room Name *</label>
-      <input class="form-input" type="text" id="room-name" placeholder="e.g. Building a React job board app">
+      <input class="form-input" type="text" id="room-title" placeholder="e.g. Building a React job board app">
     </div>
-
     <div class="form-group">
-      <label class="form-label">Project Description *</label>
-      <textarea class="form-textarea" id="room-desc" placeholder="What are you building? What problem does it solve? What stage are you at?"></textarea>
+      <label class="form-label">Description *</label>
+      <textarea class="form-textarea" id="room-desc" placeholder="What are you building? What problem does it solve?"></textarea>
     </div>
-
     <div class="form-group">
       <label class="form-label">Category</label>
       <select class="form-select" id="room-category">
@@ -395,260 +151,294 @@ a { text-decoration: none; color: inherit; }
         <option value="open">Open Source</option>
       </select>
     </div>
-
     <div class="form-group">
-      <label class="form-label">Skills Needed</label>
-      <div class="skills-input-wrap">
-        <input class="form-input" type="text" id="skill-input" placeholder="e.g. React, Python, Figma..." onkeydown="if(event.key==='Enter'){addSkill();}">
-        <button class="add-skill-btn" onclick="addSkill()">+ Add</button>
-      </div>
-      <div class="skills-tags" id="skills-tags"></div>
+      <label class="form-label">Skills Needed (comma separated)</label>
+      <input class="form-input" type="text" id="room-tags" placeholder="e.g. React, Python, Figma">
     </div>
-
     <div class="form-group">
-      <label class="form-label">Team Size (open slots)</label>
-      <div class="slots-row" id="slots-row">
-        <div class="slots-option selected" onclick="selectSlots(this, 2)">2</div>
-        <div class="slots-option" onclick="selectSlots(this, 3)">3</div>
-        <div class="slots-option" onclick="selectSlots(this, 4)">4</div>
-        <div class="slots-option" onclick="selectSlots(this, 5)">5</div>
-        <div class="slots-option" onclick="selectSlots(this, 6)">6+</div>
+      <label class="form-label">Max Team Size</label>
+      <div class="slots-row">
+        <button class="slot-opt selected" onclick="selectSlot(this, 2)">2</button>
+        <button class="slot-opt" onclick="selectSlot(this, 3)">3</button>
+        <button class="slot-opt" onclick="selectSlot(this, 4)">4</button>
+        <button class="slot-opt" onclick="selectSlot(this, 5)">5</button>
+        <button class="slot-opt" onclick="selectSlot(this, 6)">6+</button>
       </div>
     </div>
-
     <div class="modal-actions">
-      <button class="btn-modal-create" onclick="createRoom()">🚀 Create Room</button>
-      <button class="btn-modal-cancel" onclick="closeModal()">Cancel</button>
+      <button class="btn-create-room" onclick="createRoom()">🚀 Create Room</button>
+      <button class="btn-cancel" onclick="closeModal()">Cancel</button>
     </div>
   </div>
 </div>
 
+<div class="page">
+
+  <!-- HERO -->
+  <div class="hero">
+    <div class="hero-badge"><div class="live-dot"></div> <span id="live-count">0</span> Active Rooms</div>
+    <h1>Build Real Things With<br><span>Real People.</span></h1>
+    <p>Create a room, find teammates, ship real projects together. No experience required — just skills and ambition.</p>
+    <div class="hero-btns">
+      <button class="btn-create" onclick="openModal()">+ Create a Room</button>
+    </div>
+  </div>
+
+  <!-- STATS -->
+  <div class="stats-row">
+    <div class="stat-pill"><div class="stat-num" id="stat-rooms">0</div><div class="stat-label">Active Rooms</div></div>
+    <div class="stat-pill"><div class="stat-num" id="stat-members">0</div><div class="stat-label">People Building</div></div>
+    <div class="stat-pill"><div class="stat-num" id="stat-my-rooms">0</div><div class="stat-label">My Rooms</div></div>
+  </div>
+
+  <!-- FILTERS -->
+  <div class="filters-bar">
+    <button class="filter-pill active" onclick="setFilter('all', this)">All</button>
+    <button class="filter-pill" onclick="setFilter('web', this)">🌐 Web</button>
+    <button class="filter-pill" onclick="setFilter('mobile', this)">📱 Mobile</button>
+    <button class="filter-pill" onclick="setFilter('ai', this)">🤖 AI / ML</button>
+    <button class="filter-pill" onclick="setFilter('design', this)">🎨 Design</button>
+    <button class="filter-pill" onclick="setFilter('data', this)">📊 Data</button>
+    <button class="filter-pill" onclick="setFilter('startup', this)">🚀 Startup</button>
+    <input class="search-box" type="text" placeholder="🔍 Search rooms..." oninput="searchRooms(this.value)">
+  </div>
+
+  <div class="sec-header">
+    <div class="sec-title">Active Rooms</div>
+    <div class="sec-count" id="rooms-count">Loading...</div>
+  </div>
+
+  <div class="rooms-grid" id="rooms-grid">
+    <div class="loading">Loading rooms...</div>
+  </div>
+
+</div>
+
 <script src="../js/supabase.js"></script>
 <script>
-requirePro() // Redirects to payment if not Pro
+let allRooms = []
+let roomMembers = {}
+let currentFilter = 'all'
+let currentSearch = ''
+let currentUser = null
+let selectedSlots = 2
+let myJoinedRooms = new Set()
 
-// ── SAMPLE ROOMS DATA ──
-const ROOMS = [
-  {
-    id: 1, title: "Building a Real-Time Chat App with WebSockets",
-    desc: "We're building a full-stack chat app. Need a backend dev who knows Node.js and Socket.io.",
-    tags: ["React", "Node.js", "Socket.io"], category: "web",
-    status: "live", members: ["A","B","C"], slots: 1, totalSlots: 4,
-    type: "Web Dev", country: "🇳🇬"
-  },
-  {
-    id: 2, title: "AI Startup Idea — Need Co-founder & Designer",
-    desc: "I have a working MVP for an AI writing tool. Looking for a designer and growth person to launch.",
-    tags: ["Python", "OpenAI", "Figma"], category: "ai",
-    status: "open", members: ["M"], slots: 2, totalSlots: 3,
-    type: "Startup", country: "🇬🇧"
-  },
-  {
-    id: 3, title: "Open Source Dashboard Library in React",
-    desc: "Building a free, beautiful dashboard component library. Contributions welcome from all levels.",
-    tags: ["React", "TypeScript", "CSS"], category: "web",
-    status: "open", members: ["K","L","R","T"], slots: 3, totalSlots: 7,
-    type: "Open Source", country: "🇮🇳"
-  },
-  {
-    id: 4, title: "Flutter App — Fintech for Students",
-    desc: "Building a savings and investment app targeting university students. Need Flutter dev + UI designer.",
-    tags: ["Flutter", "Dart", "Firebase"], category: "mobile",
-    status: "open", members: ["O","P"], slots: 2, totalSlots: 4,
-    type: "Mobile", country: "🇬🇭"
-  },
-  {
-    id: 5, title: "Machine Learning Model for Crop Disease Detection",
-    desc: "Using computer vision to detect crop diseases from photos. Looking for ML engineers and data collectors.",
-    tags: ["Python", "TensorFlow", "CV"], category: "ai",
-    status: "live", members: ["A","B"], slots: 2, totalSlots: 4,
-    type: "AI / ML", country: "🇰🇪"
-  },
-  {
-    id: 6, title: "E-commerce Site for African Artisans",
-    desc: "Building a marketplace to help African artists sell globally. Stack: Next.js + Supabase.",
-    tags: ["Next.js", "Supabase", "Stripe"], category: "web",
-    status: "open", members: ["C","D","E"], slots: 2, totalSlots: 5,
-    type: "Web Dev", country: "🇿🇦"
-  },
-  {
-    id: 7, title: "UX Research & Redesign of a Health App",
-    desc: "Conducting full UX audit and redesign of an existing health tracking app. Designers only.",
-    tags: ["Figma", "UX Research", "Prototyping"], category: "design",
-    status: "full", members: ["F","G","H","I"], slots: 0, totalSlots: 4,
-    type: "Design", country: "🇺🇸"
-  },
-  {
-    id: 8, title: "Data Pipeline for Real-Time Sports Analytics",
-    desc: "Building a streaming data pipeline to process live sports data. Need data engineers & analysts.",
-    tags: ["Python", "Kafka", "dbt", "BigQuery"], category: "data",
-    status: "open", members: ["X","Y"], slots: 3, totalSlots: 5,
-    type: "Data", country: "🇧🇷"
-  },
-  {
-    id: 9, title: "No-Code Tool for African SMEs",
-    desc: "Building a no-code tool that lets small businesses create their own mini-apps. Looking for product thinkers.",
-    tags: ["Product", "JavaScript", "Design"], category: "startup",
-    status: "open", members: ["N"], slots: 3, totalSlots: 4,
-    type: "Startup", country: "🇳🇬"
-  },
-];
+async function init() {
+  const { data: { session } } = await db.auth.getSession()
+  currentUser = session?.user || null
+  await loadRooms()
+}
 
-let currentFilter = 'all';
-let currentSearch = '';
-let selectedSlots = 2;
-let roomSkills = [];
+async function loadRooms() {
+  const { data: rooms, error } = await db
+    .from('collab_rooms')
+    .select('*')
+    .order('created_at', { ascending: false })
 
-// ── RENDER ROOMS ──
-function renderRooms() {
-  const grid = document.getElementById('rooms-grid');
-  let filtered = ROOMS.filter(r => {
-    const matchFilter = currentFilter === 'all' || r.category === currentFilter ||
-      (currentFilter === 'open' && r.status === 'open') ||
-      (currentFilter === 'live' && r.status === 'live');
-    const matchSearch = !currentSearch ||
-      r.title.toLowerCase().includes(currentSearch) ||
-      r.tags.some(t => t.toLowerCase().includes(currentSearch));
-    return matchFilter && matchSearch;
-  });
+  if (error) { showToast('Failed to load rooms', 'error'); return }
+  allRooms = rooms || []
 
-  document.getElementById('rooms-count').textContent = `${filtered.length} room${filtered.length !== 1 ? 's' : ''} found`;
-
-  if (filtered.length === 0) {
-    grid.innerHTML = `
-      <div class="empty-state" style="grid-column:1/-1;">
-        <div class="empty-icon">🔍</div>
-        <h3>No rooms found</h3>
-        <p>Try a different filter or create your own room!</p>
-      </div>`;
-    return;
+  const { data: members } = await db.from('collab_members').select('*')
+  roomMembers = {}
+  if (members) {
+    members.forEach(m => {
+      if (!roomMembers[m.room_id]) roomMembers[m.room_id] = []
+      roomMembers[m.room_id].push(m)
+    })
   }
 
-  grid.innerHTML = filtered.map(r => {
-    const statusClass = r.status === 'live' ? 'status-live' : r.status === 'open' ? 'status-open' : 'status-full';
-    const dotClass = r.status === 'live' ? 'dot-green' : r.status === 'open' ? 'dot-gold' : 'dot-gray';
-    const statusLabel = r.status === 'live' ? '● Live' : r.status === 'open' ? '● Open' : '● Full';
-    const avatars = r.members.slice(0,3).map(m => `<div class="avatar">${m}</div>`).join('');
-    const moreCount = r.members.length > 3 ? `<div class="avatar avatar-more">+${r.members.length - 3}</div>` : '';
-    const joinBtn = r.status !== 'full'
-      ? `<button class="btn-join btn-join-active" onclick="joinRoom(${r.id}, event)">Join →</button>`
-      : `<button class="btn-join btn-join-full" disabled>Full</button>`;
+  if (currentUser) {
+    myJoinedRooms = new Set(
+      members?.filter(m => m.user_id === currentUser.id).map(m => m.room_id) || []
+    )
+  }
+
+  updateStats()
+  renderRooms()
+}
+
+function updateStats() {
+  const totalMembers = Object.values(roomMembers).reduce((sum, arr) => sum + arr.length, 0)
+  const myRooms = allRooms.filter(r => r.creator_id === currentUser?.id || myJoinedRooms.has(r.id)).length
+  document.getElementById('stat-rooms').textContent = allRooms.length
+  document.getElementById('stat-members').textContent = totalMembers
+  document.getElementById('stat-my-rooms').textContent = myRooms
+  document.getElementById('live-count').textContent = allRooms.length
+}
+
+function renderRooms() {
+  let list = allRooms.filter(r => {
+    const matchFilter = currentFilter === 'all' || r.category === currentFilter
+    const matchSearch = !currentSearch || r.title.toLowerCase().includes(currentSearch) || (r.description || '').toLowerCase().includes(currentSearch)
+    return matchFilter && matchSearch
+  })
+
+  document.getElementById('rooms-count').textContent = `${list.length} room${list.length !== 1 ? 's' : ''}`
+
+  const grid = document.getElementById('rooms-grid')
+  if (!list.length) {
+    grid.innerHTML = `<div class="empty"><div class="empty-icon">🔍</div><p>No rooms found. Create one!</p></div>`
+    return
+  }
+
+  grid.innerHTML = list.map(r => {
+    const members = roomMembers[r.id] || []
+    const memberCount = members.length
+    const isFull = memberCount >= r.max_slots
+    const isMine = r.creator_id === currentUser?.id
+    const hasJoined = myJoinedRooms.has(r.id)
+    const tags = Array.isArray(r.tags) ? r.tags : []
+
+    let btnHtml = ''
+    if (isMine) {
+      btnHtml = `<button class="btn-join btn-leave" onclick="deleteRoom(${r.id}, event)">🗑 Delete</button>`
+    } else if (hasJoined) {
+      btnHtml = `<button class="btn-join btn-leave" onclick="leaveRoom(${r.id}, event)">Leave</button>`
+    } else if (isFull) {
+      btnHtml = `<button class="btn-join btn-join-full" disabled>Full</button>`
+    } else {
+      btnHtml = `<button class="btn-join btn-join-active" onclick="joinRoom(${r.id}, event)">Join →</button>`
+    }
 
     return `
-      <div class="room-card" onclick="openRoom(${r.id})">
+      <div class="room-card ${isMine ? 'mine' : ''}">
         <div class="room-top">
-          <div class="room-status ${statusClass}">
-            <div class="status-dot ${dotClass}"></div>
-            ${statusLabel}
+          <div class="room-status ${isFull ? 'status-full' : 'status-open'}">${isFull ? '● Full' : '● Open'}</div>
+          <div style="display:flex;gap:6px;align-items:center;">
+            ${isMine ? '<span class="mine-badge">⭐ Mine</span>' : ''}
+            <div class="room-cat">${r.category}</div>
           </div>
-          <div class="room-type-badge">${r.country} ${r.type}</div>
         </div>
         <div class="room-title">${r.title}</div>
-        <div class="room-desc">${r.desc}</div>
-        <div class="room-tags">${r.tags.map(t => `<span class="tag">${t}</span>`).join('')}</div>
+        ${r.description ? `<div class="room-desc">${r.description}</div>` : ''}
+        ${tags.length ? `<div class="room-tags">${tags.map(t => `<span class="room-tag">${t}</span>`).join('')}</div>` : ''}
         <div class="room-footer">
-          <div class="room-members">
-            <div class="avatars">${avatars}${moreCount}</div>
-            <div class="member-count">${r.members.length}/${r.totalSlots}</div>
+          <div>
+            <div class="room-creator">by ${r.creator_name || 'Member'}</div>
+            <div class="room-slots">${memberCount}/${r.max_slots} members</div>
           </div>
-          ${joinBtn}
+          ${btnHtml}
         </div>
-      </div>`;
-  }).join('');
+      </div>`
+  }).join('')
 }
 
-// ── FILTER ──
-function filterRooms(filter, btn) {
-  currentFilter = filter;
-  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
-  renderRooms();
+function setFilter(filter, btn) {
+  currentFilter = filter
+  document.querySelectorAll('.filter-pill').forEach(b => b.classList.remove('active'))
+  btn.classList.add('active')
+  renderRooms()
 }
 
-// ── SEARCH ──
 function searchRooms(val) {
-  currentSearch = val.toLowerCase();
-  renderRooms();
+  currentSearch = val.toLowerCase()
+  renderRooms()
 }
 
-// ── JOIN ROOM ──
-function joinRoom(id, e) {
-  e.stopPropagation();
-  showToast('🚀 Request sent! The room leader will be in touch.', 'success');
+async function joinRoom(roomId, e) {
+  e.stopPropagation()
+  if (!currentUser) { window.location.href = '../auth/login.html'; return }
+
+  const meta = currentUser.user_metadata || {}
+  const name = meta.full_name || meta.first_name || currentUser.email.split('@')[0]
+
+  const { error } = await db.from('collab_members').insert({
+    room_id: roomId,
+    user_id: currentUser.id,
+    user_name: name
+  })
+
+  if (error) { showToast('Failed to join room', 'error'); return }
+  showToast('🎉 You joined the room!', 'success')
+  await loadRooms()
 }
 
-function openRoom(id) {
-  showToast('💬 Room chat coming soon — joining waitlist!', 'info');
+async function leaveRoom(roomId, e) {
+  e.stopPropagation()
+  const { error } = await db.from('collab_members').delete().eq('room_id', roomId).eq('user_id', currentUser.id)
+  if (error) { showToast('Failed to leave room', 'error'); return }
+  showToast('Left the room', 'info')
+  await loadRooms()
 }
 
-// ── MODAL ──
+async function deleteRoom(roomId, e) {
+  e.stopPropagation()
+  if (!confirm('Delete this room? This cannot be undone.')) return
+  await db.from('collab_members').delete().eq('room_id', roomId)
+  await db.from('collab_rooms').delete().eq('id', roomId)
+  showToast('Room deleted', 'info')
+  await loadRooms()
+}
+
+function selectSlot(btn, num) {
+  document.querySelectorAll('.slot-opt').forEach(b => b.classList.remove('selected'))
+  btn.classList.add('selected')
+  selectedSlots = num
+}
+
 function openModal() {
-  document.getElementById('modal-overlay').classList.add('open');
-  document.body.style.overflow = 'hidden';
+  if (!currentUser) { window.location.href = '../auth/login.html'; return }
+  document.getElementById('modal-bg').classList.add('open')
+  document.body.style.overflow = 'hidden'
 }
+
 function closeModal() {
-  document.getElementById('modal-overlay').classList.remove('open');
-  document.body.style.overflow = '';
+  document.getElementById('modal-bg').classList.remove('open')
+  document.body.style.overflow = ''
 }
+
 function closeModalOutside(e) {
-  if (e.target === document.getElementById('modal-overlay')) closeModal();
+  if (e.target === document.getElementById('modal-bg')) closeModal()
 }
 
-// ── SKILLS ──
-function addSkill() {
-  const input = document.getElementById('skill-input');
-  const val = input.value.trim();
-  if (!val || roomSkills.includes(val)) return;
-  roomSkills.push(val);
-  input.value = '';
-  renderSkillTags();
-}
-function removeSkill(skill) {
-  roomSkills = roomSkills.filter(s => s !== skill);
-  renderSkillTags();
-}
-function renderSkillTags() {
-  document.getElementById('skills-tags').innerHTML =
-    roomSkills.map(s => `<div class="skill-tag-rm" onclick="removeSkill('${s}')">${s} ✕</div>`).join('');
+async function createRoom() {
+  if (!currentUser) return
+  const title = document.getElementById('room-title').value.trim()
+  const desc = document.getElementById('room-desc').value.trim()
+  const category = document.getElementById('room-category').value
+  const tagsStr = document.getElementById('room-tags').value.trim()
+  const tags = tagsStr ? tagsStr.split(',').map(t => t.trim()).filter(Boolean) : []
+
+  if (!title) { showToast('Please add a room name', 'info'); return }
+  if (!desc) { showToast('Please add a description', 'info'); return }
+
+  const meta = currentUser.user_metadata || {}
+  const name = meta.full_name || meta.first_name || currentUser.email.split('@')[0]
+
+  const { data: room, error } = await db.from('collab_rooms').insert({
+    title, description: desc, category, tags,
+    creator_id: currentUser.id,
+    creator_name: name,
+    max_slots: selectedSlots,
+    status: 'open'
+  }).select().single()
+
+  if (error) { showToast('Failed to create room', 'error'); return }
+
+  await db.from('collab_members').insert({
+    room_id: room.id,
+    user_id: currentUser.id,
+    user_name: name
+  })
+
+  closeModal()
+  document.getElementById('room-title').value = ''
+  document.getElementById('room-desc').value = ''
+  document.getElementById('room-tags').value = ''
+  showToast('🚀 Room created!', 'success')
+  await loadRooms()
 }
 
-// ── SLOTS ──
-function selectSlots(el, num) {
-  document.querySelectorAll('.slots-option').forEach(o => o.classList.remove('selected'));
-  el.classList.add('selected');
-  selectedSlots = num;
-}
-
-// ── CREATE ROOM ──
-function createRoom() {
-  const name = document.getElementById('room-name').value.trim();
-  const desc = document.getElementById('room-desc').value.trim();
-  if (!name || !desc) { showToast('Please fill in the room name and description', 'error'); return; }
-  showToast('🎉 Room created! Teammates will find you soon.', 'success');
-  closeModal();
-  // Reset form
-  document.getElementById('room-name').value = '';
-  document.getElementById('room-desc').value = '';
-  roomSkills = [];
-  renderSkillTags();
-}
-
-// ── SCROLL ──
-function scrollToRooms() {
-  document.getElementById('rooms-section').scrollIntoView({ behavior: 'smooth' });
-}
-
-// ── TOAST ──
 function showToast(msg, type = 'success') {
-  const t = document.createElement('div');
-  t.className = `toast toast-${type}`;
-  t.textContent = msg;
-  document.body.appendChild(t);
-  setTimeout(() => t.remove(), 3500);
+  const t = document.createElement('div')
+  t.className = `toast toast-${type}`
+  t.textContent = msg
+  document.body.appendChild(t)
+  setTimeout(() => t.remove(), 3000)
 }
 
-// ── INIT ──
-renderRooms();
+init()
 </script>
 </body>
 </html>

@@ -4,84 +4,78 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Community — Analytica</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 body { background: #0A1628; color: #fff; font-family: 'Inter', sans-serif; min-height: 100vh; }
 a { text-decoration: none; color: inherit; }
 
-/* NAV */
 .topnav { position: fixed; top: 0; left: 0; right: 0; height: 58px; background: rgba(10,22,40,0.98); backdrop-filter: blur(12px); border-bottom: 1px solid rgba(255,255,255,0.07); display: flex; align-items: center; padding: 0 20px; gap: 12px; z-index: 100; }
 .nav-logo { font-size: 18px; font-weight: 800; color: #fff; letter-spacing: -0.5px; }
 .nav-logo span { color: #F5A623; }
 .nav-right { margin-left: auto; display: flex; gap: 8px; }
 .btn { padding: 7px 16px; border-radius: 7px; font-size: 13px; font-weight: 600; font-family: 'Inter', sans-serif; cursor: pointer; border: none; transition: all 0.15s; display: inline-block; }
 .btn-ghost { background: transparent; border: 1px solid rgba(255,255,255,0.15) !important; color: rgba(255,255,255,0.7); }
-.btn-ghost:hover { color: #fff; border-color: rgba(255,255,255,0.3) !important; }
+.btn-ghost:hover { color: #fff; }
 .btn-primary { background: #F5A623; color: #0A1628; font-weight: 700; }
 .btn-primary:hover { background: #f0b84a; }
 
-/* LAYOUT */
-.page { margin-top: 58px; max-width: 1080px; margin-left: auto; margin-right: auto; padding: 24px 20px; display: grid; grid-template-columns: 1fr; gap: 20px; }
-@media (min-width: 860px) { .page { grid-template-columns: 220px 1fr 200px; margin-top: 58px; } }
+.page { margin-top: 58px; max-width: 1080px; margin-left: auto; margin-right: auto; padding: 28px 20px 60px; display: grid; grid-template-columns: 1fr; gap: 20px; }
+@media (min-width: 860px) { .page { grid-template-columns: 200px 1fr 190px; } }
 
 /* LEFT SIDEBAR */
 .left-sidebar { display: none; }
 @media (min-width: 860px) { .left-sidebar { display: block; } }
-
-.sidebar-box { background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.07); border-radius: 12px; padding: 16px; margin-bottom: 12px; }
-.sidebar-title { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; color: rgba(255,255,255,0.3); margin-bottom: 12px; }
-.category-list { list-style: none; display: flex; flex-direction: column; gap: 2px; }
-.category-item { display: flex; align-items: center; justify-content: space-between; padding: 7px 10px; border-radius: 7px; cursor: pointer; transition: all 0.15s; }
-.category-item:hover, .category-item.active { background: rgba(245,166,35,0.08); }
-.category-item.active .cat-name { color: #F5A623; }
-.cat-name { font-size: 13px; color: rgba(255,255,255,0.55); font-weight: 500; display: flex; align-items: center; gap: 8px; }
-.cat-count { font-size: 11px; color: rgba(255,255,255,0.2); background: rgba(255,255,255,0.05); padding: 2px 7px; border-radius: 10px; }
-
-.online-list { display: flex; flex-direction: column; gap: 10px; }
-.online-user { display: flex; align-items: center; gap: 10px; }
-.o-avatar { width: 30px; height: 30px; border-radius: 50%; background: linear-gradient(135deg, #F5A623, #e8920f); display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 800; color: #0A1628; flex-shrink: 0; position: relative; }
+.sidebar-box { background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.07); border-radius: 12px; padding: 14px; margin-bottom: 12px; }
+.sidebar-title { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; color: rgba(255,255,255,0.25); margin-bottom: 10px; }
+.cat-item { display: flex; align-items: center; justify-content: space-between; padding: 7px 8px; border-radius: 7px; cursor: pointer; transition: all 0.15s; }
+.cat-item:hover, .cat-item.active { background: rgba(245,166,35,0.08); }
+.cat-item.active .cat-name { color: #F5A623; }
+.cat-name { font-size: 12px; color: rgba(255,255,255,0.5); font-weight: 500; }
+.cat-count { font-size: 10px; color: rgba(255,255,255,0.2); background: rgba(255,255,255,0.04); padding: 1px 6px; border-radius: 8px; }
+.online-item { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+.online-item:last-child { margin-bottom: 0; }
+.o-av { width: 28px; height: 28px; border-radius: 50%; background: linear-gradient(135deg, #F5A623, #e8920f); display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 800; color: #0A1628; flex-shrink: 0; position: relative; }
 .o-dot { position: absolute; bottom: 0; right: 0; width: 8px; height: 8px; background: #27AE60; border-radius: 50%; border: 1.5px solid #0A1628; }
 .o-name { font-size: 12px; font-weight: 600; }
-.o-role { font-size: 11px; color: rgba(255,255,255,0.35); }
+.o-role { font-size: 10px; color: rgba(255,255,255,0.3); }
 
 /* MAIN FEED */
-.feed { }
-
-/* TOP BAR */
-.feed-topbar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; gap: 10px; flex-wrap: wrap; }
-.feed-topbar h1 { font-size: 20px; font-weight: 800; letter-spacing: -0.5px; }
-.btn-post { padding: 8px 18px; background: #F5A623; color: #0A1628; border: none; border-radius: 7px; font-size: 13px; font-weight: 700; cursor: pointer; font-family: 'Inter', sans-serif; transition: all 0.15s; }
+.feed-topbar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; flex-wrap: wrap; gap: 10px; }
+.feed-topbar h1 { font-size: 20px; font-weight: 900; letter-spacing: -0.5px; }
+.btn-post { padding: 8px 18px; background: #F5A623; color: #0A1628; border: none; border-radius: 7px; font-size: 13px; font-weight: 700; cursor: pointer; font-family: 'Inter', sans-serif; }
 .btn-post:hover { background: #f0b84a; }
 
-/* STATS ROW */
-.stats-row { display: flex; gap: 10px; margin-bottom: 16px; flex-wrap: wrap; }
-.stat-chip { background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.07); border-radius: 8px; padding: 10px 16px; text-align: center; flex: 1; min-width: 80px; }
-.stat-chip-num { font-size: 18px; font-weight: 800; color: #F5A623; letter-spacing: -0.5px; }
-.stat-chip-label { font-size: 10px; color: rgba(255,255,255,0.3); text-transform: uppercase; letter-spacing: 0.5px; margin-top: 2px; }
+.stats-row { display: flex; gap: 10px; margin-bottom: 14px; flex-wrap: wrap; }
+.stat-chip { background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.07); border-radius: 8px; padding: 10px 14px; flex: 1; min-width: 70px; text-align: center; }
+.stat-num { font-size: 17px; font-weight: 800; color: #F5A623; }
+.stat-label { font-size: 10px; color: rgba(255,255,255,0.3); text-transform: uppercase; margin-top: 1px; }
 
-/* SEARCH + FILTER BAR */
-.filter-bar { display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; }
-.search-input { flex: 1; min-width: 160px; padding: 8px 14px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; color: #fff; font-size: 13px; font-family: 'Inter', sans-serif; outline: none; }
-.search-input:focus { border-color: rgba(245,166,35,0.4); }
-.search-input::placeholder { color: rgba(255,255,255,0.25); }
-.filter-pill { padding: 7px 14px; border-radius: 20px; font-size: 12px; font-weight: 500; cursor: pointer; border: 1px solid rgba(255,255,255,0.1); background: transparent; color: rgba(255,255,255,0.4); transition: all 0.15s; font-family: 'Inter', sans-serif; white-space: nowrap; }
+.compose-box { display: flex; align-items: center; gap: 10px; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.07); border-radius: 10px; padding: 12px 14px; margin-bottom: 14px; cursor: pointer; transition: all 0.15s; }
+.compose-box:hover { border-color: rgba(245,166,35,0.2); }
+.compose-av { width: 32px; height: 32px; border-radius: 50%; background: rgba(255,255,255,0.08); display: flex; align-items: center; justify-content: center; font-size: 14px; flex-shrink: 0; }
+.compose-placeholder { font-size: 13px; color: rgba(255,255,255,0.2); }
+
+.filter-bar { display: flex; gap: 7px; margin-bottom: 14px; flex-wrap: wrap; align-items: center; }
+.search-input { flex: 1; min-width: 140px; padding: 7px 12px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); border-radius: 7px; color: #fff; font-size: 12px; font-family: 'Inter', sans-serif; outline: none; }
+.search-input:focus { border-color: rgba(245,166,35,0.3); }
+.search-input::placeholder { color: rgba(255,255,255,0.2); }
+.filter-pill { padding: 6px 13px; border-radius: 20px; font-size: 12px; font-weight: 500; cursor: pointer; border: 1px solid rgba(255,255,255,0.1); background: transparent; color: rgba(255,255,255,0.4); transition: all 0.15s; font-family: 'Inter', sans-serif; }
 .filter-pill:hover, .filter-pill.active { background: rgba(245,166,35,0.08); border-color: rgba(245,166,35,0.3); color: #F5A623; }
 
 /* POST CARD */
-.post-card { background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.07); border-radius: 12px; padding: 18px; margin-bottom: 10px; transition: all 0.15s; cursor: pointer; }
+.post-card { background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.07); border-radius: 12px; padding: 16px; margin-bottom: 10px; transition: all 0.15s; cursor: pointer; }
 .post-card:hover { border-color: rgba(245,166,35,0.15); background: rgba(245,166,35,0.02); }
-.post-card.pinned { border-color: rgba(245,166,35,0.2); background: rgba(245,166,35,0.02); }
-
-.post-top { display: flex; align-items: flex-start; gap: 12px; margin-bottom: 12px; }
-.post-avatar { width: 36px; height: 36px; border-radius: 50%; background: linear-gradient(135deg, #F5A623, #e8920f); display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 800; color: #0A1628; flex-shrink: 0; }
+.post-card.pinned { border-color: rgba(245,166,35,0.2); }
+.post-top { display: flex; gap: 10px; margin-bottom: 10px; }
+.post-av { width: 34px; height: 34px; border-radius: 50%; background: linear-gradient(135deg, #F5A623, #e8920f); display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 800; color: #0A1628; flex-shrink: 0; overflow: hidden; }
+.post-av img { width: 100%; height: 100%; object-fit: cover; }
 .post-meta { flex: 1; }
-.post-author-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 2px; }
+.post-author-row { display: flex; align-items: center; gap: 7px; flex-wrap: wrap; margin-bottom: 2px; }
 .post-author { font-size: 13px; font-weight: 700; }
-.post-role { font-size: 11px; color: rgba(255,255,255,0.35); }
 .post-time { font-size: 11px; color: rgba(255,255,255,0.25); margin-left: auto; }
-.post-category { font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 4px; text-transform: uppercase; letter-spacing: 0.5px; }
+.post-cat { font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 4px; text-transform: uppercase; letter-spacing: 0.5px; }
 .cat-web { background: rgba(41,128,185,0.12); color: #2980B9; }
 .cat-ai { background: rgba(142,68,173,0.12); color: #9B59B6; }
 .cat-career { background: rgba(39,174,96,0.12); color: #27AE60; }
@@ -89,161 +83,79 @@ a { text-decoration: none; color: inherit; }
 .cat-general { background: rgba(255,255,255,0.06); color: rgba(255,255,255,0.4); }
 .cat-mobile { background: rgba(231,76,60,0.12); color: #E74C3C; }
 .cat-devops { background: rgba(26,188,156,0.12); color: #1ABC9C; }
-
-.pinned-label { font-size: 10px; font-weight: 700; color: #F5A623; background: rgba(245,166,35,0.1); padding: 2px 8px; border-radius: 4px; }
-
-.post-title { font-size: 15px; font-weight: 700; margin-bottom: 6px; line-height: 1.4; }
-.post-preview { font-size: 13px; color: rgba(255,255,255,0.45); line-height: 1.6; margin-bottom: 12px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
-
-.post-tags { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 12px; }
-.post-tag { font-size: 11px; padding: 2px 8px; border-radius: 4px; background: rgba(255,255,255,0.04); color: rgba(255,255,255,0.35); border: 1px solid rgba(255,255,255,0.07); }
-
-.post-footer { display: flex; align-items: center; gap: 16px; }
-.post-action { display: flex; align-items: center; gap: 5px; font-size: 12px; color: rgba(255,255,255,0.3); cursor: pointer; transition: color 0.15s; background: none; border: none; font-family: 'Inter', sans-serif; }
+.pinned-tag { font-size: 10px; font-weight: 700; color: #F5A623; background: rgba(245,166,35,0.1); padding: 2px 7px; border-radius: 4px; }
+.post-title { font-size: 14px; font-weight: 700; margin-bottom: 5px; line-height: 1.4; }
+.post-body { font-size: 12px; color: rgba(255,255,255,0.4); line-height: 1.6; margin-bottom: 10px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.post-tags { display: flex; gap: 5px; flex-wrap: wrap; margin-bottom: 10px; }
+.post-tag { font-size: 10px; padding: 2px 7px; border-radius: 4px; background: rgba(255,255,255,0.04); color: rgba(255,255,255,0.3); border: 1px solid rgba(255,255,255,0.07); }
+.post-footer { display: flex; align-items: center; gap: 14px; }
+.post-action { display: flex; align-items: center; gap: 5px; font-size: 12px; color: rgba(255,255,255,0.3); cursor: pointer; background: none; border: none; font-family: 'Inter', sans-serif; transition: color 0.15s; }
 .post-action:hover { color: #F5A623; }
 .post-action.liked { color: #E74C3C; }
-.post-action.bookmarked { color: #F5A623; }
-.post-answers { margin-left: auto; font-size: 11px; color: rgba(255,255,255,0.25); }
-.post-answers.has-answer { color: #27AE60; }
 
-/* COMPOSE BOX */
-.compose-box { background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.07); border-radius: 12px; padding: 14px; margin-bottom: 16px; display: flex; align-items: center; gap: 12px; cursor: pointer; transition: all 0.15s; }
-.compose-box:hover { border-color: rgba(245,166,35,0.2); }
-.compose-avatar { width: 36px; height: 36px; border-radius: 50%; background: rgba(255,255,255,0.08); display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0; }
-.compose-placeholder { font-size: 13px; color: rgba(255,255,255,0.25); }
-
-/* POST MODAL */
-.modal-bg { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.75); backdrop-filter: blur(6px); z-index: 200; align-items: center; justify-content: center; padding: 20px; }
-.modal-bg.open { display: flex; }
-.modal { background: #0d1f3c; border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; padding: 28px; width: 100%; max-width: 560px; max-height: 90vh; overflow-y: auto; }
-.modal h2 { font-size: 18px; font-weight: 800; margin-bottom: 4px; }
-.modal-sub { font-size: 13px; color: rgba(255,255,255,0.35); margin-bottom: 20px; }
-.form-group { margin-bottom: 14px; }
-.form-label { font-size: 12px; font-weight: 600; color: rgba(255,255,255,0.5); margin-bottom: 6px; display: block; text-transform: uppercase; letter-spacing: 0.5px; }
-.form-input, .form-select, .form-textarea { width: 100%; padding: 10px 14px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; color: #fff; font-size: 13px; font-family: 'Inter', sans-serif; outline: none; transition: border 0.15s; }
-.form-input:focus, .form-select:focus, .form-textarea:focus { border-color: rgba(245,166,35,0.4); }
-.form-input::placeholder, .form-textarea::placeholder { color: rgba(255,255,255,0.2); }
-.form-select option { background: #0d1f3c; }
-.form-textarea { min-height: 100px; resize: vertical; line-height: 1.6; }
-.modal-actions { display: flex; gap: 10px; margin-top: 20px; }
-.btn-modal-post { flex: 1; padding: 11px; background: #F5A623; color: #0A1628; border: none; border-radius: 8px; font-size: 14px; font-weight: 700; cursor: pointer; font-family: 'Inter', sans-serif; }
-.btn-modal-post:hover { background: #f0b84a; }
-.btn-modal-cancel { padding: 11px 18px; background: transparent; border: 1px solid rgba(255,255,255,0.12); border-radius: 8px; color: rgba(255,255,255,0.4); font-size: 14px; cursor: pointer; font-family: 'Inter', sans-serif; }
+/* POST DETAIL */
+.post-detail { background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.07); border-radius: 12px; padding: 18px; margin-bottom: 14px; }
+.back-btn { font-size: 12px; color: #F5A623; cursor: pointer; font-weight: 600; background: none; border: none; font-family: 'Inter', sans-serif; margin-bottom: 14px; display: inline-flex; align-items: center; gap: 4px; }
+.reply-item { display: flex; gap: 10px; padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
+.reply-item:last-child { border-bottom: none; }
+.reply-body { font-size: 13px; color: rgba(255,255,255,0.6); line-height: 1.6; }
+.reply-author { font-size: 12px; font-weight: 700; margin-bottom: 3px; }
+.reply-time { font-size: 10px; color: rgba(255,255,255,0.25); }
+.reply-input-wrap { display: flex; gap: 10px; margin-top: 14px; }
+.reply-input { flex: 1; padding: 10px 14px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; color: #fff; font-size: 13px; font-family: 'Inter', sans-serif; outline: none; }
+.reply-input:focus { border-color: rgba(245,166,35,0.4); }
+.reply-input::placeholder { color: rgba(255,255,255,0.2); }
+.btn-reply { padding: 10px 18px; background: #F5A623; color: #0A1628; border: none; border-radius: 8px; font-size: 13px; font-weight: 700; cursor: pointer; font-family: 'Inter', sans-serif; white-space: nowrap; }
 
 /* RIGHT SIDEBAR */
 .right-sidebar { display: none; }
 @media (min-width: 860px) { .right-sidebar { display: block; } }
-
-.trending-list { display: flex; flex-direction: column; gap: 2px; }
-.trending-item { padding: 8px 10px; border-radius: 7px; cursor: pointer; transition: all 0.15s; }
+.trending-item { padding: 7px 8px; border-radius: 7px; cursor: pointer; transition: all 0.15s; margin-bottom: 2px; }
 .trending-item:hover { background: rgba(255,255,255,0.04); }
-.trending-num { font-size: 10px; color: rgba(255,255,255,0.2); font-weight: 700; margin-bottom: 2px; }
-.trending-tag { font-size: 12px; font-weight: 700; color: #F5A623; margin-bottom: 1px; }
-.trending-count { font-size: 11px; color: rgba(255,255,255,0.3); }
+.trending-tag { font-size: 12px; font-weight: 700; color: #F5A623; }
+.trending-count { font-size: 10px; color: rgba(255,255,255,0.25); margin-top: 1px; }
 
-.rules-list { list-style: none; display: flex; flex-direction: column; gap: 8px; }
-.rules-list li { font-size: 12px; color: rgba(255,255,255,0.45); display: flex; gap: 8px; line-height: 1.5; }
-.rules-list li::before { content: '→'; color: #F5A623; flex-shrink: 0; }
+/* MODAL */
+.modal-bg { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.75); backdrop-filter: blur(6px); z-index: 200; align-items: flex-end; justify-content: center; }
+.modal-bg.open { display: flex; }
+.modal { background: #0d1f3c; border: 1px solid rgba(255,255,255,0.1); border-radius: 20px 20px 0 0; padding: 26px 22px; width: 100%; max-width: 560px; max-height: 90vh; overflow-y: auto; }
+.modal-title { font-size: 17px; font-weight: 800; margin-bottom: 16px; }
+.form-group { margin-bottom: 12px; }
+.form-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: rgba(255,255,255,0.35); margin-bottom: 5px; display: block; }
+.form-input, .form-select, .form-textarea { width: 100%; padding: 10px 13px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; color: #fff; font-size: 13px; font-family: 'Inter', sans-serif; outline: none; }
+.form-input:focus, .form-select:focus, .form-textarea:focus { border-color: rgba(245,166,35,0.4); }
+.form-input::placeholder, .form-textarea::placeholder { color: rgba(255,255,255,0.2); }
+.form-select option { background: #0d1f3c; }
+.form-textarea { min-height: 100px; resize: vertical; line-height: 1.6; }
+.modal-actions { display: flex; gap: 10px; margin-top: 16px; }
+.btn-post-submit { flex: 1; padding: 11px; background: #F5A623; color: #0A1628; border: none; border-radius: 8px; font-size: 14px; font-weight: 700; cursor: pointer; font-family: 'Inter', sans-serif; }
+.btn-cancel { padding: 11px 16px; background: transparent; border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; color: rgba(255,255,255,0.4); font-size: 14px; cursor: pointer; font-family: 'Inter', sans-serif; }
 
-/* TOAST */
-.toast { position: fixed; bottom: 20px; right: 20px; padding: 11px 18px; border-radius: 8px; font-size: 13px; font-weight: 500; color: #fff; z-index: 999; animation: slideUp 0.25s ease; box-shadow: 0 6px 24px rgba(0,0,0,0.4); }
+.empty { text-align: center; padding: 48px 20px; color: rgba(255,255,255,0.3); }
+.empty-icon { font-size: 36px; margin-bottom: 12px; }
+.loading { text-align: center; padding: 40px; color: rgba(255,255,255,0.3); font-size: 13px; }
+
+.toast { position: fixed; bottom: 20px; right: 20px; padding: 11px 18px; border-radius: 8px; font-size: 13px; font-weight: 500; color: #fff; z-index: 999; animation: slideUp 0.25s ease; }
 .toast-success { background: #27AE60; }
 .toast-info { background: #2980B9; }
+.toast-error { background: #E74C3C; }
 @keyframes slideUp { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:translateY(0)} }
-
-.empty-feed { text-align: center; padding: 48px 20px; color: rgba(255,255,255,0.3); }
-.empty-feed div { font-size: 40px; margin-bottom: 12px; }
-.empty-feed p { font-size: 14px; }
 </style>
 </head>
 <body>
 
-<!-- NAV -->
 <nav class="topnav">
   <a href="../index.html" class="nav-logo">Analytica<span>.</span></a>
-  <div class="nav-right">
+  <div class="nav-right" id="topnav-right">
     <a href="../auth/login.html" class="btn btn-ghost">Log In</a>
     <a href="../auth/signup.html" class="btn btn-primary">Join Free</a>
   </div>
 </nav>
 
-<div class="page">
-
-  <!-- LEFT SIDEBAR -->
-  <div class="left-sidebar">
-    <div class="sidebar-box">
-      <div class="sidebar-title">Categories</div>
-      <ul class="category-list" id="cat-list">
-        <li class="category-item active" onclick="filterCategory('all', this)"><span class="cat-name">🌐 All Posts</span><span class="cat-count">1.2K</span></li>
-        <li class="category-item" onclick="filterCategory('web', this)"><span class="cat-name">💻 Web Dev</span><span class="cat-count">340</span></li>
-        <li class="category-item" onclick="filterCategory('ai', this)"><span class="cat-name">🤖 AI / ML</span><span class="cat-count">218</span></li>
-        <li class="category-item" onclick="filterCategory('python', this)"><span class="cat-name">🐍 Python</span><span class="cat-count">196</span></li>
-        <li class="category-item" onclick="filterCategory('mobile', this)"><span class="cat-name">📱 Mobile</span><span class="cat-count">142</span></li>
-        <li class="category-item" onclick="filterCategory('career', this)"><span class="cat-name">💼 Career</span><span class="cat-count">284</span></li>
-        <li class="category-item" onclick="filterCategory('devops', this)"><span class="cat-name">⚙️ DevOps</span><span class="cat-count">98</span></li>
-        <li class="category-item" onclick="filterCategory('general', this)"><span class="cat-name">💬 General</span><span class="cat-count">164</span></li>
-      </ul>
-    </div>
-    <div class="sidebar-box">
-      <div class="sidebar-title">Online Now</div>
-      <div class="online-list" id="online-list"></div>
-    </div>
-  </div>
-
-  <!-- MAIN FEED -->
-  <div class="feed">
-    <div class="feed-topbar">
-      <h1>Community</h1>
-      <button class="btn-post" onclick="openModal()">+ New Post</button>
-    </div>
-
-    <div class="stats-row">
-      <div class="stat-chip"><div class="stat-chip-num">12.4K</div><div class="stat-chip-label">Members</div></div>
-      <div class="stat-chip"><div class="stat-chip-num">1,240</div><div class="stat-chip-label">Posts</div></div>
-      <div class="stat-chip"><div class="stat-chip-num">312</div><div class="stat-chip-label">Online</div></div>
-      <div class="stat-chip"><div class="stat-chip-num">4,800</div><div class="stat-chip-label">Replies</div></div>
-    </div>
-
-    <div class="compose-box" onclick="openModal()">
-      <div class="compose-avatar">✏️</div>
-      <div class="compose-placeholder">Share something with the community...</div>
-    </div>
-
-    <div class="filter-bar">
-      <input class="search-input" type="text" placeholder="🔍  Search posts..." oninput="searchPosts(this.value)" id="search-input">
-      <button class="filter-pill active" onclick="setSort('latest', this)">Latest</button>
-      <button class="filter-pill" onclick="setSort('top', this)">Top</button>
-      <button class="filter-pill" onclick="setSort('unanswered', this)">Unanswered</button>
-    </div>
-
-    <div id="feed-list"></div>
-  </div>
-
-  <!-- RIGHT SIDEBAR -->
-  <div class="right-sidebar">
-    <div class="sidebar-box">
-      <div class="sidebar-title">Trending Tags</div>
-      <div class="trending-list" id="trending-list"></div>
-    </div>
-    <div class="sidebar-box" style="margin-top:12px;">
-      <div class="sidebar-title">Community Rules</div>
-      <ul class="rules-list">
-        <li>Be respectful to everyone</li>
-        <li>No spam or self-promotion</li>
-        <li>Search before posting</li>
-        <li>Tag your posts correctly</li>
-        <li>Help others when you can</li>
-      </ul>
-    </div>
-  </div>
-
-</div>
-
 <!-- POST MODAL -->
 <div class="modal-bg" id="modal-bg" onclick="closeModalOutside(event)">
   <div class="modal">
-    <h2>New Post</h2>
-    <p class="modal-sub">Ask a question, share a resource or start a discussion</p>
+    <div class="modal-title">New Post</div>
     <div class="form-group">
       <label class="form-label">Title *</label>
       <input class="form-input" type="text" id="post-title" placeholder="What's your question or topic?">
@@ -262,211 +174,435 @@ a { text-decoration: none; color: inherit; }
     </div>
     <div class="form-group">
       <label class="form-label">Details</label>
-      <textarea class="form-textarea" id="post-body" placeholder="Describe your question or share your thoughts in detail..."></textarea>
+      <textarea class="form-textarea" id="post-body" placeholder="Describe your question or share your thoughts..."></textarea>
     </div>
     <div class="form-group">
       <label class="form-label">Tags (comma separated)</label>
       <input class="form-input" type="text" id="post-tags" placeholder="e.g. React, API, beginner">
     </div>
     <div class="modal-actions">
-      <button class="btn-modal-post" onclick="submitPost()">Post to Community</button>
-      <button class="btn-modal-cancel" onclick="closeModal()">Cancel</button>
+      <button class="btn-post-submit" onclick="submitPost()">Post to Community</button>
+      <button class="btn-cancel" onclick="closeModal()">Cancel</button>
     </div>
   </div>
 </div>
 
+<div class="page">
+
+  <!-- LEFT SIDEBAR -->
+  <div class="left-sidebar">
+    <div class="sidebar-box">
+      <div class="sidebar-title">Categories</div>
+      <div class="cat-item active" onclick="setCategory('all', this)"><span class="cat-name">🌐 All Posts</span><span class="cat-count" id="count-all">0</span></div>
+      <div class="cat-item" onclick="setCategory('web', this)"><span class="cat-name">💻 Web Dev</span><span class="cat-count" id="count-web">0</span></div>
+      <div class="cat-item" onclick="setCategory('ai', this)"><span class="cat-name">🤖 AI / ML</span><span class="cat-count" id="count-ai">0</span></div>
+      <div class="cat-item" onclick="setCategory('python', this)"><span class="cat-name">🐍 Python</span><span class="cat-count" id="count-python">0</span></div>
+      <div class="cat-item" onclick="setCategory('mobile', this)"><span class="cat-name">📱 Mobile</span><span class="cat-count" id="count-mobile">0</span></div>
+      <div class="cat-item" onclick="setCategory('career', this)"><span class="cat-name">💼 Career</span><span class="cat-count" id="count-career">0</span></div>
+      <div class="cat-item" onclick="setCategory('devops', this)"><span class="cat-name">⚙️ DevOps</span><span class="cat-count" id="count-devops">0</span></div>
+      <div class="cat-item" onclick="setCategory('general', this)"><span class="cat-name">💬 General</span><span class="cat-count" id="count-general">0</span></div>
+    </div>
+    <div class="sidebar-box" id="online-box">
+      <div class="sidebar-title">Recent Members</div>
+      <div id="online-list"></div>
+    </div>
+  </div>
+
+  <!-- MAIN FEED -->
+  <div class="feed" id="feed-section">
+    <div class="feed-topbar">
+      <h1>Community</h1>
+      <button class="btn-post" onclick="openModal()">+ New Post</button>
+    </div>
+
+    <div class="stats-row">
+      <div class="stat-chip"><div class="stat-num" id="stat-posts">0</div><div class="stat-label">Posts</div></div>
+      <div class="stat-chip"><div class="stat-num" id="stat-members">0</div><div class="stat-label">Members</div></div>
+      <div class="stat-chip"><div class="stat-num" id="stat-replies">0</div><div class="stat-label">Replies</div></div>
+    </div>
+
+    <div class="compose-box" onclick="openModal()">
+      <div class="compose-av" id="compose-av">✏️</div>
+      <div class="compose-placeholder">Share something with the community...</div>
+    </div>
+
+    <div class="filter-bar">
+      <input class="search-input" type="text" placeholder="🔍 Search posts..." oninput="searchPosts(this.value)" id="search-input">
+      <button class="filter-pill active" onclick="setSort('latest', this)">Latest</button>
+      <button class="filter-pill" onclick="setSort('top', this)">Top</button>
+      <button class="filter-pill" onclick="setSort('unanswered', this)">Unanswered</button>
+    </div>
+
+    <div id="feed-list"><div class="loading">Loading posts...</div></div>
+  </div>
+
+  <!-- POST DETAIL -->
+  <div id="detail-section" style="display:none;">
+    <button class="back-btn" onclick="showFeed()">← Back to Community</button>
+    <div id="detail-content"></div>
+    <div id="replies-list"></div>
+    <div class="reply-input-wrap" id="reply-wrap" style="display:none;">
+      <input class="reply-input" type="text" id="reply-input" placeholder="Write a reply..." onkeydown="if(event.key==='Enter') submitReply()">
+      <button class="btn-reply" onclick="submitReply()">Reply →</button>
+    </div>
+  </div>
+
+  <!-- RIGHT SIDEBAR -->
+  <div class="right-sidebar">
+    <div class="sidebar-box">
+      <div class="sidebar-title">Trending Tags</div>
+      <div id="trending-list"></div>
+    </div>
+    <div class="sidebar-box" style="margin-top:12px;">
+      <div class="sidebar-title">Community Rules</div>
+      <div style="font-size:12px;color:rgba(255,255,255,0.4);line-height:1.8;">
+        → Be respectful<br>
+        → No spam<br>
+        → Search before posting<br>
+        → Tag correctly<br>
+        → Help others
+      </div>
+    </div>
+  </div>
+
+</div>
+
 <script src="../js/supabase.js"></script>
 <script>
+let allPosts = []
+let currentCategory = 'all'
+let currentSort = 'latest'
+let currentSearch = ''
+let currentUser = null
+let currentPostId = null
 
-const POSTS = [
-  { id:1, author:'Adaeze O.', init:'AO', role:'Frontend Dev · Nigeria', time:'2m ago', category:'web', title:'How do I center a div vertically AND horizontally in 2026?', preview:'I know this is a classic question but I keep forgetting the cleanest way to do it. Flexbox? Grid? What do you all prefer these days?', tags:['CSS','Flexbox','Grid'], likes:42, replies:18, bookmarked:false, liked:false, pinned:true, answered:true },
-  { id:2, author:'Kofi M.', init:'KM', role:'Data Scientist · Ghana', time:'14m ago', category:'ai', title:'Best free resources to learn LLMs from scratch in 2026?', preview:'I have a solid Python background and want to get into large language models. Where should I start? Looking for courses, papers or GitHub repos.', tags:['LLMs','Python','AI'], likes:38, replies:12, bookmarked:false, liked:false, pinned:false, answered:false },
-  { id:3, author:'James L.', init:'JL', role:'Backend Dev · UK', time:'1h ago', category:'career', title:'Got my first $100K offer — here\'s what helped me get there', preview:'After 2 years of grinding, I finally landed a six-figure remote role. I want to share exactly what I did differently in the last 6 months.', tags:['Career','Salary','Remote'], likes:94, replies:31, bookmarked:false, liked:false, pinned:false, answered:true },
-  { id:4, author:'Priya S.', init:'PS', role:'Full Stack · India', time:'2h ago', category:'web', title:'Next.js 16 vs Remix — which should I pick for a new project?', preview:'Starting a new SaaS project and torn between Next.js and Remix. Anyone switched between the two recently? What were your pain points?', tags:['Next.js','Remix','React'], likes:27, replies:9, bookmarked:false, liked:false, pinned:false, answered:false },
-  { id:5, author:'Fatima M.', init:'FM', role:'Mobile Dev · Kenya', time:'3h ago', category:'mobile', title:'Flutter vs React Native in 2026 — honest comparison after building both', preview:'I have now shipped 3 apps in Flutter and 2 in React Native. Here is my completely honest take on performance, DX and which to choose.', tags:['Flutter','React Native','Mobile'], likes:61, replies:24, bookmarked:false, liked:false, pinned:false, answered:true },
-  { id:6, author:'David C.', init:'DC', role:'DevOps · Canada', time:'5h ago', category:'devops', title:'My Kubernetes setup for a 50K user SaaS — full breakdown', preview:'Sharing my entire K8s configuration that handles 50K daily active users on a $300/month infra budget. Includes auto-scaling, monitoring and CI/CD.', tags:['Kubernetes','DevOps','AWS'], likes:83, replies:19, bookmarked:false, liked:false, pinned:false, answered:true },
-  { id:7, author:'Omar B.', init:'OB', role:'Student · Morocco', time:'8h ago', category:'career', title:'Is it worth doing a CS degree in 2026 or just self-teach?', preview:'I have an offer from a university but I am also making progress self-teaching online. I want honest opinions from people who have been through both paths.', tags:['Career','Education','Advice'], likes:56, replies:44, bookmarked:false, liked:false, pinned:false, answered:false },
-  { id:8, author:'Sofia R.', init:'SR', role:'AI Engineer · Brazil', time:'12h ago', category:'python', title:'How I reduced my ML model inference time by 70% — tips inside', preview:'After weeks of profiling and optimizing, I got our production model from 800ms to 240ms per request. Here are the 5 techniques that made the biggest difference.', tags:['Python','ML','Performance'], likes:77, replies:15, bookmarked:false, liked:false, pinned:false, answered:true },
-];
-
-const TRENDING = [
-  { tag:'#React', count:'142 posts' },
-  { tag:'#Python', count:'118 posts' },
-  { tag:'#Career', count:'96 posts' },
-  { tag:'#AI', count:'88 posts' },
-  { tag:'#RemoteJobs', count:'74 posts' },
-  { tag:'#Flutter', count:'62 posts' },
-];
-
-const ONLINE = [
-  { init:'AO', name:'Adaeze O.', role:'Frontend Dev' },
-  { init:'KM', name:'Kofi M.', role:'Data Scientist' },
-  { init:'JL', name:'James L.', role:'Backend Dev' },
-  { init:'PS', name:'Priya S.', role:'Full Stack' },
-  { init:'DC', name:'David C.', role:'DevOps' },
-];
-
-let posts = [...POSTS];
-let currentCategory = 'all';
-let currentSearch = '';
-let currentSort = 'latest';
-
-function getCatClass(cat) {
-  return { web:'cat-web', ai:'cat-ai', career:'cat-career', python:'cat-python', mobile:'cat-mobile', devops:'cat-devops', general:'cat-general' }[cat] || 'cat-general';
+const CAT_COLORS = {
+  web:'cat-web', ai:'cat-ai', career:'cat-career',
+  python:'cat-python', general:'cat-general', mobile:'cat-mobile', devops:'cat-devops'
 }
-function getCatLabel(cat) {
-  return { web:'Web Dev', ai:'AI / ML', career:'Career', python:'Python', mobile:'Mobile', devops:'DevOps', general:'General' }[cat] || 'General';
+const CAT_LABELS = {
+  web:'Web Dev', ai:'AI / ML', career:'Career',
+  python:'Python', general:'General', mobile:'Mobile', devops:'DevOps'
 }
 
-function renderFeed() {
-  let list = posts.filter(p => {
-    const matchCat = currentCategory === 'all' || p.category === currentCategory;
-    const matchSearch = !currentSearch || p.title.toLowerCase().includes(currentSearch) || p.tags.some(t => t.toLowerCase().includes(currentSearch));
-    const matchSort = currentSort !== 'unanswered' || !p.answered;
-    return matchCat && matchSearch && matchSort;
-  });
+function timeAgo(dateStr) {
+  const diff = Date.now() - new Date(dateStr).getTime()
+  const mins = Math.floor(diff / 60000)
+  if (mins < 1) return 'Just now'
+  if (mins < 60) return `${mins}m ago`
+  const hrs = Math.floor(mins / 60)
+  if (hrs < 24) return `${hrs}h ago`
+  return `${Math.floor(hrs / 24)}d ago`
+}
 
-  if (currentSort === 'top') list = [...list].sort((a,b) => b.likes - a.likes);
+async function init() {
+  const { data: { session } } = await db.auth.getSession()
+  currentUser = session?.user || null
 
-  const feed = document.getElementById('feed-list');
-  if (!list.length) {
-    feed.innerHTML = `<div class="empty-feed"><div>💬</div><p>No posts found. Be the first to post!</p></div>`;
-    return;
+  if (currentUser) {
+    const meta = currentUser.user_metadata || {}
+    const initial = (meta.first_name || currentUser.email)[0].toUpperCase()
+    const av = document.getElementById('compose-av')
+    if (meta.avatar_url) {
+      av.innerHTML = `<img src="${meta.avatar_url}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`
+    } else {
+      av.textContent = initial
+      av.style.background = 'linear-gradient(135deg,#F5A623,#e8920f)'
+      av.style.color = '#0A1628'
+      av.style.fontWeight = '800'
+      av.style.borderRadius = '50%'
+    }
   }
 
-  feed.innerHTML = list.map(p => `
-    <div class="post-card ${p.pinned ? 'pinned' : ''}" onclick="openPost(${p.id})">
-      <div class="post-top">
-        <div class="post-avatar">${p.init}</div>
-        <div class="post-meta">
-          <div class="post-author-row">
-            <span class="post-author">${p.author}</span>
-            <span class="post-role">${p.role}</span>
-            ${p.pinned ? '<span class="pinned-label">📌 Pinned</span>' : ''}
-            <span class="post-time">${p.time}</span>
+  await loadPosts()
+  await loadStats()
+  await loadRecentMembers()
+}
+
+async function loadPosts() {
+  const { data, error } = await db
+    .from('posts')
+    .select('*')
+    .order('is_pinned', { ascending: false })
+    .order('created_at', { ascending: false })
+
+  if (error) { showToast('Failed to load posts', 'error'); return }
+  allPosts = data || []
+  updateCategoryCounts()
+  renderPosts()
+  renderTrending()
+}
+
+async function loadStats() {
+  const { count: postCount } = await db.from('posts').select('*', { count: 'exact', head: true })
+  const { count: replyCount } = await db.from('post_replies').select('*', { count: 'exact', head: true })
+  const { count: memberCount } = await db.from('user_profiles').select('*', { count: 'exact', head: true })
+  document.getElementById('stat-posts').textContent = postCount || 0
+  document.getElementById('stat-replies').textContent = replyCount || 0
+  document.getElementById('stat-members').textContent = memberCount || 0
+}
+
+async function loadRecentMembers() {
+  const { data } = await db.from('user_profiles').select('full_name, email').order('created_at', { ascending: false }).limit(5)
+  if (!data) return
+  document.getElementById('online-list').innerHTML = data.map(u => {
+    const name = u.full_name || u.email?.split('@')[0] || 'Member'
+    const initial = name[0].toUpperCase()
+    return `<div class="online-item">
+      <div class="o-av">${initial}<div class="o-dot"></div></div>
+      <div><div class="o-name">${name}</div><div class="o-role">Member</div></div>
+    </div>`
+  }).join('')
+}
+
+function updateCategoryCounts() {
+  const cats = ['all','web','ai','python','mobile','career','devops','general']
+  cats.forEach(cat => {
+    const el = document.getElementById(`count-${cat}`)
+    if (el) el.textContent = cat === 'all' ? allPosts.length : allPosts.filter(p => p.category === cat).length
+  })
+}
+
+function renderPosts() {
+  let list = allPosts.filter(p => {
+    const matchCat = currentCategory === 'all' || p.category === currentCategory
+    const matchSearch = !currentSearch || p.title.toLowerCase().includes(currentSearch) || (p.body || '').toLowerCase().includes(currentSearch)
+    const matchSort = currentSort !== 'unanswered' || p.replies_count === 0
+    return matchCat && matchSearch && matchSort
+  })
+  if (currentSort === 'top') list = [...list].sort((a, b) => b.likes - a.likes)
+
+  const feed = document.getElementById('feed-list')
+  if (!list.length) {
+    feed.innerHTML = `<div class="empty"><div class="empty-icon">💬</div><p>No posts found. Be the first to post!</p></div>`
+    return
+  }
+
+  feed.innerHTML = list.map(p => {
+    const initial = (p.author_name || p.author_email || 'U')[0].toUpperCase()
+    const tags = Array.isArray(p.tags) ? p.tags : []
+    return `
+      <div class="post-card ${p.is_pinned ? 'pinned' : ''}" onclick="openPost(${p.id})">
+        <div class="post-top">
+          <div class="post-av">${initial}</div>
+          <div class="post-meta">
+            <div class="post-author-row">
+              <span class="post-author">${p.author_name || 'Member'}</span>
+              ${p.is_pinned ? '<span class="pinned-tag">📌 Pinned</span>' : ''}
+              <span class="post-time">${timeAgo(p.created_at)}</span>
+            </div>
+            <span class="post-cat ${CAT_COLORS[p.category] || 'cat-general'}">${CAT_LABELS[p.category] || 'General'}</span>
           </div>
-          <span class="post-category ${getCatClass(p.category)}">${getCatLabel(p.category)}</span>
         </div>
-      </div>
-      <div class="post-title">${p.title}</div>
-      <div class="post-preview">${p.preview}</div>
-      <div class="post-tags">${p.tags.map(t => `<span class="post-tag">#${t}</span>`).join('')}</div>
-      <div class="post-footer">
-        <button class="post-action ${p.liked ? 'liked' : ''}" onclick="toggleLike(${p.id}, event)">
-          ${p.liked ? '❤️' : '🤍'} ${p.likes}
-        </button>
-        <button class="post-action" onclick="openPost(${p.id})">💬 ${p.replies} replies</button>
-        <button class="post-action ${p.bookmarked ? 'bookmarked' : ''}" onclick="toggleBookmark(${p.id}, event)">
-          ${p.bookmarked ? '🔖' : '🏷️'} Save
-        </button>
-        <span class="post-answers ${p.answered ? 'has-answer' : ''}">
-          ${p.answered ? '✓ Answered' : '○ Needs answer'}
-        </span>
-      </div>
-    </div>`).join('');
+        <div class="post-title">${p.title}</div>
+        ${p.body ? `<div class="post-body">${p.body}</div>` : ''}
+        ${tags.length ? `<div class="post-tags">${tags.map(t => `<span class="post-tag">#${t}</span>`).join('')}</div>` : ''}
+        <div class="post-footer">
+          <button class="post-action" onclick="likePost(${p.id}, event)">❤️ ${p.likes}</button>
+          <button class="post-action" onclick="openPost(${p.id})">💬 ${p.replies_count} replies</button>
+        </div>
+      </div>`
+  }).join('')
 }
 
-function renderSidebars() {
-  document.getElementById('trending-list').innerHTML = TRENDING.map((t,i) => `
-    <div class="trending-item" onclick="searchPosts('${t.tag.slice(1)}')">
-      <div class="trending-num">#${i+1}</div>
-      <div class="trending-tag">${t.tag}</div>
-      <div class="trending-count">${t.count}</div>
-    </div>`).join('');
-
-  document.getElementById('online-list').innerHTML = ONLINE.map(u => `
-    <div class="online-user">
-      <div class="o-avatar">${u.init}<div class="o-dot"></div></div>
-      <div><div class="o-name">${u.name}</div><div class="o-role">${u.role}</div></div>
-    </div>`).join('');
+function renderTrending() {
+  const tagMap = {}
+  allPosts.forEach(p => {
+    const tags = Array.isArray(p.tags) ? p.tags : []
+    tags.forEach(t => { tagMap[t] = (tagMap[t] || 0) + 1 })
+  })
+  const sorted = Object.entries(tagMap).sort((a, b) => b[1] - a[1]).slice(0, 6)
+  document.getElementById('trending-list').innerHTML = sorted.length
+    ? sorted.map(([tag, count]) => `
+        <div class="trending-item" onclick="searchPosts('${tag}')">
+          <div class="trending-tag">#${tag}</div>
+          <div class="trending-count">${count} post${count !== 1 ? 's' : ''}</div>
+        </div>`).join('')
+    : '<div style="font-size:12px;color:rgba(255,255,255,0.2);">No tags yet</div>'
 }
 
-function filterCategory(cat, el) {
-  currentCategory = cat;
-  document.querySelectorAll('.category-item').forEach(i => i.classList.remove('active'));
-  el.classList.add('active');
-  renderFeed();
+function setCategory(cat, el) {
+  currentCategory = cat
+  document.querySelectorAll('.cat-item').forEach(i => i.classList.remove('active'))
+  el.classList.add('active')
+  renderPosts()
 }
 
 function setSort(sort, btn) {
-  currentSort = sort;
-  document.querySelectorAll('.filter-pill').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
-  renderFeed();
+  currentSort = sort
+  document.querySelectorAll('.filter-pill').forEach(b => b.classList.remove('active'))
+  btn.classList.add('active')
+  renderPosts()
 }
 
 function searchPosts(val) {
-  currentSearch = val.toLowerCase().replace('#','');
-  document.getElementById('search-input').value = val;
-  renderFeed();
+  currentSearch = val.toLowerCase().replace('#', '')
+  document.getElementById('search-input').value = val
+  renderPosts()
 }
 
-function toggleLike(id, e) {
-  e.stopPropagation();
-  const p = posts.find(p => p.id === id);
-  if (!p) return;
-  p.liked = !p.liked;
-  p.likes += p.liked ? 1 : -1;
-  renderFeed();
+async function likePost(id, e) {
+  e.stopPropagation()
+  if (!currentUser) { showToast('Log in to like posts', 'info'); return }
+
+  const { data: existing } = await db.from('post_likes').select('id').eq('post_id', id).eq('user_id', currentUser.id).single()
+
+  if (existing) {
+    await db.from('post_likes').delete().eq('post_id', id).eq('user_id', currentUser.id)
+    await db.from('posts').update({ likes: allPosts.find(p => p.id === id).likes - 1 }).eq('id', id)
+  } else {
+    await db.from('post_likes').insert({ post_id: id, user_id: currentUser.id })
+    await db.from('posts').update({ likes: allPosts.find(p => p.id === id).likes + 1 }).eq('id', id)
+  }
+  await loadPosts()
 }
 
-function toggleBookmark(id, e) {
-  e.stopPropagation();
-  const p = posts.find(p => p.id === id);
-  if (!p) return;
-  p.bookmarked = !p.bookmarked;
-  showToast(p.bookmarked ? '🔖 Post saved!' : 'Bookmark removed', p.bookmarked ? 'success' : 'info');
-  renderFeed();
+async function openPost(id) {
+  currentPostId = id
+  const post = allPosts.find(p => p.id === id)
+  if (!post) return
+
+  document.getElementById('feed-section').style.display = 'none'
+  document.getElementById('detail-section').style.display = 'block'
+
+  const initial = (post.author_name || 'U')[0].toUpperCase()
+  const tags = Array.isArray(post.tags) ? post.tags : []
+
+  document.getElementById('detail-content').innerHTML = `
+    <div class="post-detail">
+      <div class="post-top">
+        <div class="post-av">${initial}</div>
+        <div class="post-meta">
+          <div class="post-author-row">
+            <span class="post-author">${post.author_name || 'Member'}</span>
+            <span class="post-time">${timeAgo(post.created_at)}</span>
+          </div>
+          <span class="post-cat ${CAT_COLORS[post.category] || 'cat-general'}">${CAT_LABELS[post.category] || 'General'}</span>
+        </div>
+      </div>
+      <div class="post-title" style="font-size:18px;margin-bottom:10px;">${post.title}</div>
+      ${post.body ? `<div style="font-size:14px;color:rgba(255,255,255,0.6);line-height:1.75;margin-bottom:12px;">${post.body}</div>` : ''}
+      ${tags.length ? `<div class="post-tags">${tags.map(t => `<span class="post-tag">#${t}</span>`).join('')}</div>` : ''}
+      <div class="post-footer" style="margin-top:12px;">
+        <button class="post-action" onclick="likePost(${post.id}, event)">❤️ ${post.likes}</button>
+        <span style="font-size:12px;color:rgba(255,255,255,0.25);">${post.replies_count} replies</span>
+      </div>
+    </div>`
+
+  await loadReplies(id)
+
+  if (currentUser) {
+    document.getElementById('reply-wrap').style.display = 'flex'
+  }
 }
 
-function openPost(id) {
-  showToast('💬 Full post view coming soon!', 'info');
+async function loadReplies(postId) {
+  const { data } = await db.from('post_replies').select('*').eq('post_id', postId).order('created_at', { ascending: true })
+  const list = document.getElementById('replies-list')
+  if (!data || !data.length) {
+    list.innerHTML = `<div class="empty" style="padding:24px 0;"><div class="empty-icon" style="font-size:28px;">💬</div><p style="font-size:13px;">No replies yet — be the first!</p></div>`
+    return
+  }
+  list.innerHTML = data.map(r => {
+    const initial = (r.author_name || 'U')[0].toUpperCase()
+    return `<div class="reply-item">
+      <div class="post-av" style="width:30px;height:30px;font-size:11px;flex-shrink:0;">${initial}</div>
+      <div>
+        <div class="reply-author">${r.author_name || 'Member'} <span style="font-size:10px;font-weight:400;color:rgba(255,255,255,0.25);">${timeAgo(r.created_at)}</span></div>
+        <div class="reply-body">${r.body}</div>
+      </div>
+    </div>`
+  }).join('')
+}
+
+async function submitReply() {
+  if (!currentUser) { showToast('Log in to reply', 'info'); return }
+  const input = document.getElementById('reply-input')
+  const body = input.value.trim()
+  if (!body) return
+
+  const meta = currentUser.user_metadata || {}
+  const name = meta.full_name || meta.first_name || currentUser.email.split('@')[0]
+
+  const { error } = await db.from('post_replies').insert({
+    post_id: currentPostId,
+    user_id: currentUser.id,
+    author_name: name,
+    body
+  })
+
+  if (error) { showToast('Failed to post reply', 'error'); return }
+
+  await db.from('posts').update({ replies_count: (allPosts.find(p => p.id === currentPostId)?.replies_count || 0) + 1 }).eq('id', currentPostId)
+
+  input.value = ''
+  showToast('Reply posted!', 'success')
+  await loadReplies(currentPostId)
+  await loadPosts()
+}
+
+function showFeed() {
+  document.getElementById('feed-section').style.display = 'block'
+  document.getElementById('detail-section').style.display = 'none'
+  currentPostId = null
 }
 
 function openModal() {
-  document.getElementById('modal-bg').classList.add('open');
-  document.body.style.overflow = 'hidden';
+  if (!currentUser) { window.location.href = '../auth/login.html'; return }
+  document.getElementById('modal-bg').classList.add('open')
+  document.body.style.overflow = 'hidden'
 }
+
 function closeModal() {
-  document.getElementById('modal-bg').classList.remove('open');
-  document.body.style.overflow = '';
+  document.getElementById('modal-bg').classList.remove('open')
+  document.body.style.overflow = ''
 }
+
 function closeModalOutside(e) {
-  if (e.target === document.getElementById('modal-bg')) closeModal();
+  if (e.target === document.getElementById('modal-bg')) closeModal()
 }
 
-function submitPost() {
-  const title = document.getElementById('post-title').value.trim();
-  const body = document.getElementById('post-body').value.trim();
-  const cat = document.getElementById('post-category').value;
-  const tags = document.getElementById('post-tags').value.split(',').map(t => t.trim()).filter(Boolean);
-  if (!title) { showToast('Please add a title', 'info'); return; }
+async function submitPost() {
+  if (!currentUser) return
+  const title = document.getElementById('post-title').value.trim()
+  const body = document.getElementById('post-body').value.trim()
+  const category = document.getElementById('post-category').value
+  const tagsStr = document.getElementById('post-tags').value.trim()
+  const tags = tagsStr ? tagsStr.split(',').map(t => t.trim()).filter(Boolean) : []
 
-  const newPost = {
-    id: Date.now(), author:'You', init:'YO', role:'Community Member',
-    time:'Just now', category: cat, title, preview: body || 'No description added.',
-    tags: tags.length ? tags : ['General'],
-    likes:0, replies:0, bookmarked:false, liked:false, pinned:false, answered:false
-  };
-  posts.unshift(newPost);
-  closeModal();
-  document.getElementById('post-title').value = '';
-  document.getElementById('post-body').value = '';
-  document.getElementById('post-tags').value = '';
-  renderFeed();
-  showToast('🎉 Post published!', 'success');
+  if (!title) { showToast('Please add a title', 'info'); return }
+
+  const meta = currentUser.user_metadata || {}
+  const name = meta.full_name || meta.first_name || currentUser.email.split('@')[0]
+
+  const { error } = await db.from('posts').insert({
+    user_id: currentUser.id,
+    author_name: name,
+    author_email: currentUser.email,
+    title, body, category, tags,
+    likes: 0, replies_count: 0, is_pinned: false
+  })
+
+  if (error) { showToast('Failed to post. Try again.', 'error'); return }
+
+  closeModal()
+  document.getElementById('post-title').value = ''
+  document.getElementById('post-body').value = ''
+  document.getElementById('post-tags').value = ''
+  showToast('🎉 Post published!', 'success')
+  await loadPosts()
+  await loadStats()
 }
 
 function showToast(msg, type = 'success') {
-  const t = document.createElement('div');
-  t.className = `toast toast-${type}`;
-  t.textContent = msg;
-  document.body.appendChild(t);
-  setTimeout(() => t.remove(), 3000);
+  const t = document.createElement('div')
+  t.className = `toast toast-${type}`
+  t.textContent = msg
+  document.body.appendChild(t)
+  setTimeout(() => t.remove(), 3000)
 }
 
-renderFeed();
-renderSidebars();
+init()
 </script>
 </body>
 </html>
